@@ -1,6 +1,8 @@
-<div align="center">
+<div align="center" style="text-align: center">
+  <img src="logo.png" width="33%">
+</div>
 
-![brick](./logo.png)
+<div align="center">
 
 [![travis-ci](https://travis-ci.com/evercyan/brick.svg?branch=master)](https://travis-ci.com/github/evercyan/brick)
 [![codecov](https://codecov.io/gh/evercyan/brick/branch/master/graph/badge.svg)](https://codecov.io/gh/evercyan/brick)
