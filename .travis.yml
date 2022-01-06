@@ -1,0 +1,17 @@
+language: go
+
+go:
+  - "1.17"
+
+branches:
+  only:
+    - master
+
+before_install:
+  - go get -t -v ./...
+
+script:
+  - go test -race -coverprofile=coverage.out -covermode=atomic -gcflags 'all=-N -l' ./...
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
