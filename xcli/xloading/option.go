@@ -3,6 +3,7 @@ package xloading
 // Style 加载样式
 type Style int
 
+// 样式
 const (
 	Style1 Style = iota
 	Style2
@@ -11,6 +12,7 @@ const (
 	Style5
 )
 
+// Elements ...
 func (t Style) Elements() []string {
 	switch t {
 	case Style2:
@@ -33,6 +35,7 @@ func (t Style) Elements() []string {
 // Symbol 结束符号
 type Symbol int
 
+// 符号
 const (
 	Symbol1 Symbol = iota
 	Symbol2
@@ -41,6 +44,7 @@ const (
 	Symbol5
 )
 
+// Elements ...
 func (t Symbol) Elements() []string {
 	switch t {
 	case Symbol2:

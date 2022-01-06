@@ -1,7 +1,9 @@
 package internal
 
+// Symbol 符号
 type Symbol int
 
+// 符号
 const (
 	SymbolNone Symbol = iota
 	SymbolBegin

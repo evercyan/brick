@@ -3,6 +3,7 @@ package xcolor
 // Sty 样式枚举
 type Sty int
 
+// 样式
 const (
 	StyNone         Sty = iota // 默认
 	StyBold                    // 加粗
@@ -49,6 +50,7 @@ func (t Sty) String() string {
 // Fg 前景色枚举 (Basic 30, Hi-Intensity 90)
 type Fg int
 
+// 前景色
 const (
 	FgNone    Fg = iota + 89 // 默认
 	FgBlack                  // 黑色
@@ -92,6 +94,7 @@ func (t Fg) String() string {
 // Bg 背景色枚举 (Basic 40, Hi-Intensity 100)
 type Bg int
 
+// 背景色
 const (
 	BgNone    Bg = iota + 99 // 默认背景
 	BgBlack                  // 黑色背景

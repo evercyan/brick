@@ -9,7 +9,9 @@ import (
 )
 
 type (
-	App         struct{}
+	// App ...
+	App struct{}
+	// CommentInfo ...
 	CommentInfo struct {
 		Field string
 		Type  string
@@ -122,7 +124,7 @@ func (t *App) buildStruct(text string, scene int) (string, error) {
 	}
 	stmt, ok := statement.(*sqlparser.DDL)
 	if !ok || stmt.Action != sqlparser.CreateStr {
-		return "", fmt.Errorf("sql is not a create statment")
+		return "", fmt.Errorf("sql is not a create statement")
 	}
 	// 构造输出
 	builder := strings.Builder{}
