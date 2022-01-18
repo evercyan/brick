@@ -3,6 +3,8 @@ package internal
 var (
 	// FlagJSONUseSnake export json with snake(default camel case)
 	FlagJSONUseSnake bool
+	// FlagComment export comment tag
+	FlagComment bool
 )
 
 // struct scene

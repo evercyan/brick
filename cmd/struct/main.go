@@ -19,6 +19,9 @@ func main() {
 	root.PersistentFlags().BoolVarP(
 		&internal.FlagJSONUseSnake, "snake", "s", false, "JSON field with snake",
 	)
+	root.PersistentFlags().BoolVarP(
+		&internal.FlagComment, "comment", "c", false, "export comment tag",
+	)
 
 	root.Execute()
 }

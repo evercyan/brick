@@ -27,13 +27,13 @@ struct gorm "CREATE TABLE user_info (
 ```go
 // UserInfo ...
 type UserInfo struct {
-	Id	int	`json:"id" gorm:"column:id" comment:""`
-	Name	string	`json:"name" gorm:"column:name" comment:"姓名"`
-	Age	int8	`json:"age" gorm:"column:age" comment:"年龄"`
-	AgeUnit	AgeUnit	`json:"ageUnit" gorm:"column:age_unit" comment:"年龄单位: 0, 岁; 1, 月; 2, 天;"`
-	Gender	Gender	`json:"gender" gorm:"column:gender" comment:"性别: 0, 未知; 1, 男; 2, 女;"`
-	CreateTime	time.Time	`json:"createTime" gorm:"column:create_time" comment:"创建时间"`
-	UpdateTime	time.Time	`json:"updateTime" gorm:"column:update_time" comment:"更新时间"`
+	Id	int	`json:"id" gorm:"column:id"`
+	Name	string	`json:"name" gorm:"column:name"`
+	Age	int8	`json:"age" gorm:"column:age"`
+	AgeUnit	AgeUnit	`json:"ageUnit" gorm:"column:age_unit"`
+	Gender	Gender	`json:"gender" gorm:"column:gender"`
+	CreateTime	time.Time	`json:"createTime" gorm:"column:create_time"`
+	UpdateTime	time.Time	`json:"updateTime" gorm:"column:update_time"`
 }
 
 // AgeUnit 年龄单位

@@ -179,14 +179,24 @@ func (t *App) buildStruct(text string, scene int) (string, error) {
 					toType = toField
 				}
 			}
-			builder.WriteString(fmt.Sprintf(
-				"\t%s\t%s\t`json:\"%s\" gorm:\"column:%s\" comment:\"%s\"`\n",
-				toField,
-				toType,
-				JSONField,
-				field,
-				toComment,
-			))
+			if FlagComment {
+				builder.WriteString(fmt.Sprintf(
+					"\t%s\t%s\t`json:\"%s\" gorm:\"column:%s\" comment:\"%s\"`\n",
+					toField,
+					toType,
+					JSONField,
+					field,
+					toComment,
+				))
+			} else {
+				builder.WriteString(fmt.Sprintf(
+					"\t%s\t%s\t`json:\"%s\" gorm:\"column:%s\"`\n",
+					toField,
+					toType,
+					JSONField,
+					field,
+				))
+			}
 		}
 	}
 	builder.WriteString("}\n")
