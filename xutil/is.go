@@ -139,18 +139,18 @@ func IsJSONObject(elem interface{}) bool {
 	return IsJSONString(string(b))
 }
 
-// InArray ...
-func InArray(elem interface{}, target interface{}) bool {
-	targetValue := reflect.ValueOf(target)
-	switch reflect.TypeOf(target).Kind() {
+// IsContains ...
+func IsContains(src, elem interface{}) bool {
+	srcValue := reflect.ValueOf(src)
+	switch reflect.TypeOf(src).Kind() {
 	case reflect.Slice, reflect.Array:
-		for i := 0; i < targetValue.Len(); i++ {
-			if targetValue.Index(i).Interface() == elem {
+		for i := 0; i < srcValue.Len(); i++ {
+			if srcValue.Index(i).Interface() == elem {
 				return true
 			}
 		}
 	case reflect.Map:
-		return targetValue.MapIndex(reflect.ValueOf(elem)).IsValid()
+		return srcValue.MapIndex(reflect.ValueOf(elem)).IsValid()
 	}
 	return false
 }

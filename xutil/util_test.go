@@ -44,3 +44,9 @@ func TestPretty(t *testing.T) {
 	}
 	assert.NotEmpty(t, Pretty(data))
 }
+
+func TestLen(t *testing.T) {
+	s := "hello 世界"
+	assert.Equal(t, 12, len(s))
+	assert.Equal(t, 8, Len(s))
+}

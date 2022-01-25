@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 // RandNumber ...
@@ -59,4 +60,9 @@ func Replace(elem string, replace map[string]string) string {
 func Pretty(v interface{}) string {
 	out, _ := json.MarshalIndent(v, "", "    ")
 	return string(out)
+}
+
+// Len ..
+func Len(s string) int {
+	return utf8.RuneCountInString(s)
 }

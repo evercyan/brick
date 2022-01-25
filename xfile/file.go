@@ -3,9 +3,12 @@ package xfile
 import (
 	"bufio"
 	"bytes"
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 
@@ -86,7 +89,7 @@ func LineContent(filepath string, numbers ...int) map[int]string {
 	count := len(numbers)
 	fileScanner := bufio.NewScanner(file)
 	for number := 1; fileScanner.Scan(); number++ {
-		if count == 0 || xutil.InArray(number, numbers) {
+		if count == 0 || xutil.IsContains(numbers, number) {
 			res[number] = fileScanner.Text()
 		}
 	}
@@ -122,11 +125,43 @@ func WriteJSON(filepath string, data interface{}) error {
 	return os.WriteFile(filepath, b, 0664)
 }
 
-// ReadJSON Read JSON file data
+// ReadJSON read JSON file data
 func ReadJSON(filepath string, data interface{}) error {
 	b, err := os.ReadFile(filepath)
 	if err != nil {
 		return err
 	}
 	return json.Unmarshal(b, data)
+}
+
+// Md5 file md5
+func Md5(path string) (string, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
+	fi, err := f.Stat()
+	if err != nil {
+		return "", err
+	}
+	var size int64 = 1024 * 1024
+	hash := md5.New()
+	if fi.Size() < size {
+		data, err := ioutil.ReadFile(path)
+		if err != nil {
+			return "", err
+		}
+		hash.Write(data)
+	} else {
+		b := make([]byte, size)
+		for {
+			n, err := f.Read(b)
+			if err != nil {
+				break
+			}
+			hash.Write(b[:n])
+		}
+	}
+	return hex.EncodeToString(hash.Sum(nil)), nil
 }

@@ -2,7 +2,9 @@ package xcrypto
 
 import (
 	"crypto/hmac"
+	"crypto/sha1"
 	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 
 	"github.com/spaolacci/murmur3"
@@ -22,4 +24,11 @@ func HmacSha256(src string, secret string) string {
 	h := hmac.New(sha256.New, []byte(secret))
 	h.Write([]byte(src))
 	return fmt.Sprintf("%x", h.Sum(nil))
+}
+
+// Sha1 ...
+func Sha1(str string) string {
+	hash := sha1.New()
+	hash.Write([]byte(str))
+	return hex.EncodeToString(hash.Sum(nil))
 }
