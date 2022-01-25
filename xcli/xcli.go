@@ -6,8 +6,8 @@ import (
 )
 
 // Exec ...
-func Exec(cmd string) string {
-	b, err := exec.Command("sh", "-c", cmd).Output()
+func Exec(s string) string {
+	b, err := exec.Command("sh", "-c", s).Output()
 	if err != nil {
 		return ""
 	}

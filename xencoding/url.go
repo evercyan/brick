@@ -5,13 +5,13 @@ import (
 )
 
 // URLEncode ...
-func URLEncode(text string) string {
-	return url.QueryEscape(text)
+func URLEncode(s string) string {
+	return url.QueryEscape(s)
 }
 
 // URLDecode ...
-func URLDecode(text string) string {
-	resp, err := url.QueryUnescape(text)
+func URLDecode(s string) string {
+	resp, err := url.QueryUnescape(s)
 	if err != nil {
 		return ""
 	}

@@ -5,12 +5,12 @@ import (
 )
 
 // JSONEncode ...
-func JSONEncode(elem interface{}) string {
-	b, _ := json.Marshal(elem)
+func JSONEncode(v interface{}) string {
+	b, _ := json.Marshal(v)
 	return string(b)
 }
 
 // JSONDecode ...
-func JSONDecode(str string, dst interface{}) error {
-	return json.Unmarshal([]byte(str), dst)
+func JSONDecode(s string, dst interface{}) error {
+	return json.Unmarshal([]byte(s), dst)
 }

@@ -1,41 +1,41 @@
 package xregexp
 
 // HasIP ...
-func HasIP(str string) bool {
-	return HasIPV4(str) || HasIPV6(str)
+func HasIP(s string) bool {
+	return HasIPV4(s) || HasIPV6(s)
 }
 
 // HasIPV4 ...
-func HasIPV4(str string) bool {
-	return has(patternIPV4, str)
+func HasIPV4(s string) bool {
+	return has(patternIPV4, s)
 }
 
 // HasIPV6 ...
-func HasIPV6(str string) bool {
-	return has(patternIPV6, str)
+func HasIPV6(s string) bool {
+	return has(patternIPV6, s)
 }
 
 // HasPhone ...
-func HasPhone(str string) bool {
-	return has(patternPhone, str)
+func HasPhone(s string) bool {
+	return has(patternPhone, s)
 }
 
 // HasEmail ...
-func HasEmail(str string) bool {
-	return has(patternEmail, str)
+func HasEmail(s string) bool {
+	return has(patternEmail, s)
 }
 
 // HasLink ...
-func HasLink(str string) bool {
-	return has(patternLink, str)
+func HasLink(s string) bool {
+	return has(patternLink, s)
 }
 
 // HasDate ...
-func HasDate(str string) bool {
-	return has(patternDate, str)
+func HasDate(s string) bool {
+	return has(patternDate, s)
 }
 
 // HasTime ...
-func HasTime(str string) bool {
-	return has(patternTime, str)
+func HasTime(s string) bool {
+	return has(patternTime, s)
 }

@@ -6,11 +6,11 @@ import (
 )
 
 // ToUint ...
-func ToUint(elem interface{}) uint64 {
-	if elem == nil {
+func ToUint(v interface{}) uint64 {
+	if v == nil {
 		return 0
 	}
-	switch val := elem.(type) {
+	switch val := v.(type) {
 	case int:
 		return uint64(val)
 	case int8:
@@ -55,11 +55,11 @@ func ToUint(elem interface{}) uint64 {
 }
 
 // ToFloat64 ...
-func ToFloat64(elem interface{}) float64 {
-	if elem == nil {
+func ToFloat64(v interface{}) float64 {
+	if v == nil {
 		return 0
 	}
-	switch val := elem.(type) {
+	switch val := v.(type) {
 	case int:
 		return float64(val)
 	case int8:
@@ -104,18 +104,18 @@ func ToFloat64(elem interface{}) float64 {
 }
 
 // ToString ...
-func ToString(elem interface{}) string {
-	return fmt.Sprintf("%v", elem)
+func ToString(v interface{}) string {
+	return fmt.Sprintf("%v", v)
 }
 
 // ToBool ...
-func ToBool(elem interface{}) bool {
-	if elem == nil {
+func ToBool(v interface{}) bool {
+	if v == nil {
 		return false
 	}
-	if v, ok := elem.(bool); ok {
+	if v, ok := v.(bool); ok {
 		return v
 	}
-	v, err := strconv.ParseBool(ToString(elem))
-	return err == nil && v
+	b, err := strconv.ParseBool(ToString(v))
+	return err == nil && b
 }
