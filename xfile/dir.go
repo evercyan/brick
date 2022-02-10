@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
@@ -36,6 +37,7 @@ func ListFiles(dir string, match string, recurse ...bool) []string {
 	if err != nil {
 		return res
 	}
+	re := regexp.MustCompile(match)
 	for _, file := range files {
 		fp := fmt.Sprintf("%s/%s", strings.TrimRight(dir, "/"), file.Name())
 		if file.IsDir() {
@@ -44,7 +46,7 @@ func ListFiles(dir string, match string, recurse ...bool) []string {
 			}
 			continue
 		}
-		if match != "" && !strings.Contains(file.Name(), match) {
+		if match != "" && !re.MatchString(file.Name()) {
 			continue
 		}
 		res = append(res, fp)
