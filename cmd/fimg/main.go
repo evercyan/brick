@@ -5,7 +5,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// grm join -d ~/Downloads/ss
+// grm splicing -d ~/Downloads/ss
 func main() {
 	root := &cobra.Command{
 		Use:     "fimg",
@@ -13,7 +13,7 @@ func main() {
 		Version: "v0.0.1",
 	}
 
-	root.AddCommand(internal.JoinCommand)
+	root.AddCommand(internal.SplicingCommand)
 
 	root.Execute()
 }

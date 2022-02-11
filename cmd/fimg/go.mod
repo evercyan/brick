@@ -8,8 +8,11 @@ require (
 )
 
 require (
+	github.com/barasher/go-exiftool v1.7.0 // indirect
+	github.com/disintegration/imaging v1.6.2 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
+	golang.org/x/image v0.0.0-20210628002857-a66eb6448b8d // indirect
 )
 
 replace github.com/evercyan/brick => ../../
