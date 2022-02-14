@@ -18,7 +18,7 @@ var (
 		Padding:   20,
 		Space:     10,
 		Quality:   100,
-		WaterMark: true,
+		WaterMark: nil,
 	}
 )
 
@@ -28,7 +28,7 @@ type SplicingOption struct {
 	Padding   int         // 上右下左边距
 	Space     int         // 图片间距
 	Quality   int         // 图片质量
-	WaterMark bool        // 水印开关
+	WaterMark image.Image // 水印图片
 }
 
 // WithSplicingColor 背景颜色
@@ -65,8 +65,8 @@ func WithSplicingQuality(v int) func(option *SplicingOption) {
 	}
 }
 
-// WithSplicingWaterMark 水印
-func WithSplicingWaterMark(v bool) func(option *SplicingOption) {
+// WithSplicingWaterMark 图片水印
+func WithSplicingWaterMark(v image.Image) func(option *SplicingOption) {
 	return func(option *SplicingOption) {
 		option.WaterMark = v
 	}
@@ -74,7 +74,7 @@ func WithSplicingWaterMark(v bool) func(option *SplicingOption) {
 
 // ----------------------------------------------------------------
 
-// Splicing ...
+// Splicing 拼接图片
 func Splicing(
 	images []image.Image,
 	row int,
@@ -134,12 +134,6 @@ func Splicing(
 		x0 := opt.Padding + rowIndex*opt.Space + rowIndex*width
 		y0 := opt.Padding + colIndex*opt.Space + colIndex*height
 
-		// TODO debug
-		fmt.Printf(
-			"index: %d, rowIndex: %d, colIndex: %d, point: (%d, %d)\n",
-			index, rowIndex, colIndex, x0, y0,
-		)
-
 		// 将原图重置大小
 		resizeImg := Resize(img, width, height)
 
@@ -157,5 +151,17 @@ func Splicing(
 			draw.Over,
 		)
 	}
+
+	// 水印
+	if opt.WaterMark != nil {
+		wmWidth := totalWidth * 3 / 10
+		wmHeight := opt.WaterMark.Bounds().Dy() * wmWidth / opt.WaterMark.Bounds().Dx()
+		wmImg := Resize(opt.WaterMark, wmWidth, wmHeight)
+		return WaterMarkImage(dstImg, wmImg, image.Point{
+			X: totalWidth - wmWidth,
+			Y: totalHeight - wmHeight,
+		}), nil
+	}
+
 	return dstImg, nil
 }

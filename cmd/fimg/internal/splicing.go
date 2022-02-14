@@ -1,9 +1,10 @@
 package internal
 
 import (
+	"bytes"
+	"embed"
+	"fmt"
 	"image"
-	"image/png"
-	"os"
 	"regexp"
 	"sort"
 
@@ -13,6 +14,10 @@ import (
 	"github.com/evercyan/brick/ximage"
 	"github.com/spf13/cobra"
 )
+
+// files 水印图片
+//go:embed splicing_logo.png
+var files embed.FS
 
 var (
 	ImageRegex  = `(\d+)\.(jpg|jpeg|png)$` // 图片匹配规则
@@ -37,22 +42,22 @@ var (
 		Short: "拼接图片",
 		Run: func(cmd *cobra.Command, args []string) {
 			if SplicingImageDir == "" {
-				xcolor.Fail("图片路径为空:", "e.g. fimg join /tmp/xxx")
+				xcolor.Fail("Error:", "图片目录不能为空")
 				return
 			}
 			if !xfile.IsExist(SplicingImageDir) {
-				xcolor.Fail("图片路径无效:", SplicingImageDir)
+				xcolor.Fail("Error:", "图片目录不存在")
 				return
 			}
 			fileList := xfile.ListFiles(SplicingImageDir, ImageRegex)
 			if len(fileList) == 0 {
-				xcolor.Fail("未找到有效的图片文件:", SplicingImageDir)
+				xcolor.Fail("Error:", "目录下图片文件格式需要满足 xxx_数字.(png|jpg|jpeg)")
 				return
 			}
 
-			// 截取文件名中的数字, 进行排序, 方便按序拼接
+			// 取文件名中的数字, 进行排序, 按序拼接
+			imageNums := make([]int, 0)
 			imageMap := make(map[int]string)
-			nums := make([]int, 0)
 			re := regexp.MustCompile(ImageRegex)
 			for _, filePath := range fileList {
 				matchs := re.FindStringSubmatch(filePath)
@@ -64,12 +69,11 @@ var (
 					continue
 				}
 				imageMap[num] = filePath
-				nums = append(nums, num)
+				imageNums = append(imageNums, num)
 			}
-			sort.Ints(nums)
-
+			sort.Ints(imageNums)
 			images := make([]image.Image, 0)
-			for _, num := range nums {
+			for _, num := range imageNums {
 				img, _, err := ximage.Parse(imageMap[num])
 				if err != nil {
 					continue
@@ -78,29 +82,38 @@ var (
 			}
 
 			// 拼接图片
+			options := []func(option *ximage.SplicingOption){
+				ximage.WithSplicingColor(SplicingColor),     // 颜色
+				ximage.WithSplicingPadding(SplicingPadding), // 边距
+				ximage.WithSplicingSpace(SplicingSpace),     // 间距
+				ximage.WithSplicingQuality(SplicingQuality), // 质量
+			}
+			// 水印
+			if SplicingWaterMark {
+				b, err := files.ReadFile("splicing_logo.png")
+				if err == nil {
+					wmImg, _, _ := image.Decode(bytes.NewReader(b))
+					options = append(options, ximage.WithSplicingWaterMark(wmImg))
+				}
+			}
 			dstImg, err := ximage.Splicing(
 				images,
 				SplicingRowCount,
 				SplicingColCount,
-				ximage.WithSplicingColor(SplicingColor),
-				ximage.WithSplicingPadding(SplicingPadding),
-				ximage.WithSplicingSpace(SplicingSpace),
-				ximage.WithSplicingQuality(SplicingQuality),
-				ximage.WithSplicingWaterMark(SplicingWaterMark),
+				options...,
 			)
 			if err != nil {
-				xcolor.Fail("拼接图片失败:", err.Error())
+				xcolor.Fail("Error:", err.Error())
 				return
 			}
 
 			// 保存图片
-			file, _ := os.Create(ImageOutput)
-			defer file.Close()
-			if err := png.Encode(file, dstImg); err != nil {
-				xcolor.Fail("拼接图片失败:", err.Error())
+			if err := ximage.Write(ImageOutput, dstImg); err != nil {
+				xcolor.Fail("Error:", err.Error())
 				return
 			}
-			xcolor.Success("拼接图片成功:", ImageOutput)
+
+			xcolor.Success("🍺🍺🍺:", fmt.Sprintf("点击打开 %s", ImageOutput))
 		},
 	}
 )
@@ -109,10 +122,16 @@ func init() {
 	flags := SplicingCommand.PersistentFlags()
 	flags.IntVarP(&SplicingRowCount, "row", "", 2, "图片行数")
 	flags.IntVarP(&SplicingColCount, "col", "", 2, "图片列数")
-	flags.StringVarP(&SplicingColor, "color", "", "#ffffff", "背景颜色")
+	flags.StringVarP(&SplicingColor, "color", "", "ffffff", "背景颜色")
 	flags.IntVarP(&SplicingPadding, "padding", "", 20, "图片边距")
 	flags.IntVarP(&SplicingSpace, "space", "", 10, "图片间距")
 	flags.IntVarP(&SplicingQuality, "quality", "", 100, "图片质量: 取值范围 1-100")
-	flags.BoolVarP(&SplicingWaterMark, "watermark", "w", true, "图片水印")
-	flags.StringVarP(&SplicingImageDir, "image dir", "d", "", "图片目录, 图片文件格式需要满足 xxx_数字.(png|jpg|jpeg)")
+	flags.BoolVarP(&SplicingWaterMark, "watermark", "w", false, "图片水印")
+	flags.StringVarP(
+		&SplicingImageDir,
+		"image dir",
+		"d",
+		"",
+		"图片目录, 图片文件格式需要满足 xxx_数字.(png|jpg|jpeg)",
+	)
 }

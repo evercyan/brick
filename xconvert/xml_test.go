@@ -8,13 +8,15 @@ import (
 
 func TestXML2Map(t *testing.T) {
 	str := `<xml>
-				<a>a</a>
-				<c>c</c>
+				<a>a1</a>
+				<b>b1</b>
+				<c><c1>c11</c1></c>
 			</xml>`
 
 	m, err := XML2Map(str)
 
 	assert.Nil(t, err)
-	assert.Equal(t, "a", m["a"])
-	assert.Equal(t, "c", m["c"])
+	assert.Equal(t, "a1", m["a"])
+	assert.Equal(t, "b1", m["b"])
+	assert.Equal(t, "", m["c"])
 }
