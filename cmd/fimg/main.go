@@ -5,15 +5,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// grm splicing -d ~/Downloads/ss
 func main() {
 	root := &cobra.Command{
 		Use:     "fimg",
 		Short:   "fimg: image toolkit",
 		Version: "v0.0.1",
 	}
-
 	root.AddCommand(internal.SplicingCommand)
-
 	root.Execute()
 }

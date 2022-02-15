@@ -43,6 +43,7 @@ var (
 	SplicingCommand = &cobra.Command{
 		Use:   "splicing",
 		Short: "拼接图片",
+		Long:  "目录下图片文件格式需要满足 xxx_数字.(png|jpg|jpeg), 程序会按 `数字` 顺序来依次拼接",
 		Run: func(cmd *cobra.Command, args []string) {
 			if SplicingImageDir == "" {
 				xcolor.Fail("Error:", "图片目录不能为空")
@@ -129,12 +130,12 @@ func init() {
 	flags.IntVarP(&SplicingPadding, "padding", "", 20, "图片边距")
 	flags.IntVarP(&SplicingSpace, "space", "", 10, "图片间距")
 	flags.IntVarP(&SplicingQuality, "quality", "", 100, "图片质量: 取值范围 1-100")
-	flags.BoolVarP(&SplicingWaterMark, "watermark", "w", false, "图片水印")
+	flags.BoolVarP(&SplicingWaterMark, "watermark", "", false, "图片水印")
 	flags.StringVarP(
 		&SplicingImageDir,
-		"image dir",
+		"dir",
 		"d",
 		"",
-		"图片目录, 图片文件格式需要满足 xxx_数字.(png|jpg|jpeg)",
+		"图片目录, 目录下图片文件格式需要满足 xxx_数字.(png|jpg|jpeg)",
 	)
 }
