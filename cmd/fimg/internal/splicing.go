@@ -20,10 +20,13 @@ import (
 var files embed.FS
 
 var (
-	ImageRegex  = `(\d+)\.(jpg|jpeg|png)$` // 图片匹配规则
-	ImageOutput = "./splicing.png"         // 图片输出路径
+	// ImageRegex 图片匹配规则
+	ImageRegex = `(\d+)\.(jpg|jpeg|png)$`
+	// ImageOutput 图片输出路径
+	ImageOutput = "./splicing.png"
 )
 
+// 拼接图片选项
 var (
 	SplicingRowCount  int    // 行数
 	SplicingColCount  int    // 列数

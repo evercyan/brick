@@ -3,7 +3,7 @@ package ximage
 import (
 	"fmt"
 	"image"
-	_ "image/gif"
+	_ "image/gif" // ...
 	"image/jpeg"
 	"image/png"
 	"os"
