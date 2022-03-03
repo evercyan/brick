@@ -1,12 +1,10 @@
 # struct
 
-> Golang 结构体工具
-
-> Golang struct toolkit
+> Golang 结构体工具, Golang Struct Toolkit
 
 ---
 
-## Mysql 转 Gorm Struct + 字段枚举
+## 生成 Gorm Struct
 
 > 生成枚举需要注释满足格式 "注释: 0, 枚举说明; 1, 枚举说明;"
 
@@ -27,53 +25,58 @@ struct gorm "CREATE TABLE user_info (
 ```go
 // UserInfo ...
 type UserInfo struct {
-	Id	int	`json:"id" gorm:"column:id" comment:""`
-	Name	string	`json:"name" gorm:"column:name" comment:"姓名"`
-	Age	int8	`json:"age" gorm:"column:age" comment:"年龄"`
-	AgeUnit	AgeUnit	`json:"ageUnit" gorm:"column:age_unit" comment:"年龄单位: 0, 岁; 1, 月; 2, 天;"`
-	Gender	Gender	`json:"gender" gorm:"column:gender" comment:"性别: 0, 未知; 1, 男; 2, 女;"`
-	CreateTime	time.Time	`json:"createTime" gorm:"column:create_time" comment:"创建时间"`
-	UpdateTime	time.Time	`json:"updateTime" gorm:"column:update_time" comment:"更新时间"`
+	Id         uint64          `json:"id" gorm:"column:id"`
+	Name       string          `json:"name" gorm:"column:name"`
+	Age        int8            `json:"age" gorm:"column:age"`
+	AgeUnit    UserInfoAgeUnit `json:"age_unit" gorm:"column:age_unit"`
+	Gender     UserInfoGender  `json:"gender" gorm:"column:gender"`
+	CreateTime time.Time       `json:"create_time" gorm:"column:create_time"`
+	UpdateTime time.Time       `json:"update_time" gorm:"column:update_time"`
 }
 
-// AgeUnit 年龄单位
-type AgeUnit int8
+// TableName ...
+func (t *UserInfo) TableName() string {
+	return "user_info"
+}
+
+// UserInfoAgeUnit 年龄单位
+type UserInfoAgeUnit int8
 
 const (
-	AgeUnit0 AgeUnit = iota
-	AgeUnit1
-	AgeUnit2
+	UserInfoAgeUnit0 UserInfoAgeUnit = iota
+	UserInfoAgeUnit1
+	UserInfoAgeUnit2
 )
 
-func (t AgeUnit) String() string {
+func (t UserInfoAgeUnit) String() string {
 	switch t {
-	case AgeUnit0:
+	case UserInfoAgeUnit0:
 		return "岁"
-	case AgeUnit1:
+	case UserInfoAgeUnit1:
 		return "月"
-	case AgeUnit2:
+	case UserInfoAgeUnit2:
 		return "天"
 	default:
 		return ""
 	}
 }
 
-// Gender 性别
-type Gender int8
+// UserInfoGender 性别
+type UserInfoGender int8
 
 const (
-	Gender0 Gender = iota
-	Gender1
-	Gender2
+	UserInfoGender0 UserInfoGender = iota
+	UserInfoGender1
+	UserInfoGender2
 )
 
-func (t Gender) String() string {
+func (t UserInfoGender) String() string {
 	switch t {
-	case Gender0:
+	case UserInfoGender0:
 		return "未知"
-	case Gender1:
+	case UserInfoGender1:
 		return "男"
-	case Gender2:
+	case UserInfoGender2:
 		return "女"
 	default:
 		return ""
@@ -83,7 +86,7 @@ func (t Gender) String() string {
 
 ---
 
-## Mysql 转 Common Struct
+## 生成普通 Struct
 
 ```shell
 struct common "CREATE TABLE user_info (
@@ -101,19 +104,19 @@ struct common "CREATE TABLE user_info (
 ```go
 // UserInfo ...
 type UserInfo struct {
-	Id	int	`json:"id"`
-	Name	string	`json:"name"`
-	Age	int8	`json:"age"`
-	AgeUnit	int8	`json:"ageUnit"`
-	Gender	int8	`json:"gender"`
-	CreateTime	time.Time	`json:"createTime"`
-	UpdateTime	time.Time	`json:"updateTime"`
+	Id         uint64    `json:"id"`
+	Name       string    `json:"name"`
+	Age        int8      `json:"age"`
+	AgeUnit    int8      `json:"age_unit"`
+	Gender     int8      `json:"gender"`
+	CreateTime time.Time `json:"create_time"`
+	UpdateTime time.Time `json:"update_time"`
 }
 ```
 
 ---
 
-## 生成枚举
+## 生成枚举代码
 
 > 满足格式: "类型名称:类型:注释:0, 枚举说明;1, 枚举说明;"
 
@@ -143,4 +146,20 @@ func (t AgeUnit) String() string {
 		return ""
 	}
 }
+```
+
+---
+
+## 解析 sql 文件批量生成 Gorm Struct 文件
+
+> sql 建议从数据库相关工具直接导出结构来使用
+
+```shell
+struct sql ~/Downloads/demo.sql
+
+# Success: 写入文件成功: ~/Downloads/demo.sql-output/a.go
+# Success: 写入文件成功: ~/Downloads/demo.sql-output/b.go
+# Success: 写入文件成功: ~/Downloads/demo.sql-output/c.go
+# Success: 写入文件成功: ~/Downloads/demo.sql-output/d.go
+# 🍺🍺🍺 共生成 4 个文件
 ```

@@ -1,25 +1,22 @@
 package ximage
 
 import (
-	_ "image/gif"  // ...
-	_ "image/jpeg" // ...
-	_ "image/png"  // ...
+	"image"
+
+	"github.com/disintegration/imaging"
+	"github.com/noelyahan/mergi"
 )
 
-// Type ...
-func Type(filepath string) string {
-	_, t, err := getImage(filepath)
-	if err != nil {
-		return ""
-	}
-	return t
+// Resize ...
+func Resize(img image.Image, width, height int) image.Image {
+	return imaging.Resize(img, width, height, imaging.NearestNeighbor)
 }
 
-// Size ...
-func Size(filepath string) (int, int) {
-	img, _, err := getImage(filepath)
+// WaterMarkImage ...
+func WaterMarkImage(img, wmImg image.Image, p image.Point) image.Image {
+	res, err := mergi.Watermark(wmImg, img, p)
 	if err != nil {
-		return 0, 0
+		return img
 	}
-	return img.Bounds().Dx(), img.Bounds().Dy()
+	return res
 }

@@ -22,16 +22,16 @@ const (
 )
 
 // is ...
-func is(pattern, str string) bool {
-	return regexp.MustCompile(`^` + pattern + `$`).MatchString(str)
+func is(pattern, s string) bool {
+	return regexp.MustCompile(`^` + pattern + `$`).MatchString(s)
 }
 
 // has ...
-func has(pattern, str string) bool {
-	return regexp.MustCompile(pattern).MatchString(str)
+func has(pattern, s string) bool {
+	return regexp.MustCompile(pattern).MatchString(s)
 }
 
 // match ...
-func match(pattern, str string) []string {
-	return regexp.MustCompile(pattern).FindAllString(str, -1)
+func match(pattern, s string) []string {
+	return regexp.MustCompile(pattern).FindAllString(s, -1)
 }

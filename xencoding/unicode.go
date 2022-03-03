@@ -7,15 +7,15 @@ import (
 )
 
 // UnicodeEncode ...
-func UnicodeEncode(str string) string {
-	quoted := strconv.QuoteToASCII(str)
+func UnicodeEncode(s string) string {
+	quoted := strconv.QuoteToASCII(s)
 	return quoted[1 : len(quoted)-1]
 }
 
 // UnicodeDecode ...
-func UnicodeDecode(str string) string {
+func UnicodeDecode(s string) string {
 	res := ""
-	for _, v := range strings.Split(str, "\\u") {
+	for _, v := range strings.Split(s, "\\u") {
 		if len(v) < 1 {
 			continue
 		}

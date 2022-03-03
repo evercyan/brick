@@ -1,6 +1,6 @@
 package xregexp
 
 // MatchChinese ...
-func MatchChinese(str string) []string {
-	return match(patternChinese, str)
+func MatchChinese(s string) []string {
+	return match(patternChinese, s)
 }

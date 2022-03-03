@@ -54,10 +54,9 @@ func TestIsJson(t *testing.T) {
 	assert.True(t, IsJSONObject(struct{}{}))
 }
 
-func TestInArray(t *testing.T) {
-	assert.True(t, InArray(1, []int{1, 2, 3}))
-	assert.False(t, InArray(4, []int{1, 2, 3}))
-
-	assert.True(t, InArray(1, map[int]int{1: 1, 2: 2}))
-	assert.False(t, InArray(3, map[int]int{1: 1, 2: 2}))
+func TestIsContains(t *testing.T) {
+	assert.True(t, IsContains([]int{1, 2, 3}, 1))
+	assert.False(t, IsContains([]int{1, 2, 3}, 4))
+	assert.True(t, IsContains(map[int]int{1: 1, 2: 2}, 1))
+	assert.False(t, IsContains(map[int]int{1: 1, 2: 2}, 3))
 }

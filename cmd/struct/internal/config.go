@@ -3,12 +3,15 @@ package internal
 var (
 	// FlagJSONUseSnake export json with snake(default camel case)
 	FlagJSONUseSnake bool
+	// FlagComment export comment tag
+	FlagComment bool
 )
 
 // struct scene
 const (
-	SceneGorm int = iota
-	SceneCommon
+	sceneGorm int = iota
+	sceneCommon
+	sceneFile
 )
 
 // mysql type to golang type
@@ -49,5 +52,33 @@ var (
 		"decimal":            "float64",
 		"binary":             "string",
 		"varbinary":          "string",
+	}
+	// typeNumber 数字类型
+	typeNumber = []string{
+		"int",
+		"int",
+		"int8",
+		"int16",
+		"int32",
+		"int64",
+		"uint",
+		"uint",
+		"uint8",
+		"uint16",
+		"uint32",
+		"uint64",
+	}
+	// protectedFields 受保护的字段, 需做转义再还原
+	protectedFields = []string{
+		"status",
+		"from",
+		"desc",
+		"level",
+		"group",
+		"check",
+		"cascade",
+		"describe",
+		"order",
+		"date",
 	}
 )

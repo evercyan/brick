@@ -1,51 +1,51 @@
 package xregexp
 
 // IsIPV4 ...
-func IsIPV4(str string) bool {
-	return is(patternIPV4, str)
+func IsIPV4(s string) bool {
+	return is(patternIPV4, s)
 }
 
 // IsIPV6 ...
-func IsIPV6(str string) bool {
-	return is(patternIPV6, str)
+func IsIPV6(s string) bool {
+	return is(patternIPV6, s)
 }
 
 // IsIP ...
-func IsIP(str string) bool {
-	return IsIPV4(str) || IsIPV4(str)
+func IsIP(s string) bool {
+	return IsIPV4(s) || IsIPV4(s)
 }
 
 // IsMacAddress ...
-func IsMacAddress(str string) bool {
-	return is(patternMacAddress, str)
+func IsMacAddress(s string) bool {
+	return is(patternMacAddress, s)
 }
 
 // IsPhone ...
-func IsPhone(str string) bool {
-	return is(patternPhone, str)
+func IsPhone(s string) bool {
+	return is(patternPhone, s)
 }
 
 // IsEmail ...
-func IsEmail(str string) bool {
-	return is(patternEmail, str)
+func IsEmail(s string) bool {
+	return is(patternEmail, s)
 }
 
 // IsLink ...
-func IsLink(str string) bool {
-	return is(patternLink, str)
+func IsLink(s string) bool {
+	return is(patternLink, s)
 }
 
 // IsDate ...
-func IsDate(str string) bool {
-	return is(patternDate, str)
+func IsDate(s string) bool {
+	return is(patternDate, s)
 }
 
 // IsTime ...
-func IsTime(str string) bool {
-	return is(patternTime, str)
+func IsTime(s string) bool {
+	return is(patternTime, s)
 }
 
 // IsHexColor ...
-func IsHexColor(str string) bool {
-	return is(patternHexColor, str)
+func IsHexColor(s string) bool {
+	return is(patternHexColor, s)
 }

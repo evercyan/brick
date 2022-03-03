@@ -7,8 +7,8 @@ import (
 )
 
 // is ...
-func is(elem interface{}, types ...reflect.Kind) bool {
-	elemType := reflect.ValueOf(elem).Kind()
+func is(v interface{}, types ...reflect.Kind) bool {
+	elemType := reflect.ValueOf(v).Kind()
 	for _, t := range types {
 		if t == elemType {
 			return true
@@ -18,9 +18,9 @@ func is(elem interface{}, types ...reflect.Kind) bool {
 }
 
 // IsInt ...
-func IsInt(elem interface{}) bool {
+func IsInt(v interface{}) bool {
 	return is(
-		elem,
+		v,
 		reflect.Int,
 		reflect.Int8,
 		reflect.Int16,
@@ -30,9 +30,9 @@ func IsInt(elem interface{}) bool {
 }
 
 // IsUint ...
-func IsUint(elem interface{}) bool {
+func IsUint(v interface{}) bool {
 	return is(
-		elem,
+		v,
 		reflect.Uint,
 		reflect.Uint8,
 		reflect.Uint16,
@@ -43,17 +43,18 @@ func IsUint(elem interface{}) bool {
 }
 
 // IsFloat ...
-func IsFloat(elem interface{}) bool {
-	return is(elem,
+func IsFloat(v interface{}) bool {
+	return is(
+		v,
 		reflect.Float32,
 		reflect.Float64,
 	)
 }
 
 // IsNumeric ...
-func IsNumeric(elem interface{}) bool {
+func IsNumeric(v interface{}) bool {
 	return is(
-		elem,
+		v,
 		reflect.Int,
 		reflect.Int8,
 		reflect.Int16,
@@ -71,86 +72,86 @@ func IsNumeric(elem interface{}) bool {
 }
 
 // IsBool ...
-func IsBool(elem interface{}) bool {
-	return is(elem, reflect.Bool)
+func IsBool(v interface{}) bool {
+	return is(v, reflect.Bool)
 }
 
 // IsString ...
-func IsString(elem interface{}) bool {
-	return is(elem, reflect.String)
+func IsString(v interface{}) bool {
+	return is(v, reflect.String)
 }
 
 // IsSlice ...
-func IsSlice(elem interface{}) bool {
-	return is(elem, reflect.Slice)
+func IsSlice(v interface{}) bool {
+	return is(v, reflect.Slice)
 }
 
 // IsArray ...
-func IsArray(elem interface{}) bool {
-	return is(elem, reflect.Array)
+func IsArray(v interface{}) bool {
+	return is(v, reflect.Array)
 }
 
 // IsStruct ...
-func IsStruct(elem interface{}) bool {
-	return is(elem, reflect.Struct)
+func IsStruct(v interface{}) bool {
+	return is(v, reflect.Struct)
 }
 
 // IsMap ...
-func IsMap(elem interface{}) bool {
-	return is(elem, reflect.Map)
+func IsMap(v interface{}) bool {
+	return is(v, reflect.Map)
 }
 
 // IsFunc ...
-func IsFunc(elem interface{}) bool {
-	return is(elem, reflect.Func)
+func IsFunc(v interface{}) bool {
+	return is(v, reflect.Func)
 }
 
 // IsChannel ...
-func IsChannel(elem interface{}) bool {
-	return is(elem, reflect.Chan)
+func IsChannel(v interface{}) bool {
+	return is(v, reflect.Chan)
 }
 
 // IsTime ...
-func IsTime(elem interface{}) bool {
-	if _, ok := elem.(time.Time); ok {
+func IsTime(v interface{}) bool {
+	if _, ok := v.(time.Time); ok {
 		return true
 	}
 	return false
 }
 
 // IsEmpty ...
-func IsEmpty(elem interface{}) bool {
-	if elem == nil {
+func IsEmpty(v interface{}) bool {
+	if v == nil {
 		return true
 	}
-	elemValue := reflect.ValueOf(elem)
+	elemValue := reflect.ValueOf(v)
 	return reflect.DeepEqual(elemValue.Interface(), reflect.Zero(elemValue.Type()).Interface())
 }
 
 // IsJSONString ...
-func IsJSONString(str string) bool {
+func IsJSONString(s string) bool {
 	var raw json.RawMessage
-	return json.Unmarshal([]byte(str), &raw) == nil
+	return json.Unmarshal([]byte(s), &raw) == nil
 }
 
 // IsJSONObject ...
-func IsJSONObject(elem interface{}) bool {
-	b, _ := json.Marshal(elem)
+func IsJSONObject(v interface{}) bool {
+	b, _ := json.Marshal(v)
 	return IsJSONString(string(b))
 }
 
-// InArray ...
-func InArray(elem interface{}, target interface{}) bool {
-	targetValue := reflect.ValueOf(target)
-	switch reflect.TypeOf(target).Kind() {
+// IsContains ...
+func IsContains(src, v interface{}) bool {
+	srcValue := reflect.ValueOf(src)
+	switch reflect.TypeOf(src).Kind() {
 	case reflect.Slice, reflect.Array:
-		for i := 0; i < targetValue.Len(); i++ {
-			if targetValue.Index(i).Interface() == elem {
+		for i := 0; i < srcValue.Len(); i++ {
+			if srcValue.Index(i).Interface() == v {
 				return true
 			}
 		}
 	case reflect.Map:
-		return targetValue.MapIndex(reflect.ValueOf(elem)).IsValid()
+		return srcValue.MapIndex(reflect.ValueOf(v)).IsValid()
 	}
 	return false
 }

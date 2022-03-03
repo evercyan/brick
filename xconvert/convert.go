@@ -9,8 +9,8 @@ import (
 )
 
 // ToCamelCase ...
-func ToCamelCase(str string) string {
-	chunks := regexp.MustCompile(`[\p{L}\p{N}]+`).FindAll([]byte(str), -1)
+func ToCamelCase(s string) string {
+	chunks := regexp.MustCompile(`[\p{L}\p{N}]+`).FindAll([]byte(s), -1)
 	for k, v := range chunks {
 		if k == 0 {
 			continue
@@ -21,9 +21,9 @@ func ToCamelCase(str string) string {
 }
 
 // ToSnakeCase ...
-func ToSnakeCase(str string) string {
-	str = ToCamelCase(str)
-	runes := []rune(str)
+func ToSnakeCase(s string) string {
+	s = ToCamelCase(s)
+	runes := []rune(s)
 	length := len(runes)
 	var resp []rune
 	for i := 0; i < length; i++ {

@@ -75,3 +75,9 @@ func TestJSON(t *testing.T) {
 	assert.NotNil(t, WriteJSON(filepath, make(chan int)))
 	assert.NotNil(t, ReadJSON("/tmp/abc", d))
 }
+
+func TestMd5(t *testing.T) {
+	res, err := Md5("../logo.png")
+	assert.Nil(t, err)
+	assert.NotEmpty(t, res)
+}
