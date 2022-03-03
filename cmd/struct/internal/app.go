@@ -2,9 +2,15 @@ package internal
 
 import (
 	"fmt"
+	"os"
+	"os/exec"
+	"regexp"
 	"strings"
 
+	"github.com/evercyan/brick/xcli/xcolor"
 	"github.com/evercyan/brick/xconvert"
+	"github.com/evercyan/brick/xfile"
+	"github.com/evercyan/brick/xutil"
 	"github.com/xwb1989/sqlparser"
 )
 
@@ -26,23 +32,60 @@ var (
 
 // ----------------------------------------------------------------
 
-// GormStruct generate gorm struct
+// GormStruct ...
 func (t *App) GormStruct(text string) (string, error) {
-	return t.buildStruct(text, SceneGorm)
+	return t.buildStruct(text, sceneGorm)
 }
 
-// Enum generate enum code
+// CommonStruct ...
+func (t *App) CommonStruct(text string) (string, error) {
+	return t.buildStruct(text, sceneCommon)
+}
+
+// Sql ...
+func (t *App) Sql(filepath, dstDir string) {
+	// 读取 sql 文件内容
+	content := xfile.Read(filepath)
+
+	// 匹配 `CREATE TABLE 建表语句`
+	re := regexp.MustCompile(`(?s)CREATE TABLE (.*?) \(.*?COMMENT='[^']*?';`)
+	matches := re.FindAllStringSubmatch(content, -1)
+	if len(matches) == 0 {
+		xcolor.Fail("Error:", "无效的 sql 内容, 建议从数据库相关工具直接导出结构来使用")
+		return
+	}
+
+	count := 0
+	for _, match := range matches {
+		dstFile := fmt.Sprintf("%s/%s.go", dstDir, strings.ReplaceAll(match[1], "`", ""))
+		if xfile.IsExist(dstFile) {
+			continue
+		}
+
+		sql := match[0]
+		res, err := t.buildStruct(sql, sceneFile)
+		if err != nil {
+			xcolor.Fail("Error:", fmt.Sprintf("解析 sql 失败: %s \n %s", err.Error(), sql))
+			continue
+		}
+
+		if err := xfile.Write(dstFile, res); err != nil {
+			xcolor.Fail("Error:", fmt.Sprintf("写入文件失败: %s", err.Error()))
+			continue
+		}
+		xcolor.Success("Success:", fmt.Sprintf("写入文件成功: %s", dstFile))
+		count++
+	}
+	xcolor.Success("\n🍺🍺🍺", fmt.Sprintf("共生成 %d 个文件", count))
+}
+
+// Enum ...
 func (t *App) Enum(text string) (string, error) {
 	info := t.parseComment(text)
 	if info == nil {
 		return "", fmt.Errorf("invalid enum text")
 	}
 	return t.buildEnum(info), nil
-}
-
-// CommonStruct generate common struct
-func (t *App) CommonStruct(text string) (string, error) {
-	return t.buildStruct(text, SceneCommon)
 }
 
 // ----------------------------------------------------------------
@@ -118,6 +161,7 @@ func (t *App) buildEnum(info *CommentInfo) string {
 
 // buildStruct ...
 func (t *App) buildStruct(text string, scene int) (string, error) {
+	text = t.replaceKeyword(text, scene)
 	statement, err := sqlparser.ParseStrictDDL(text)
 	if err != nil {
 		return "", err
@@ -131,7 +175,22 @@ func (t *App) buildStruct(text string, scene int) (string, error) {
 	// 表名 & 注释
 	tableName := stmt.NewName.Name.String()
 	structName := strings.Title(xconvert.ToCamelCase(tableName))
-	builder.WriteString("\n")
+	if scene == sceneFile {
+		builder.WriteString("package po\n")
+		builder.WriteString("\n")
+		// 引入 time
+		for _, column := range stmt.TableSpec.Columns {
+			toType, ok := typeMap[column.Type.Type]
+			if ok && toType == "time.Time" {
+				builder.WriteString("import (\n")
+				builder.WriteString("\t\"time\"\n")
+				builder.WriteString(")\n\n")
+				break
+			}
+		}
+	} else {
+		builder.WriteString("\n")
+	}
 	builder.WriteString(fmt.Sprintf("// %s ...\n", structName))
 	builder.WriteString(fmt.Sprintf("type %s struct { \n", structName))
 	// 枚举字段
@@ -149,6 +208,16 @@ func (t *App) buildStruct(text string, scene int) (string, error) {
 		}
 		// 字段原名
 		field := column.Name.String()
+
+		// 特殊字段处理
+		if xutil.InArray(toType, typeNumber) {
+			if strings.HasSuffix(field, "id") {
+				toType = "uint64"
+			} else if strings.HasSuffix(field, "time") {
+				toType = "int64"
+			}
+		}
+
 		// 字段大驼峰
 		toField := strings.Title(xconvert.ToCamelCase(field))
 		// JSON 可选择性使用下划线
@@ -156,7 +225,7 @@ func (t *App) buildStruct(text string, scene int) (string, error) {
 		if FlagJSONUseSnake {
 			JSONField = field
 		}
-		if scene == SceneCommon {
+		if scene == sceneCommon {
 			// 标准的结构体
 			builder.WriteString(fmt.Sprintf(
 				"\t%s\t%s\t`json:\"%s\"`\n",
@@ -172,11 +241,11 @@ func (t *App) buildStruct(text string, scene int) (string, error) {
 				toComment = string(comment.Val)
 			}
 			if toComment != "" {
-				commentInfo := t.parseComment(fmt.Sprintf("%s:%s:%s", toField, toType, toComment))
+				commentInfo := t.parseComment(fmt.Sprintf("%s%s:%s:%s", structName, toField, toType, toComment))
 				if commentInfo != nil {
 					commentList = append(commentList, commentInfo)
 					// 能解析出枚举, 则变更字段类型
-					toType = toField
+					toType = structName + toField
 				}
 			}
 			if FlagComment {
@@ -201,7 +270,7 @@ func (t *App) buildStruct(text string, scene int) (string, error) {
 	}
 	builder.WriteString("}\n")
 
-	if scene == SceneGorm {
+	if scene == sceneGorm || scene == sceneFile {
 		builder.WriteString("\n")
 		builder.WriteString("// TableName ...\n")
 		builder.WriteString(fmt.Sprintf("func (t *%s) TableName() string {\n", structName))
@@ -213,5 +282,59 @@ func (t *App) buildStruct(text string, scene int) (string, error) {
 		builder.WriteString(t.buildEnum(v))
 	}
 
-	return builder.String(), nil
+	res := t.fmt(t.restoreKeyword(builder.String()))
+	return res, nil
+}
+
+// ----------------------------------------------------------------
+
+// replaceKeyword 替换关键字
+func (t *App) replaceKeyword(s string, scene int) string {
+	for _, keyword := range protectedFields {
+		lastChar := keyword[len(keyword)-1:]
+		if scene == sceneFile {
+			s = strings.ReplaceAll(
+				s,
+				fmt.Sprintf("`%s`", keyword),
+				fmt.Sprintf("`%s%s`", keyword, lastChar),
+			)
+		} else {
+			s = strings.ReplaceAll(
+				s,
+				fmt.Sprintf(" %s ", keyword),
+				fmt.Sprintf(" %s%s ", keyword, lastChar),
+			)
+		}
+	}
+	return s
+}
+
+// restoreKeyword 还原关键字
+func (t *App) restoreKeyword(s string) string {
+	for _, keyword := range protectedFields {
+		lastChar := keyword[len(keyword)-1:]
+		field := xconvert.ToCamelCase(keyword)
+		title := strings.Title(field)
+		// CheckCodee	string	`json:"checkCodee" gorm:"column:check_codee"`
+		// CheckCodee => CheckCode
+		// checkCodee => checkCode
+		// check_codee => check_code
+		s = xutil.Replace(s, map[string]string{
+			title + lastChar:   title,
+			field + lastChar:   field,
+			keyword + lastChar: keyword,
+		})
+	}
+	return s
+}
+
+// fmt gofmt 格式化
+func (t *App) fmt(s string) string {
+	filepath := os.TempDir() + "tmp.go"
+	xfile.Write(filepath, s)
+	output, err := exec.Command("gofmt", filepath).Output()
+	if err != nil {
+		return s
+	}
+	return string(output)
 }
