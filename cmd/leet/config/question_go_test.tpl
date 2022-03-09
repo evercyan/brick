@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSolution(t *testing.T) {
+func Test_FuncToReplace(t *testing.T) {
 	cases := []struct {
 		inputs  []interface{}
 		expects []interface{}
