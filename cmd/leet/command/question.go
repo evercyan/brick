@@ -1,0 +1,103 @@
+package command
+
+import (
+	"fmt"
+	"os"
+	"strings"
+
+	"github.com/evercyan/brick/cmd/leet/config"
+	"github.com/evercyan/brick/cmd/leet/internal"
+	"github.com/evercyan/brick/xcli/xcolor"
+	"github.com/evercyan/brick/xconvert"
+	"github.com/evercyan/brick/xutil"
+	"github.com/peterh/liner"
+	"github.com/spf13/cobra"
+)
+
+var (
+	// QuestionCommand ...
+	QuestionCommand = &cobra.Command{
+		Use:     "question",
+		Aliases: []string{"q"},
+		Short:   "生成答题文件, e.g. leet question two-sum",
+		Run: func(cmd *cobra.Command, args []string) {
+			if len(args) == 0 {
+				xcolor.Fail(config.SymbolError, "请输入题目标识或ID")
+				return
+			}
+
+			app := internal.NewApp()
+
+			// 校验问题
+			if _, err := app.GetList(); err != nil {
+				xcolor.Fail(config.SymbolError, err.Error())
+				return
+			}
+			question := &config.Question{}
+			text, num := args[0], int64(xconvert.ToUint(args[0]))
+			for _, v := range app.List {
+				if v.Slug == text || v.Qid == num {
+					question = v
+					break
+				}
+			}
+			if question.Qid == 0 {
+				xcolor.Fail(config.SymbolError, "未匹配到问题详情")
+				return
+			}
+			xcolor.Success(
+				config.SymbolNotice,
+				fmt.Sprintf("匹配问题: %d. %s (%s)", question.Qid, question.Title, question.Link),
+			)
+
+			// 问题详情
+			detail, err := app.GetDetail(question.Slug)
+			if err != nil {
+				xcolor.Fail(config.SymbolError, err.Error())
+				return
+			}
+			question.Detail = detail
+
+			// 校验语言
+			lang := ""
+			if app.Lang != "" && xutil.IsContains(detail.LangList, app.Lang) {
+				lang = app.Lang
+			} else {
+				xcolor.Success(
+					config.SymbolNotice,
+					fmt.Sprintf("支持的编程语言是: [%s]", strings.Join(detail.LangList, ", ")),
+				)
+				// 监听输入, 自动补全语言
+				line := liner.NewLiner()
+				defer line.Close()
+				line.SetCtrlCAborts(true)
+				line.SetCompleter(func(line string) []string {
+					list := make([]string, 0)
+					for _, v := range detail.LangList {
+						if strings.HasPrefix(v, strings.ToLower(line)) {
+							list = append(list, v)
+						}
+					}
+					return list
+				})
+				text, err := line.Prompt(config.SymbolNotice + " 输入编程语言: ")
+				if err == liner.ErrPromptAborted {
+					os.Exit(0)
+				}
+				if !xutil.IsContains(detail.LangList, text) {
+					xcolor.Fail(config.SymbolError, "无效的编程语言")
+					return
+				}
+				lang = text
+			}
+			xcolor.Success(config.SymbolNotice, fmt.Sprintf("使用的编程语言是: %s", lang))
+
+			if err := app.GenerateQuestion(question, app.Path, lang); err != nil {
+				xcolor.Fail(config.SymbolError, err.Error())
+				return
+			}
+
+			xcolor.Success(config.SymbolSuccess, "生成答题文件成功")
+		},
+	}
+)
