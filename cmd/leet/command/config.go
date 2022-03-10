@@ -7,20 +7,22 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// 配置
 var (
+	// ConfigCommand ...
 	ConfigCommand = &cobra.Command{
 		Use:     "config",
 		Aliases: []string{"c"},
-		Short:   "答题配置",
+		Short:   "设置答题配置",
 	}
+	// ConfigListCommand ...
 	ConfigListCommand = &cobra.Command{
 		Use:   "list",
-		Short: "打印答题配置",
+		Short: "输出答题配置",
 		Run: func(cmd *cobra.Command, args []string) {
 			xcolor.Success(internal.NewApp().Render())
 		},
 	}
+	// ConfigPathCommand ...
 	ConfigPathCommand = &cobra.Command{
 		Use:   "path",
 		Short: "答题配置: 设置答题文件生成目录",
@@ -37,6 +39,7 @@ var (
 			xcolor.Success(app.Render())
 		},
 	}
+	// ConfigLangCommand ...
 	ConfigLangCommand = &cobra.Command{
 		Use:   "lang",
 		Short: "答题配置: 设置答题文件默认语言",

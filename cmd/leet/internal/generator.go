@@ -8,11 +8,10 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/evercyan/brick/xutil"
-
 	"github.com/evercyan/brick/cmd/leet/config"
 	"github.com/evercyan/brick/xcli/xcolor"
 	"github.com/evercyan/brick/xfile"
+	"github.com/evercyan/brick/xutil"
 )
 
 // Generator ...
@@ -25,9 +24,15 @@ func newGenerator() *Generator {
 // ----------------------------------------------------------------
 
 // GenerateQuestion ...
-func (t *Generator) GenerateQuestion(detail *config.Question, fileDir, lang string) error {
+func (t *Generator) GenerateQuestion(
+	detail *config.Question,
+	projectDir string,
+	lang string,
+) error {
 	// 答题目录
-	questionDir := fileDir + GetQuestionPath(detail.Fid, detail.Qid, detail.Slug)
+	questionDir := fmt.Sprintf(
+		"%s/%s", projectDir, GetQuestionPath(detail.Fid, detail.Qid, detail.Slug),
+	)
 	if !xfile.IsExist(questionDir) {
 		if err := os.MkdirAll(questionDir, os.ModePerm); err != nil {
 			return fmt.Errorf("创建答题文件目录失败")
@@ -128,13 +133,16 @@ func (t *Generator) GenerateQuestion(detail *config.Question, fileDir, lang stri
 }
 
 // GenerateRecord ...
-func (t *Generator) GenerateRecord(list []*config.Question, fileDir string) error {
+func (t *Generator) GenerateRecord(
+	list []*config.Question,
+	projectDir string,
+) error {
 	lines := make([]string, 0)
 	lines = append(lines, "| # | 标题 | 难度 |")
 	lines = append(lines, "| :-: | :-- | :-: |")
 	for _, v := range list {
 		qPath := GetQuestionPath(v.Fid, v.Qid, v.Slug)
-		qReadme := fileDir + qPath + "/README.md"
+		qReadme := fmt.Sprintf("%s/%s/README.md", projectDir, qPath)
 		if !xfile.IsExist(qReadme) {
 			continue
 		}
@@ -143,7 +151,7 @@ func (t *Generator) GenerateRecord(list []*config.Question, fileDir string) erro
 			v.Fid,
 			v.Link,
 			v.Title,
-			"."+qPath,
+			fmt.Sprintf("./%s", qPath),
 			v.Level.String(),
 		))
 	}
@@ -157,7 +165,7 @@ func (t *Generator) GenerateRecord(list []*config.Question, fileDir string) erro
 	if err := tpl.Execute(&b, recordInfo); err != nil {
 		return fmt.Errorf("解析答题纪录模板失败")
 	}
-	fileRecord := fmt.Sprintf("%s/RECORD.md", fileDir)
+	fileRecord := fmt.Sprintf("%s/RECORD.md", projectDir)
 	if err := xfile.Write(fileRecord, string(b.Bytes())); err != nil {
 		return fmt.Errorf("创建答题纪录文件失败")
 	}
@@ -168,9 +176,9 @@ func (t *Generator) GenerateRecord(list []*config.Question, fileDir string) erro
 func (t *Generator) GenerateTag(
 	list []*config.Question,
 	tagList []*config.Tag,
-	fileDir string,
+	projectDir string,
 ) error {
-	tagPath := fmt.Sprintf("%s/%s", fileDir, config.TagPath)
+	tagPath := fmt.Sprintf("%s/%s", projectDir, config.TagPath)
 	if !xfile.IsExist(tagPath) {
 		if err := os.MkdirAll(tagPath, os.ModePerm); err != nil {
 			return fmt.Errorf("创建标签文件目录失败")
@@ -187,7 +195,7 @@ func (t *Generator) GenerateTag(
 			}
 			status := ""
 			qPath := GetQuestionPath(v.Fid, v.Qid, v.Slug)
-			qReadme := fileDir + qPath + "/README.md"
+			qReadme := fmt.Sprintf("%s/%s/README.md", projectDir, qPath)
 			if xfile.IsExist(qReadme) {
 				status = "✅"
 			}
@@ -196,7 +204,7 @@ func (t *Generator) GenerateTag(
 				v.Fid,
 				v.Link,
 				v.Title,
-				".."+qPath,
+				fmt.Sprintf("../%s", qPath),
 				v.Level.String(),
 				status,
 			))
@@ -212,7 +220,7 @@ func (t *Generator) GenerateTag(
 			Question string
 		}{
 			Name:     tag.Name,
-			Link:     fmt.Sprintf(config.LeetCodeTagURL, tag.Slug),
+			Link:     GetTagLink(tag.Slug),
 			Badge:    badge,
 			Question: strings.Join(lines, "\n"),
 		}
@@ -227,7 +235,6 @@ func (t *Generator) GenerateTag(
 			continue
 		}
 		xcolor.Success(config.SymbolNotice, fileTag)
-		break
 	}
 	return nil
 }

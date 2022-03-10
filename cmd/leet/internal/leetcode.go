@@ -11,6 +11,7 @@ import (
 	"github.com/evercyan/brick/xjson"
 )
 
+// LeetCode ...
 type LeetCode struct {
 	Ctx context.Context
 }
@@ -23,11 +24,12 @@ func newLeetCode() *LeetCode {
 
 // ----------------------------------------------------------------
 
+// GetQuestionList ...
 func (t *LeetCode) GetQuestionList() ([]*config.Question, error) {
 	res := xhttp.Get(t.Ctx, config.LeetCodeAllURL)
 	content := xjson.New(res).Key("stat_status_pairs").ToJSON()
 	if content == "" {
-		return nil, fmt.Errorf("获取 LeetCode 问题列表失败")
+		return nil, fmt.Errorf("获取 LeetCode 题目列表失败")
 	}
 	originList := make([]struct {
 		Stat struct {
@@ -51,7 +53,7 @@ func (t *LeetCode) GetQuestionList() ([]*config.Question, error) {
 		Progress  int  `json:"progress"`
 	}, 0)
 	if err := json.Unmarshal([]byte(content), &originList); err != nil {
-		return nil, fmt.Errorf("解析问题信息失败")
+		return nil, fmt.Errorf("解析题目信息失败")
 	}
 	list := make([]*config.Question, 0)
 	for _, v := range originList {
@@ -78,7 +80,7 @@ func (t *LeetCode) GetQuestionDetail(slug string) (*config.QuestionDetail, error
 	})
 	content := xjson.New(res).Key("data").Key("question").ToJSON()
 	if content == "" {
-		return nil, fmt.Errorf("获取 LeetCode 问题详情失败")
+		return nil, fmt.Errorf("获取 LeetCode 题目详情失败")
 	}
 	originDetail := struct {
 		QuestionId         string `json:"questionId"`
@@ -100,7 +102,7 @@ func (t *LeetCode) GetQuestionDetail(slug string) (*config.QuestionDetail, error
 		} `json:"codeSnippets"`
 	}{}
 	if err := json.Unmarshal([]byte(content), &originDetail); err != nil {
-		return nil, fmt.Errorf("解析问题详情失败")
+		return nil, fmt.Errorf("解析题目详情失败")
 	}
 	detail := &config.QuestionDetail{
 		Title:       originDetail.TranslatedTitle,

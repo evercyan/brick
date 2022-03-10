@@ -52,7 +52,7 @@ var (
 				xcolor.Fail(config.SymbolError, err.Error())
 				return
 			}
-			xcolor.Success(config.SymbolSuccess, "生成答题标签文件")
+			xcolor.Success(config.SymbolSuccess, "生成答题标签文件成功")
 		},
 	}
 )

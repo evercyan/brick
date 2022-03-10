@@ -26,17 +26,14 @@ var (
 				xcolor.Fail(config.SymbolError, "请输入题目标识或ID")
 				return
 			}
-
 			defer func(begin time.Time) {
 				xcolor.Success(
 					config.SymbolTime,
 					fmt.Sprintf("耗时: %s", time.Now().Sub(begin).String()),
 				)
 			}(time.Now())
-
 			app := internal.NewApp()
-
-			// 校验问题
+			// 校验题目
 			list, err := app.GetQuestionList()
 			if err != nil {
 				xcolor.Fail(config.SymbolError, err.Error())
@@ -51,15 +48,15 @@ var (
 				}
 			}
 			if question.Qid == 0 {
-				xcolor.Fail(config.SymbolError, "未匹配到问题详情")
+				xcolor.Fail(config.SymbolError, "未匹配到题目")
 				return
 			}
 			xcolor.Success(
 				config.SymbolNotice,
-				fmt.Sprintf("匹配问题: %d. %s (%s)", question.Qid, question.Title, question.Link),
+				fmt.Sprintf("匹配题目: %d. %s (%s)", question.Qid, question.Title, question.Link),
 			)
 
-			// 问题详情
+			// 题目详情
 			detail, err := app.GetQuestionDetail(question.Slug)
 			if err != nil {
 				xcolor.Fail(config.SymbolError, err.Error())
@@ -106,7 +103,6 @@ var (
 				xcolor.Fail(config.SymbolError, err.Error())
 				return
 			}
-
 			xcolor.Success(config.SymbolSuccess, "生成答题文件成功")
 		},
 	}

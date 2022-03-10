@@ -14,11 +14,11 @@ import (
 )
 
 var (
-	// QuestionCommand ...
+	// ListCommand ...
 	ListCommand = &cobra.Command{
 		Use:     "list",
 		Aliases: []string{"l"},
-		Short:   "查询问题列表, e.g. leet list two-sum",
+		Short:   "查询答题列表, e.g. leet list two-sum",
 		Run: func(cmd *cobra.Command, args []string) {
 			defer func(begin time.Time) {
 				xcolor.Success(

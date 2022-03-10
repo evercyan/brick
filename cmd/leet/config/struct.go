@@ -31,7 +31,7 @@ type QuestionDetail struct {
 type Tag struct {
 	Name  string `json:"name"`  // 名称
 	Slug  string `json:"slug"`  // 标识
-	Count int    `json:"count"` // 问题数量
+	Count int    `json:"count"` // 题目数量
 }
 
 // ----------------------------------------------------------------

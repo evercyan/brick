@@ -11,6 +11,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// Config ...
 type Config struct {
 	Path string `json:"path" yaml:"path" table:"答题目录"`
 	Lang string `json:"lang" yaml:"lang" table:"答题语言"`
@@ -31,9 +32,6 @@ func newConfig() *Config {
 // Render ...
 func (t *Config) Render() string {
 	list := [][]string{
-		{
-			"键名", "键值",
-		},
 		{
 			"答题目录", t.Path,
 		},

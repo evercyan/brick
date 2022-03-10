@@ -1,5 +1,6 @@
 package config
 
+// 应用
 const (
 	App        = "leet"
 	ConfigFile = "leet.yaml"
@@ -30,7 +31,7 @@ var (
 	LangMap = map[string]map[string]string{
 		"golang": {
 			"file":        "solution.go",
-			"fileTpl":     "package leet\n\n%s",
+			"fileTpl":     "package solution\n\n%s",
 			"testfile":    "solution_test.go",
 			"testfileTpl": TplQuestionGoTest,
 		},
@@ -47,10 +48,10 @@ var (
 
 // LeetCode 接口地址
 const (
-	LeetCodeAllURL      = "https://leetcode-cn.com/api/problems/all/"  // 问题列表地址
+	LeetCodeAllURL      = "https://leetcode-cn.com/api/problems/all/"  // 题目列表地址
 	LeetCodeTagURL      = "https://leetcode-cn.com/tag/%s/problemset/" // 标签页面地址
-	LeetCodeGraphqlURL  = "https://leetcode-cn.com/graphql"            // 问题数据地址
-	LeetCodeQuestionURL = "https://leetcode-cn.com/problems/%s/"       // 问题页面地址
+	LeetCodeGraphqlURL  = "https://leetcode-cn.com/graphql"            // 题目数据地址
+	LeetCodeQuestionURL = "https://leetcode-cn.com/problems/%s/"       // 题目页面地址
 )
 
 // 文件地址配置

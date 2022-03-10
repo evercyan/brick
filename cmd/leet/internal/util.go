@@ -8,9 +8,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/evercyan/brick/xconvert"
-
 	"github.com/evercyan/brick/cmd/leet/config"
+	"github.com/evercyan/brick/xconvert"
 	"github.com/evercyan/brick/xfile"
 )
 
@@ -21,7 +20,7 @@ func GetCfgPath() string {
 		panic(err)
 	}
 	filepath := fmt.Sprintf(
-		"%s/.Config/%s",
+		"%s/.config/%s",
 		userPath.HomeDir,
 		strings.ToLower(config.App),
 	)
@@ -41,6 +40,11 @@ func GetCfgFilepath() string {
 // GetQuestionLink ...
 func GetQuestionLink(slug string) string {
 	return fmt.Sprintf(config.LeetCodeQuestionURL, slug)
+}
+
+// GetTagLink ...
+func GetTagLink(tag string) string {
+	return fmt.Sprintf(config.LeetCodeTagURL, tag)
 }
 
 // FormatQuestionContent ...
@@ -64,8 +68,8 @@ func GetQuestionPath(fid string, qid int64, slug string) string {
 		id = qid
 	}
 	tpl := "%d-%s"
-	if qid < 10000 {
+	if id < 10000 {
 		tpl = "%04d-%s"
 	}
-	return "/questions/" + fmt.Sprintf(tpl, qid, slug)
+	return fmt.Sprintf("%s/%s", config.QuestionPath, fmt.Sprintf(tpl, id, slug))
 }

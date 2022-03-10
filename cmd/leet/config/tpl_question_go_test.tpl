@@ -1,4 +1,4 @@
-package leet
+package solution
 
 import (
 	"testing"
