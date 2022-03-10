@@ -7,31 +7,27 @@ import (
 	"strings"
 
 	"github.com/evercyan/brick/cmd/leet/config"
-	"github.com/evercyan/brick/xcli/xtable"
-	"github.com/evercyan/brick/xconvert"
 	"github.com/evercyan/brick/xhttp"
 	"github.com/evercyan/brick/xjson"
 )
 
-type Leet struct {
-	Ctx  context.Context
-	List []*config.Question
+type LeetCode struct {
+	Ctx context.Context
 }
 
-func newLeet() *Leet {
-	return &Leet{
-		Ctx:  context.Background(),
-		List: make([]*config.Question, 0),
+func newLeetCode() *LeetCode {
+	return &LeetCode{
+		Ctx: context.Background(),
 	}
 }
 
 // ----------------------------------------------------------------
 
-func (t *Leet) GetList(keywords ...string) (string, error) {
+func (t *LeetCode) GetQuestionList() ([]*config.Question, error) {
 	res := xhttp.Get(t.Ctx, config.LeetCodeAllURL)
 	content := xjson.New(res).Key("stat_status_pairs").ToJSON()
 	if content == "" {
-		return "", fmt.Errorf("获取 LeetCode 问题列表失败")
+		return nil, fmt.Errorf("获取 LeetCode 问题列表失败")
 	}
 	originList := make([]struct {
 		Stat struct {
@@ -55,9 +51,8 @@ func (t *Leet) GetList(keywords ...string) (string, error) {
 		Progress  int  `json:"progress"`
 	}, 0)
 	if err := json.Unmarshal([]byte(content), &originList); err != nil {
-		return "", fmt.Errorf("解析问题信息失败")
+		return nil, fmt.Errorf("解析问题信息失败")
 	}
-
 	list := make([]*config.Question, 0)
 	for _, v := range originList {
 		list = append([]*config.Question{{
@@ -69,33 +64,11 @@ func (t *Leet) GetList(keywords ...string) (string, error) {
 			Level: v.Difficulty.Level,
 		}}, list...)
 	}
-	t.List = list
-
-	matchs := make([][]interface{}, 0)
-	text, num := "", int64(0)
-	if len(keywords) > 0 {
-		text, num = keywords[0], int64(xconvert.ToUint(keywords[0]))
-	}
-	for _, v := range list {
-		if strings.Contains(v.Fid, text) ||
-			strings.Contains(v.Title, text) ||
-			strings.Contains(v.Slug, text) ||
-			v.Qid == num {
-			matchs = append(matchs, []interface{}{
-				v.Fid,
-				v.Title,
-				v.Slug,
-				v.Level.String(),
-			})
-		}
-	}
-	return xtable.New(matchs).Style(xtable.Dashed).Border(true).Header([]string{
-		"ID", "标题", "标识", "难度",
-	}).Text(), nil
+	return list, nil
 }
 
-// GetDetail ...
-func (t *Leet) GetDetail(slug string) (*config.QuestionDetail, error) {
+// GetQuestionDetail ...
+func (t *LeetCode) GetQuestionDetail(slug string) (*config.QuestionDetail, error) {
 	res := xhttp.Post(t.Ctx, config.LeetCodeGraphqlURL, map[string]interface{}{
 		"operationName": "questionData",
 		"query":         "query questionData($titleSlug: String!) {question(titleSlug: $titleSlug) {questionId questionFrontendId title titleSlug content translatedTitle translatedContent topicTags {name slug translatedName} codeSnippets {lang langSlug code}}}",
@@ -130,17 +103,23 @@ func (t *Leet) GetDetail(slug string) (*config.QuestionDetail, error) {
 		return nil, fmt.Errorf("解析问题详情失败")
 	}
 	detail := &config.QuestionDetail{
-		Title:    originDetail.TranslatedTitle,
-		Content:  FormatQuestionContent(originDetail.TranslatedContent),
-		TagList:  make([]map[string]string, 0),
-		LangList: make([]string, 0),
-		CodeMap:  make(map[string]string),
+		Title:       originDetail.TranslatedTitle,
+		Content:     FormatQuestionContent(originDetail.TranslatedContent),
+		TagList:     make([]config.Tag, 0),
+		TagSlugList: make([]string, 0),
+		LangList:    make([]string, 0),
+		CodeMap:     make(map[string]string),
 	}
 	for _, v := range originDetail.TopicTags {
-		detail.TagList = append(detail.TagList, map[string]string{
-			"slug": v.Slug,
-			"name": v.TranslatedName,
+		tagName := v.TranslatedName
+		if tagName == "" {
+			tagName = v.Name
+		}
+		detail.TagList = append(detail.TagList, config.Tag{
+			Name: tagName,
+			Slug: v.Slug,
 		})
+		detail.TagSlugList = append(detail.TagSlugList, v.Slug)
 	}
 	for _, v := range originDetail.CodeSnippets {
 		lang := strings.ToLower(v.LangSlug)
@@ -148,4 +127,47 @@ func (t *Leet) GetDetail(slug string) (*config.QuestionDetail, error) {
 		detail.CodeMap[lang] = v.Code
 	}
 	return detail, nil
+}
+
+// GetTagList ...
+func (t *LeetCode) GetTagList() ([]*config.Tag, error) {
+	res := xhttp.Post(t.Ctx, config.LeetCodeGraphqlURL, map[string]interface{}{
+		"query":     "query questionTagTypeWithTags {questionTagTypeWithTags {name transName tagRelation {questionNum tag {name id nameTranslated slug}}}}",
+		"variables": map[string]string{},
+	})
+	content := xjson.New(res).Key("data").Key("questionTagTypeWithTags").ToJSON()
+	if content == "" {
+		return nil, fmt.Errorf("获取 LeetCode 标签列表失败")
+	}
+	var tagList []struct {
+		Name        string `json:"name"`
+		TransName   string `json:"transName"`
+		TagRelation []struct {
+			QuestionNum int `json:"questionNum"`
+			Tag         struct {
+				Name           string `json:"name"`
+				Id             string `json:"id"`
+				NameTranslated string `json:"nameTranslated"`
+				Slug           string `json:"slug"`
+			} `json:"tag"`
+		} `json:"tagRelation"`
+	}
+	if err := json.Unmarshal([]byte(content), &tagList); err != nil {
+		return nil, fmt.Errorf("解析标签列表失败")
+	}
+	list := make([]*config.Tag, 0)
+	for _, v := range tagList {
+		for _, vv := range v.TagRelation {
+			tagName := vv.Tag.NameTranslated
+			if tagName == "" {
+				tagName = vv.Tag.Name
+			}
+			list = append(list, &config.Tag{
+				Name:  tagName,
+				Slug:  vv.Tag.Slug,
+				Count: vv.QuestionNum,
+			})
+		}
+	}
+	return list, nil
 }

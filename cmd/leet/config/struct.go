@@ -17,11 +17,21 @@ type Question struct {
 
 // QuestionDetail ...
 type QuestionDetail struct {
-	Title    string              `json:"title"`
-	Content  string              `json:"content"`
-	TagList  []map[string]string `json:"tag_list"`
-	LangList []string            `json:"lang_list"`
-	CodeMap  map[string]string   `json:"code_map"`
+	Title       string            `json:"title"`
+	Content     string            `json:"content"`
+	TagList     []Tag             `json:"tag_list"`
+	TagSlugList []string          `json:"tag_slug_list"`
+	LangList    []string          `json:"lang_list"`
+	CodeMap     map[string]string `json:"code_map"`
+}
+
+// ----------------------------------------------------------------
+
+// Tag ...
+type Tag struct {
+	Name  string `json:"name"`  // 名称
+	Slug  string `json:"slug"`  // 标识
+	Count int    `json:"count"` // 问题数量
 }
 
 // ----------------------------------------------------------------

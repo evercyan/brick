@@ -2,15 +2,15 @@ package internal
 
 type app struct {
 	*Config
-	*Leet
-	*File
+	*LeetCode
+	*Generator
 }
 
-// NewService ...
+// NewApp ...
 func NewApp() *app {
 	return &app{
-		Config: newConfig(),
-		Leet:   newLeet(),
-		File:   newFile(),
+		Config:    newConfig(),
+		LeetCode:  newLeetCode(),
+		Generator: newGenerator(),
 	}
 }

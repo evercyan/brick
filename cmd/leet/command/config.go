@@ -10,8 +10,9 @@ import (
 // 配置
 var (
 	ConfigCommand = &cobra.Command{
-		Use:   "config",
-		Short: "答题配置",
+		Use:     "config",
+		Aliases: []string{"c"},
+		Short:   "答题配置",
 	}
 	ConfigListCommand = &cobra.Command{
 		Use:   "list",

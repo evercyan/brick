@@ -10,6 +10,7 @@ const (
 	SymbolError   = "💣"
 	SymbolNotice  = "🐶"
 	SymbolSuccess = "🎉"
+	SymbolTime    = "🕙"
 )
 
 // 答题语言配置
@@ -46,9 +47,14 @@ var (
 
 // LeetCode 接口地址
 const (
-	LeetCodeAllURL         = "https://leetcode-cn.com/api/problems/all/" // 问题列表地址
-	LeetCodeTagURL         = "https://leetcode-cn.com/tag/%s/"           // 标签页面地址
-	LeetCodeGraphqlURL     = "https://leetcode-cn.com/graphql"           // 问题数据地址
-	LeetCodeQuestionURL    = "https://leetcode-cn.com/problems/%s/"      // 问题页面地址
-	LeetCodeQuestionSetURL = "https://leetcode-cn.com/problemset/all/"   // 题库首页
+	LeetCodeAllURL      = "https://leetcode-cn.com/api/problems/all/"  // 问题列表地址
+	LeetCodeTagURL      = "https://leetcode-cn.com/tag/%s/problemset/" // 标签页面地址
+	LeetCodeGraphqlURL  = "https://leetcode-cn.com/graphql"            // 问题数据地址
+	LeetCodeQuestionURL = "https://leetcode-cn.com/problems/%s/"       // 问题页面地址
+)
+
+// 文件地址配置
+const (
+	QuestionPath = "questions"
+	TagPath      = "tags"
 )

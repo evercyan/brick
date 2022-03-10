@@ -15,5 +15,6 @@ func main() {
 	root.AddCommand(command.ListCommand)
 	root.AddCommand(command.QuestionCommand)
 	root.AddCommand(command.RecordCommand)
+	root.AddCommand(command.TagCommand)
 	root.Execute()
 }

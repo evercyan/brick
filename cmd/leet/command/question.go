@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/evercyan/brick/cmd/leet/config"
 	"github.com/evercyan/brick/cmd/leet/internal"
@@ -26,16 +27,24 @@ var (
 				return
 			}
 
+			defer func(begin time.Time) {
+				xcolor.Success(
+					config.SymbolTime,
+					fmt.Sprintf("耗时: %s", time.Now().Sub(begin).String()),
+				)
+			}(time.Now())
+
 			app := internal.NewApp()
 
 			// 校验问题
-			if _, err := app.GetList(); err != nil {
+			list, err := app.GetQuestionList()
+			if err != nil {
 				xcolor.Fail(config.SymbolError, err.Error())
 				return
 			}
 			question := &config.Question{}
 			text, num := args[0], int64(xconvert.ToUint(args[0]))
-			for _, v := range app.List {
+			for _, v := range list {
 				if v.Slug == text || v.Qid == num {
 					question = v
 					break
@@ -51,7 +60,7 @@ var (
 			)
 
 			// 问题详情
-			detail, err := app.GetDetail(question.Slug)
+			detail, err := app.GetQuestionDetail(question.Slug)
 			if err != nil {
 				xcolor.Fail(config.SymbolError, err.Error())
 				return
@@ -92,6 +101,7 @@ var (
 			}
 			xcolor.Success(config.SymbolNotice, fmt.Sprintf("使用的编程语言是: %s", lang))
 
+			// 生成答题文件相关
 			if err := app.GenerateQuestion(question, app.Path, lang); err != nil {
 				xcolor.Fail(config.SymbolError, err.Error())
 				return

@@ -8,21 +8,24 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/evercyan/brick/xutil"
+
 	"github.com/evercyan/brick/cmd/leet/config"
 	"github.com/evercyan/brick/xcli/xcolor"
 	"github.com/evercyan/brick/xfile"
 )
 
-type File struct{}
+// Generator ...
+type Generator struct{}
 
-func newFile() *File {
-	return &File{}
+func newGenerator() *Generator {
+	return &Generator{}
 }
 
 // ----------------------------------------------------------------
 
 // GenerateQuestion ...
-func (t *File) GenerateQuestion(detail *config.Question, fileDir, lang string) error {
+func (t *Generator) GenerateQuestion(detail *config.Question, fileDir, lang string) error {
 	// 答题目录
 	questionDir := fileDir + GetQuestionPath(detail.Fid, detail.Qid, detail.Slug)
 	if !xfile.IsExist(questionDir) {
@@ -34,13 +37,13 @@ func (t *File) GenerateQuestion(detail *config.Question, fileDir, lang string) e
 	// 生成答题 README.md
 	tagList := make([]string, 0)
 	for _, v := range detail.Detail.TagList {
-		if v["slug"] == "" {
+		if v.Slug == "" {
 			continue
 		}
 		tagList = append(tagList, fmt.Sprintf(
 			"[%s](%s)",
-			v["name"],
-			fmt.Sprintf(config.LeetCodeTagURL, v["slug"]),
+			v.Name,
+			fmt.Sprintf(config.LeetCodeTagURL, v.Slug),
 		))
 	}
 	readmeInfo := struct {
@@ -121,5 +124,110 @@ func (t *File) GenerateQuestion(detail *config.Question, fileDir, lang string) e
 		}
 	}
 
+	return nil
+}
+
+// GenerateRecord ...
+func (t *Generator) GenerateRecord(list []*config.Question, fileDir string) error {
+	lines := make([]string, 0)
+	lines = append(lines, "| # | 标题 | 难度 |")
+	lines = append(lines, "| :-: | :-- | :-: |")
+	for _, v := range list {
+		qPath := GetQuestionPath(v.Fid, v.Qid, v.Slug)
+		qReadme := fileDir + qPath + "/README.md"
+		if !xfile.IsExist(qReadme) {
+			continue
+		}
+		lines = append(lines, fmt.Sprintf(
+			"| [%s](%s) | [%s](%s) | %s |",
+			v.Fid,
+			v.Link,
+			v.Title,
+			"."+qPath,
+			v.Level.String(),
+		))
+	}
+	recordInfo := struct {
+		Question string
+	}{
+		Question: strings.Join(lines, "\n"),
+	}
+	var b bytes.Buffer
+	tpl := template.Must(template.New("record").Parse(config.TplRecord))
+	if err := tpl.Execute(&b, recordInfo); err != nil {
+		return fmt.Errorf("解析答题纪录模板失败")
+	}
+	fileRecord := fmt.Sprintf("%s/RECORD.md", fileDir)
+	if err := xfile.Write(fileRecord, string(b.Bytes())); err != nil {
+		return fmt.Errorf("创建答题纪录文件失败")
+	}
+	return nil
+}
+
+// GenerateTag ...
+func (t *Generator) GenerateTag(
+	list []*config.Question,
+	tagList []*config.Tag,
+	fileDir string,
+) error {
+	tagPath := fmt.Sprintf("%s/%s", fileDir, config.TagPath)
+	if !xfile.IsExist(tagPath) {
+		if err := os.MkdirAll(tagPath, os.ModePerm); err != nil {
+			return fmt.Errorf("创建标签文件目录失败")
+		}
+	}
+	tpl := template.Must(template.New("tag").Parse(config.TplTag))
+	for _, tag := range tagList {
+		lines := make([]string, 0)
+		lines = append(lines, "| # | 标题 | 难度 | 状态 |")
+		lines = append(lines, "| :-: | :-- | :-: | :-: |")
+		for _, v := range list {
+			if v.Detail == nil || !xutil.IsContains(v.Detail.TagSlugList, tag.Slug) {
+				continue
+			}
+			status := ""
+			qPath := GetQuestionPath(v.Fid, v.Qid, v.Slug)
+			qReadme := fileDir + qPath + "/README.md"
+			if xfile.IsExist(qReadme) {
+				status = "✅"
+			}
+			lines = append(lines, fmt.Sprintf(
+				"| [%s](%s) | [%s](%s) | %s | %s |",
+				v.Fid,
+				v.Link,
+				v.Title,
+				".."+qPath,
+				v.Level.String(),
+				status,
+			))
+		}
+		badge := fmt.Sprintf(
+			"![total](https://img.shields.io/badge/total-%d-ff9985.svg?style=flat)",
+			tag.Count,
+		)
+		recordInfo := struct {
+			Name     string
+			Link     string
+			Badge    string
+			Question string
+		}{
+			Name:     tag.Name,
+			Link:     fmt.Sprintf(config.LeetCodeTagURL, tag.Slug),
+			Badge:    badge,
+			Question: strings.Join(lines, "\n"),
+		}
+		var b bytes.Buffer
+		if err := tpl.Execute(&b, recordInfo); err != nil {
+			xcolor.Fail(config.SymbolError, "解析标签模板失败")
+			continue
+		}
+		fileTag := fmt.Sprintf("%s/%s.md", tagPath, tag.Name)
+		if err := xfile.Write(fileTag, string(b.Bytes())); err != nil {
+			xcolor.Fail(config.SymbolError, "创建标签文件失败")
+			continue
+		}
+		xcolor.Success(config.SymbolNotice, fileTag)
+		break
+	}
 	return nil
 }
