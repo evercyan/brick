@@ -13,11 +13,6 @@ var (
 		Use:     "config",
 		Aliases: []string{"c"},
 		Short:   "设置答题配置",
-	}
-	// ConfigListCommand ...
-	ConfigListCommand = &cobra.Command{
-		Use:   "list",
-		Short: "输出答题配置",
 		Run: func(cmd *cobra.Command, args []string) {
 			xcolor.Success(internal.NewApp().Render())
 		},
@@ -60,7 +55,6 @@ var (
 
 func init() {
 	ConfigCommand.AddCommand(
-		ConfigListCommand,
 		ConfigPathCommand,
 		ConfigLangCommand,
 	)

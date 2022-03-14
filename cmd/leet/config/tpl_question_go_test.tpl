@@ -1,6 +1,7 @@
 package solution
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -20,10 +21,10 @@ func Test_FuncToReplace(t *testing.T) {
 			},
 		},
 	}
-	for _, c := range cases {
-		t.Run("FuncToReplace", func(t *testing.T) {
-			ret := FuncToReplace(c.inputs[0].(string))
-			assert.Equal(t, c.expects[0].(string), ret)
+	for k, v := range cases {
+		t.Run(fmt.Sprintf("FuncToReplace_%d", k), func(t *testing.T) {
+			res := FuncToReplace(v.inputs[0].(string))
+			assert.Equal(t, v.expects[0].(string), res)
 		})
 	}
 }
