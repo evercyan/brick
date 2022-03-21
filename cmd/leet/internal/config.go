@@ -13,8 +13,9 @@ import (
 
 // Config ...
 type Config struct {
-	Path string `json:"path" yaml:"path" table:"答题目录"`
-	Lang string `json:"lang" yaml:"lang" table:"答题语言"`
+	Path         string `json:"path" yaml:"path" table:"答题目录"`
+	Lang         string `json:"lang" yaml:"lang" table:"答题语言"`
+	QuestionFile string `json:"question_file" yaml:"questionFile"`
 }
 
 func newConfig() *Config {
@@ -51,7 +52,7 @@ func (t *Config) SetPath(s string) error {
 		return fmt.Errorf("无效的文件目录")
 	}
 	t.Path = s
-	return t.update()
+	return t.Update()
 }
 
 // SetLang ...
@@ -61,11 +62,11 @@ func (t *Config) SetLang(s string) error {
 		return fmt.Errorf("无效的答题语言, 支持: [%s]", strings.Join(config.LangList, ", "))
 	}
 	t.Lang = lang
-	return t.update()
+	return t.Update()
 }
 
-// update ...
-func (t *Config) update() error {
+// Update ...
+func (t *Config) Update() error {
 	b, _ := yaml.Marshal(t)
 	return xfile.Write(GetCfgFilepath(), string(b))
 }

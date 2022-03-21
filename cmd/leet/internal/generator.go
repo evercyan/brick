@@ -11,7 +11,6 @@ import (
 	"github.com/evercyan/brick/cmd/leet/config"
 	"github.com/evercyan/brick/xcli/xcolor"
 	"github.com/evercyan/brick/xfile"
-	"github.com/evercyan/brick/xutil"
 )
 
 // Generator ...
@@ -174,11 +173,11 @@ func (t *Generator) GenerateRecord(
 
 // GenerateTag ...
 func (t *Generator) GenerateTag(
-	list []*config.Question,
 	tagList []*config.Tag,
+	tagMap map[string][]*config.Question,
 	projectDir string,
 ) error {
-	tagPath := fmt.Sprintf("%s/%s", projectDir, config.TagPath)
+	tagPath := fmt.Sprintf("%s/%s", projectDir, config.CategoryPath)
 	if !xfile.IsExist(tagPath) {
 		if err := os.MkdirAll(tagPath, os.ModePerm); err != nil {
 			return fmt.Errorf("创建标签文件目录失败")
@@ -186,16 +185,17 @@ func (t *Generator) GenerateTag(
 	}
 	tpl := template.Must(template.New("tag").Parse(config.TplTag))
 	for _, tag := range tagList {
+		questionList, ok := tagMap[tag.Slug]
+		if !ok {
+			continue
+		}
 		lines := make([]string, 0)
 		lines = append(lines, "| # | 标题 | 难度 | 状态 |")
 		lines = append(lines, "| :-: | :-- | :-: | :-: |")
-		for _, v := range list {
-			if v.Detail == nil || !xutil.IsContains(v.Detail.TagSlugList, tag.Slug) {
-				continue
-			}
-			status := ""
+		for _, v := range questionList {
 			qPath := GetQuestionPath(v.Fid, v.Qid, v.Slug)
 			qReadme := fmt.Sprintf("%s/%s/README.md", projectDir, qPath)
+			status := ""
 			if xfile.IsExist(qReadme) {
 				status = "✅"
 			}

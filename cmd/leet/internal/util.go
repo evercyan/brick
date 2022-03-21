@@ -37,6 +37,11 @@ func GetCfgFilepath() string {
 	return fmt.Sprintf("%s/%s", GetCfgPath(), config.ConfigFile)
 }
 
+// GetQuestionFilepath ...
+func GetQuestionFilepath() string {
+	return fmt.Sprintf("%s/%s", GetCfgPath(), config.QuestionFile)
+}
+
 // GetQuestionLink ...
 func GetQuestionLink(slug string) string {
 	return fmt.Sprintf(config.LeetCodeQuestionURL, slug)

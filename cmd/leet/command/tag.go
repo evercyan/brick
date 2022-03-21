@@ -2,7 +2,6 @@ package command
 
 import (
 	"fmt"
-	"sync"
 	"time"
 
 	"github.com/evercyan/brick/cmd/leet/config"
@@ -25,30 +24,20 @@ var (
 				)
 			}(time.Now())
 			app := internal.NewApp()
-			list, err := app.GetQuestionList()
-			if err != nil {
-				xcolor.Fail(config.SymbolError, err.Error())
-				return
-			}
-			var wg sync.WaitGroup
-			for k, v := range list {
-				wg.Add(1)
-				go func(k int, slug string) {
-					defer wg.Done()
-					detail, err := app.GetQuestionDetail(slug)
-					if err != nil {
-						return
-					}
-					list[k].Detail = detail
-				}(k, v.Slug)
-			}
-			wg.Wait()
+			// 标签列表
 			tagList, err := app.GetTagList()
 			if err != nil {
 				xcolor.Fail(config.SymbolError, err.Error())
 				return
 			}
-			if err := app.GenerateTag(list, tagList, app.Path); err != nil {
+			// 标签问题 map
+			tagMap, err := app.GetTagQuestionMap(app)
+			if err != nil {
+				xcolor.Fail(config.SymbolError, err.Error())
+				return
+			}
+			// 生成标签文件
+			if err := app.GenerateTag(tagList, tagMap, app.Path); err != nil {
 				xcolor.Fail(config.SymbolError, err.Error())
 				return
 			}

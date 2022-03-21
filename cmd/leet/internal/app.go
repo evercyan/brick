@@ -1,14 +1,14 @@
 package internal
 
-type app struct {
+type App struct {
 	*Config
 	*LeetCode
 	*Generator
 }
 
 // NewApp ...
-func NewApp() *app {
-	return &app{
+func NewApp() *App {
+	return &App{
 		Config:    newConfig(),
 		LeetCode:  newLeetCode(),
 		Generator: newGenerator(),

@@ -6,7 +6,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/evercyan/brick/xencoding"
+
 	"github.com/evercyan/brick/cmd/leet/config"
+	"github.com/evercyan/brick/xfile"
 	"github.com/evercyan/brick/xhttp"
 	"github.com/evercyan/brick/xjson"
 )
@@ -172,4 +175,64 @@ func (t *LeetCode) GetTagList() ([]*config.Tag, error) {
 		}
 	}
 	return list, nil
+}
+
+// GetTagQuestionMap ...
+func (t *LeetCode) GetTagQuestionMap(app *App) (map[string][]*config.Question, error) {
+	res := xhttp.Post(t.Ctx, config.LeetCodeGraphqlURL, map[string]interface{}{
+		"operationName": "allQuestionUrls",
+		"query":         "query allQuestionUrls{allQuestionUrls{questionUrl __typename}}",
+		"variables":     map[string]string{},
+	})
+	content := xjson.New(res).Key("data").Key("allQuestionUrls").Key("questionUrl").ToString()
+	if content == "" {
+		return nil, fmt.Errorf("获取 LeetCode 问题列表失败")
+	}
+	questionContent := ""
+	if content == app.QuestionFile {
+		// 文件无变化
+		questionContent = xfile.Read(GetQuestionFilepath())
+	} else {
+		// 获取文件
+		jsonContent := xhttp.Get(t.Ctx, content)
+		if jsonContent == "" {
+			return nil, fmt.Errorf("获取 LeetCode 问题数据失败")
+		}
+		tmp := make([]config.QuestionTag, 0)
+		if err := json.Unmarshal([]byte(jsonContent), &tmp); err != nil {
+			return nil, fmt.Errorf("问题数据解析失败")
+		}
+		questionContent = xencoding.JSONEncode(tmp)
+		// 更新配置文件 & 保存 JSON 文件
+		app.QuestionFile = content
+		app.Update()
+		xfile.Write(GetQuestionFilepath(), questionContent)
+	}
+	qList := make([]config.QuestionTag, 0)
+	if err := json.Unmarshal([]byte(questionContent), &qList); err != nil {
+		return nil, fmt.Errorf("问题数据解析失败")
+	}
+	// 问题列表
+	questionList, err := t.GetQuestionList()
+	if err != nil {
+		return nil, err
+	}
+	questionMap := make(map[string]*config.Question)
+	for _, v := range questionList {
+		questionMap[v.Slug] = v
+	}
+	// 拼组数据
+	tagMap := make(map[string][]*config.Question)
+	for _, v := range qList {
+		if _, ok := questionMap[v.Slug]; !ok {
+			continue
+		}
+		for _, vv := range v.TopicTags {
+			if _, ok := tagMap[vv.Slug]; !ok {
+				tagMap[vv.Slug] = make([]*config.Question, 0)
+			}
+			tagMap[vv.Slug] = append(tagMap[vv.Slug], questionMap[v.Slug])
+		}
+	}
+	return tagMap, nil
 }

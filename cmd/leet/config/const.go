@@ -2,8 +2,9 @@ package config
 
 // 应用
 const (
-	App        = "leet"
-	ConfigFile = "leet.yaml"
+	App          = "leet"
+	ConfigFile   = "leet.yaml"
+	QuestionFile = "question.json"
 )
 
 // 符号
@@ -56,6 +57,6 @@ const (
 
 // 文件地址配置
 const (
-	QuestionPath = "questions"
-	TagPath      = "tags"
+	QuestionPath = "question"
+	CategoryPath = "category"
 )

@@ -36,6 +36,16 @@ type Tag struct {
 
 // ----------------------------------------------------------------
 
+// QuestionTag ...
+type QuestionTag struct {
+	Slug      string `json:"titleSlug"`
+	TopicTags []struct {
+		Slug string `json:"slug"`
+	} `json:"topicTags"`
+}
+
+// ----------------------------------------------------------------
+
 // QuestionLevel 题目难度
 type QuestionLevel int
 

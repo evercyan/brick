@@ -1,4 +1,4 @@
-package helper
+package xleet
 
 // ListNode ...
 type ListNode struct {
@@ -25,6 +25,17 @@ func Node2Slice(l *ListNode) []int {
 		l = l.Next
 	}
 	return nums
+}
+
+// Node2Cycle ...
+func Node2Cycle(l *ListNode) (*ListNode, int) {
+	head, length := l, 1
+	for l.Next != nil {
+		l = l.Next
+		length++
+	}
+	l.Next = head
+	return head, length
 }
 
 // Slice2Cycle ...
