@@ -55,7 +55,6 @@ var (
 				config.SymbolNotice,
 				fmt.Sprintf("匹配题目: %d. %s (%s)", question.Qid, question.Title, question.Link),
 			)
-
 			// 题目详情
 			detail, err := app.GetQuestionDetail(question.Slug)
 			if err != nil {
@@ -63,7 +62,6 @@ var (
 				return
 			}
 			question.Detail = detail
-
 			// 校验语言
 			lang := ""
 			if app.Lang != "" && xutil.IsContains(detail.LangList, app.Lang) {
@@ -97,7 +95,6 @@ var (
 				lang = text
 			}
 			xcolor.Success(config.SymbolNotice, fmt.Sprintf("使用的编程语言是: %s", lang))
-
 			// 生成答题文件相关
 			if err := app.GenerateQuestion(question, app.Path, lang); err != nil {
 				xcolor.Fail(config.SymbolError, err.Error())

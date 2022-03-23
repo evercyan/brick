@@ -1,10 +1,31 @@
 package xleet
 
+import (
+	"fmt"
+)
+
 // ListNode ...
 type ListNode struct {
 	Val  int
 	Next *ListNode
 }
+
+// List ...
+func (t *ListNode) List() []int {
+	return Node2Slice(t)
+}
+
+// D ...
+func (t *ListNode) D() {
+	fmt.Println(t.List())
+}
+
+// V ...
+func (t *ListNode) V() {
+	fmt.Println(t.Val)
+}
+
+// ----------------------------------------------------------------
 
 // Slice2Node ...
 func Slice2Node(nums []int) *ListNode {
