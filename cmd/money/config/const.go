@@ -1,11 +1,7 @@
 package config
 
-// 本金: capital
-// 利息: interest
-
 const (
 	Error     = "💣"
-	Notice    = "🐶"
 	Success   = "🎉"
 	Separator = "\n----------------------------------------------------------------\n"
 )
