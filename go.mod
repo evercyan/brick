@@ -1,6 +1,6 @@
 module github.com/evercyan/brick
 
-go 1.17
+go 1.18
 
 require (
 	github.com/barasher/go-exiftool v1.7.0
@@ -12,6 +12,7 @@ require (
 	github.com/spaolacci/murmur3 v1.1.0
 	github.com/stretchr/testify v1.7.0
 	github.com/wenzhenxi/gorsa v0.0.0-20210524035706-528c7050d703
+	golang.org/x/exp v0.0.0-20220328175248-053ad81199eb
 )
 
 require (
