@@ -119,12 +119,6 @@ func TestChunk(t *testing.T) {
 	assert.Equal(t, [][]int{}, Chunk(a, 0))
 }
 
-func TestContains(t *testing.T) {
-	assert.True(t, Contains([]int{1, 2, 3}, 1))
-	assert.True(t, Contains([]string{"a", "b"}, "a"))
-	assert.False(t, Contains([]string{"a", "b"}, "c"))
-}
-
 func TestUnion(t *testing.T) {
 	assert.ElementsMatch(t, []int{2, 3}, Intersect(
 		[]int{1, 2, 3},
@@ -134,7 +128,7 @@ func TestUnion(t *testing.T) {
 		[]int{1, 2, 3},
 		[]int{2, 3, 4},
 	))
-	assert.ElementsMatch(t, []int{1, 2, 3, 2, 3, 4}, Union(
+	assert.ElementsMatch(t, []int{1, 2, 3, 4}, Union(
 		[]int{1, 2, 3},
 		[]int{2, 3, 4},
 	))

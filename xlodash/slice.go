@@ -18,6 +18,11 @@ func Unique[V comparable](list []V) []V {
 	return res
 }
 
+// Union ...
+func Union[V comparable](list []V, target []V) []V {
+	return Unique(append(list, target...))
+}
+
 // Map ...
 func Map[V any, R any](list []V, f func(int, V) R) []R {
 	res := make([]R, 0, len(list))
@@ -69,16 +74,6 @@ func Chunk[V any](list []V, size int) [][]V {
 	return res
 }
 
-// Contains ...
-func Contains[V comparable](list []V, target V) bool {
-	for _, v := range list {
-		if v == target {
-			return true
-		}
-	}
-	return false
-}
-
 // Intersect ...
 func Intersect[V comparable](list []V, target []V) []V {
 	res := make([]V, 0)
@@ -108,9 +103,4 @@ func Diff[V comparable](list []V, target []V) []V {
 		}
 	}
 	return res
-}
-
-// Union ...
-func Union[V comparable](list []V, target []V) []V {
-	return append(list, target...)
 }
