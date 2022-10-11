@@ -12,5 +12,6 @@ func main() {
 		Version: "v0.0.1",
 	}
 	root.AddCommand(command.InterestCommand)
+	root.AddCommand(command.TaxCommand)
 	root.Execute()
 }

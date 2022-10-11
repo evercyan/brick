@@ -5,7 +5,7 @@ import (
 )
 
 var (
-	Questions = []*survey.Question{
+	Question = []*survey.Question{
 		{
 			Name: "Capital",
 			Prompt: &survey.Input{
@@ -84,8 +84,8 @@ type MonthPayment struct {
 
 // ----------------------------------------------------------------
 
-// Answers ...
-type Answers struct {
+// Answer ...
+type Answer struct {
 	Capital     float64 `survey:"Capital"`
 	RateType    string  `survey:"RateType"`
 	RateValue   float64 `survey:"RateValue"`
@@ -95,7 +95,7 @@ type Answers struct {
 }
 
 // GetRateByPeroid 根据还款周期计算利率
-func (t *Answers) GetRateByPeroid() float64 {
+func (t *Answer) GetRateByPeroid() float64 {
 	if (t.PeriodType == PeriodTypeDay && t.RateType == RateTypeDay) ||
 		(t.PeriodType == PeriodTypeMonth && t.RateType == RateTypeMonth) ||
 		(t.PeriodType == PeriodTypeYear && t.RateType == RateTypeYear) {
@@ -122,7 +122,7 @@ func (t *Answers) GetRateByPeroid() float64 {
 }
 
 // GetMonthValue 获取按月还款参数
-func (t *Answers) GetMonthValue() (float64, int) {
+func (t *Answer) GetMonthValue() (float64, int) {
 	var (
 		rate   float64 = 0
 		peroid         = 0
