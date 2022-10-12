@@ -78,6 +78,9 @@ func CalMonthEqualInterest(
 		monthCapital := monthTotal - monthInterest
 		total = total + monthTotal
 		remainCapital = remainCapital - monthCapital
+		if remainCapital <= 0 {
+			remainCapital = 0
+		}
 		totalCapital := amount - remainCapital
 		totalInterest := total - totalCapital
 		list = append(list, &config.MonthPayment{

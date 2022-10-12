@@ -37,7 +37,7 @@ var (
 			Name: "Deduction",
 			Prompt: &survey.Input{
 				Message: "专项附加扣除, 包括租房房贷或赡养老人等",
-				Default: "3500",
+				Default: "0",
 			},
 			Validate:  survey.Required,
 			Transform: survey.Title,
