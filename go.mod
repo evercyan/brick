@@ -1,16 +1,19 @@
 module github.com/evercyan/brick
 
-go 1.18
+go 1.17
 
 require (
 	github.com/barasher/go-exiftool v1.7.0
 	github.com/disintegration/imaging v1.6.2
 	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/noelyahan/mergi v0.0.0-20190514155713-69271a4267fb
+	github.com/pkg/errors v0.9.1
 	github.com/rs/xid v1.3.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/spaolacci/murmur3 v1.1.0
 	github.com/stretchr/testify v1.7.0
+	github.com/techxmind/go-utils v0.1.1
 	github.com/wenzhenxi/gorsa v0.0.0-20210524035706-528c7050d703
 	golang.org/x/exp v0.0.0-20220328175248-053ad81199eb
 )

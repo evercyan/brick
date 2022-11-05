@@ -1,4 +1,4 @@
-package xutil
+package xtype
 
 import (
 	"testing"

@@ -12,7 +12,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/evercyan/brick/xutil"
+	"github.com/evercyan/brick/xtype"
 )
 
 // Read ...
@@ -89,7 +89,7 @@ func LineContent(filepath string, numbers ...int) map[int]string {
 	count := len(numbers)
 	fileScanner := bufio.NewScanner(file)
 	for number := 1; fileScanner.Scan(); number++ {
-		if count == 0 || xutil.IsContains(numbers, number) {
+		if count == 0 || xtype.IsContains(numbers, number) {
 			res[number] = fileScanner.Text()
 		}
 	}

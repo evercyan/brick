@@ -1,4 +1,4 @@
-package xconvert
+package xtype
 
 import (
 	"testing"
@@ -61,4 +61,15 @@ func TestToBool(t *testing.T) {
 	assert.False(t, ToBool("0"))
 	assert.True(t, ToBool("1"))
 	assert.False(t, ToBool(nil))
+}
+
+func TestToSlice(t *testing.T) {
+	assert.Equal(t, []interface{}{}, ToSlice(nil))
+	assert.Equal(t, []interface{}{1}, ToSlice(1))
+	assert.Equal(t, []interface{}{"a"}, ToSlice("a"))
+	assert.Equal(t, []interface{}{"a", "b", "c"}, ToSlice("a, b, , ,c"))
+	assert.Equal(t, []interface{}{"a", "b"}, ToSlice([]interface{}{"a", "b"}))
+	assert.Equal(t, []interface{}{1, 2, 3}, ToSlice([]int{1, 2, 3}))
+	assert.Equal(t, []interface{}{1, 2, 3}, ToSlice([3]int{1, 2, 3}))
+	assert.Equal(t, []interface{}{1}, ToSlice(map[string]int{"a": 1}))
 }

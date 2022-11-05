@@ -1,8 +1,10 @@
-package xconvert
+package xtype
 
 import (
 	"fmt"
+	"reflect"
 	"strconv"
+	"strings"
 )
 
 // ToUint ...
@@ -118,4 +120,42 @@ func ToBool(v interface{}) bool {
 	}
 	b, err := strconv.ParseBool(ToString(v))
 	return err == nil && b
+}
+
+// ToSlice ...
+func ToSlice(v interface{}) []interface{} {
+	res := make([]interface{}, 0)
+	if v == nil {
+		return res
+	}
+	vo := reflect.ValueOf(v)
+	vt := vo.Kind()
+	if vt == reflect.String {
+		vv := v.(string)
+		if vv == "" {
+			return res
+		}
+		vvs := strings.Split(vv, ",")
+		res = make([]interface{}, 0, len(vvs))
+		for _, vvv := range vvs {
+			vvv = strings.TrimSpace(vvv)
+			if vvv != "" {
+				res = append(res, vvv)
+			}
+		}
+		return res
+	} else if vt == reflect.Map {
+		iter := vo.MapRange()
+		for iter.Next() {
+			res = append(res, iter.Value().Interface())
+		}
+	} else if vt == reflect.Array || vt == reflect.Slice {
+		res = make([]interface{}, vo.Len())
+		for i := 0; i < vo.Len(); i++ {
+			res[i] = vo.Index(i).Interface()
+		}
+	} else {
+		res = append(res, v)
+	}
+	return res
 }

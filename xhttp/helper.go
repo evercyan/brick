@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"io"
 
-	"github.com/evercyan/brick/xutil"
+	"github.com/evercyan/brick/xtype"
 )
 
 // getDecompressBody
@@ -24,16 +24,16 @@ func getDecompressBody(compressType string, body io.ReadCloser) (io.ReadCloser, 
 
 // getRequestBody ...
 func getRequestBody(body interface{}) []byte {
-	if s, ok := body.(string); ok {
+	if s, sok := body.(string); sok {
 		return []byte(s)
-	} else if b, ok := body.([]byte); ok {
+	} else if b, bok := body.([]byte); bok {
 		return b
-	} else if xutil.IsJSONObject(body) {
-		b, err := json.Marshal(body)
+	} else if xtype.IsJSONObject(body) {
+		b1, err := json.Marshal(body)
 		if err != nil {
 			return nil
 		}
-		return b
+		return b1
 	}
 	return nil
 }

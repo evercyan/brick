@@ -3,7 +3,7 @@ package xversion
 import (
 	"strings"
 
-	"github.com/evercyan/brick/xconvert"
+	"github.com/evercyan/brick/xtype"
 	"github.com/evercyan/brick/xutil"
 )
 
@@ -35,7 +35,7 @@ func Compare(src string, dst string) CompareResult {
 	}
 	for i := 0; i < minLen; i++ {
 		// 无法转换的, 默认为 0, 即 v1.a.3 == v1.0.3
-		srcNum, dstNum := xconvert.ToUint(srcs[i]), xconvert.ToUint(dsts[i])
+		srcNum, dstNum := xtype.ToUint(srcs[i]), xtype.ToUint(dsts[i])
 		if srcNum < dstNum {
 			return Less
 		} else if srcNum > dstNum {
