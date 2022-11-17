@@ -117,8 +117,16 @@ func ReaderMineType(r io.Reader) string {
 }
 
 // WriteJSON write data to JSON file
-func WriteJSON(filepath string, data interface{}) error {
-	b, err := json.Marshal(data)
+func WriteJSON(filepath string, data interface{}, pretty ...bool) error {
+	var (
+		b   []byte
+		err error
+	)
+	if len(pretty) > 0 {
+		b, err = json.MarshalIndent(data, "", "    ")
+	} else {
+		b, err = json.Marshal(data)
+	}
 	if err != nil {
 		return err
 	}
