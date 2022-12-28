@@ -1,8 +1,9 @@
-// Package xloading 终端加载渲染
-// 	l := xloading.New("message success").Start()
-// 	time.Sleep(2 * time.Second)
-// 	l.Success()
 package xloading
+
+// Package xloading 终端加载渲染
+//  l := xloading.New("message success").Start()
+//  time.Sleep(2 * time.Second)
+//  l.Success()
 
 import (
 	"fmt"

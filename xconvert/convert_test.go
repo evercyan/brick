@@ -6,6 +6,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestTitle(t *testing.T) {
+	assert.Equal(t, "FirstName", Title("firstName"))
+}
+
 func TestToCamelCase(t *testing.T) {
 	assert.Equal(t, "userName", ToCamelCase("user_name"))
 	assert.Equal(t, "userNAme", ToCamelCase("user_nAme"))

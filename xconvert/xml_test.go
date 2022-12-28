@@ -13,7 +13,7 @@ func TestXML2Map(t *testing.T) {
 				<c><c1>c11</c1></c>
 			</xml>`
 
-	m, err := XML2Map(str)
+	m, err := XML2Object(str)
 
 	assert.Nil(t, err)
 	assert.Equal(t, "a1", m["a"])

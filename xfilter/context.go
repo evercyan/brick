@@ -21,7 +21,7 @@ func (t *Context) Get(k string) (interface{}, bool) {
 	return t.data.Load(k)
 }
 
-// Value 读取 ctx 数据
+// Ctx 读取 ctx 数据
 func (t *Context) Ctx(k string) interface{} {
 	return t.ctx.Value(k)
 }

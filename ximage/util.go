@@ -8,6 +8,7 @@ import (
 	"image/png"
 	"os"
 
+	"github.com/evercyan/brick/xencoding"
 	"github.com/evercyan/brick/xfile"
 )
 
@@ -66,4 +67,13 @@ func Write(filepath string, img image.Image) error {
 	default:
 		return fmt.Errorf("invalid image type: %s", ext)
 	}
+}
+
+// Base64 ...
+func Base64(filepath string) string {
+	return fmt.Sprintf(
+		"data:image/%s;base64,%s",
+		Type(filepath),
+		xencoding.Base64Encode(xfile.Read(filepath)),
+	)
 }

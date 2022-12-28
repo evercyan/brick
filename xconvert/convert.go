@@ -6,7 +6,15 @@ import (
 	"reflect"
 	"regexp"
 	"unicode"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
+
+// Title ...
+func Title(s string) string {
+	return cases.Title(language.English, cases.NoLower).String(s)
+}
 
 // ToCamelCase ...
 func ToCamelCase(s string) string {
@@ -15,7 +23,7 @@ func ToCamelCase(s string) string {
 		if k == 0 {
 			continue
 		}
-		chunks[k] = bytes.Title(v)
+		chunks[k] = cases.Title(language.English, cases.NoLower).Bytes(v)
 	}
 	return string(bytes.Join(chunks, nil))
 }

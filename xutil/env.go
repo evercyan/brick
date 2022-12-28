@@ -7,10 +7,10 @@ import (
 )
 
 // GetEnv ...
-func GetEnv(name string, defaultValues ...string) string {
+func GetEnv(name string, defaults ...string) string {
 	value := os.Getenv(name)
-	if value == "" && len(defaultValues) > 0 {
-		value = defaultValues[0]
+	if value == "" && len(defaults) > 0 {
+		value = defaults[0]
 	}
 	return value
 }

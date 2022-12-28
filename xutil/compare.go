@@ -6,7 +6,7 @@ import (
 	"github.com/evercyan/brick/xtype"
 )
 
-// Number ...
+// CompareNumber ...
 func CompareNumber(a, b interface{}) int {
 	fa := xtype.ToFloat64(a)
 	fb := xtype.ToFloat64(b)
@@ -18,7 +18,7 @@ func CompareNumber(a, b interface{}) int {
 	return 0
 }
 
-// String ...
+// CompareString ...
 func CompareString(a, b interface{}) int {
 	sa, sb := "", ""
 	if xtype.IsString(a) {

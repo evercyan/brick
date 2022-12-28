@@ -1,6 +1,7 @@
+package xcolor
+
 // Package xcolor 渲染终端文本颜色背景色和显示样式
 //  xcolor.New("text").Fg(xcolor.FgGreen).Render()
-package xcolor
 
 import (
 	"fmt"

@@ -1,18 +1,28 @@
-
-.PHONY: help test testgc cover
-
 help:
-	@echo "Usage:"
-	@sed -n 's/^##//p' ${MAKEFILE_LIST} | column -t -s ':' |  sed -e 's/^/ /'
+	@echo 'Usage:'
+	@echo ' make [target]'
+	@echo ''
+	@echo 'Targets:'
+	@awk '/^[a-zA-Z\-\_0-9]+:/ { \
+	helpMessage = match(lastLine, /^# (.*)/); \
+		if (helpMessage) { \
+			helpCommand = substr($$1, 0, index($$1, ":")-1); \
+			helpMessage = substr(lastLine, RSTART + 2, RLENGTH); \
+			printf "\033[36m%-16s\033[0m %s\n", helpCommand,helpMessage; \
+		} \
+	} \
+	{ lastLine = $$0 }' $(MAKEFILE_LIST)
 
-## test: 测试
+.DEFAULT_GOAL := help
+
+# 单元测试
 test:
 	go test -v -coverprofile=/tmp/cover.out -covermode=atomic -race ./...
 
-## testgc: gc 测试
+# 单元测试 -gcflags
 testgc:
 	go test -v -coverprofile=/tmp/cover.out -covermode=atomic -race -gcflags "all=-N -l" ./...
 
-## cover: 覆盖率
-cover:
+# 生成覆盖率报告
+cover: test
 	go tool cover -html=/tmp/cover.out

@@ -7,6 +7,7 @@ import (
 // Logic 条件组逻辑关系
 type Logic int
 
+// ...
 const (
 	LogicAnd Logic = iota
 	LogicOr

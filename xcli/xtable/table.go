@@ -1,7 +1,8 @@
+package xtable
+
 // Package xtable 终端表格渲染
 //  list := [][]int{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}
 //  xtable.New(list).Render()
-package xtable
 
 import (
 	"fmt"

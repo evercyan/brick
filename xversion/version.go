@@ -16,16 +16,16 @@ func Format(version string) string {
 }
 
 // Compare 版本比较
-func Compare(src string, dst string) CompareResult {
+func Compare(src string, dst string) int {
 	src, dst = Format(src), Format(dst)
 	if src == dst {
-		return Equal
+		return 0
 	}
 	if src == "" {
-		return Less
+		return -1
 	}
 	if dst == "" {
-		return Greater
+		return 1
 	}
 	srcs, dsts := strings.Split(src, "."), strings.Split(dst, ".")
 	srcLen, dstLen := len(srcs), len(dsts)
@@ -37,16 +37,17 @@ func Compare(src string, dst string) CompareResult {
 		// 无法转换的, 默认为 0, 即 v1.a.3 == v1.0.3
 		srcNum, dstNum := xtype.ToUint(srcs[i]), xtype.ToUint(dsts[i])
 		if srcNum < dstNum {
-			return Less
+			return -1
 		} else if srcNum > dstNum {
-			return Greater
+			return 1
 		}
 	}
+
 	if srcLen < dstLen {
-		return Less
+		return -1
 	} else if srcLen == dstLen {
-		return Equal
+		return 0
 	} else {
-		return Greater
+		return 1
 	}
 }

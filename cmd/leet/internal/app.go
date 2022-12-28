@@ -1,5 +1,6 @@
 package internal
 
+// App ...
 type App struct {
 	*Config
 	*LeetCode

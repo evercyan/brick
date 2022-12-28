@@ -21,3 +21,7 @@ func TestSize(t *testing.T) {
 	assert.Empty(t, w1)
 	assert.Empty(t, h1)
 }
+
+func TestBase64(t *testing.T) {
+	assert.NotEmpty(t, Base64("../logo.png"))
+}

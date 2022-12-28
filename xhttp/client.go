@@ -9,35 +9,60 @@ import (
 	"sync"
 )
 
-// client ...
-type client struct {
+// Client ...
+type Client struct {
 	*http.Client
+
 	tlsConfig *tls.Config
 	option    *Option
 }
 
 // Get ...
-func (t *client) Get(ctx context.Context, url string, headers http.Header) (*http.Response, error) {
+func (t *Client) Get(
+	ctx context.Context,
+	url string,
+	headers http.Header,
+) (*http.Response, error) {
 	return t.Do(ctx, "GET", url, headers, nil)
 }
 
 // Post ...
-func (t *client) Post(ctx context.Context, url string, headers http.Header, body []byte) (*http.Response, error) {
+func (t *Client) Post(
+	ctx context.Context,
+	url string,
+	headers http.Header,
+	body []byte,
+) (*http.Response, error) {
 	return t.Do(ctx, "POST", url, headers, body)
 }
 
 // Put ...
-func (t *client) Put(ctx context.Context, url string, headers http.Header, body []byte) (*http.Response, error) {
+func (t *Client) Put(
+	ctx context.Context,
+	url string,
+	headers http.Header,
+	body []byte,
+) (*http.Response, error) {
 	return t.Do(ctx, "PUT", url, headers, body)
 }
 
 // Delete ...
-func (t *client) Delete(ctx context.Context, url string, headers http.Header) (*http.Response, error) {
+func (t *Client) Delete(
+	ctx context.Context,
+	url string,
+	headers http.Header,
+) (*http.Response, error) {
 	return t.Do(ctx, "DELETE", url, headers, nil)
 }
 
 // Do ...
-func (t *client) Do(ctx context.Context, method string, url string, headers http.Header, body []byte) (*http.Response, error) {
+func (t *Client) Do(
+	ctx context.Context,
+	method string,
+	url string,
+	headers http.Header,
+	body []byte,
+) (*http.Response, error) {
 	// https
 	if strings.HasPrefix(url, "https") {
 		if transport, ok := t.Client.Transport.(*http.Transport); ok {
@@ -82,7 +107,7 @@ func (t *client) Do(ctx context.Context, method string, url string, headers http
 	}
 
 	// compress
-	respBody, err := getDecompressBody(res.Header.Get("Content-Encoding"), res.Body)
+	respBody, err := GetDecompressBody(res.Header.Get("Content-Encoding"), res.Body)
 	if err != nil {
 		res.Body.Close()
 		return nil, err
@@ -95,22 +120,22 @@ func (t *client) Do(ctx context.Context, method string, url string, headers http
 // ----------------------------------------------------------------
 
 var (
-	defaultClient     *client
+	defaultClient     *Client
 	defaultClientOnce sync.Once
 )
 
-// NewClient ...
-func NewClient() *client {
+// New ...
+func New() *Client {
 	defaultClientOnce.Do(func() {
-		defaultClient = NewClientWithOptions(defaultOption)
+		defaultClient = NewWithtions(defaultOption)
 	})
 	return defaultClient
 }
 
-// NewClientWithOptions ...
-func NewClientWithOptions(option *Option) *client {
+// NewWithtions ...
+func NewWithtions(option *Option) *Client {
 	option = setOptionDefaultValue(option)
-	client := &client{
+	client := &Client{
 		Client: &http.Client{
 			Transport: &http.Transport{
 				MaxIdleConnsPerHost:   option.ConnsPerHost,

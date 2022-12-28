@@ -6,69 +6,59 @@ import (
 	"strconv"
 )
 
-type js struct {
+// JSON ...
+type JSON struct {
 	value interface{}
 }
 
 // New ...
-func New(s string) *js {
-	j := new(js)
+func New(s string) *JSON {
+	j := new(JSON)
 	var v interface{}
-	if err := json.Unmarshal([]byte(s), &v); err != nil {
-		return j
+	if err := json.Unmarshal([]byte(s), &v); err == nil {
+		j.value = v
 	}
-	j.value = v
 	return j
 }
 
 // Key ...
-func (j *js) Key(key string) *js {
+func (j *JSON) Key(key string) *JSON {
 	m, ok := (j.value).(map[string]interface{})
-	if !ok {
+	if ok {
+		j.value = m[key]
+	} else {
 		j.value = nil
-		return j
 	}
-	if _, ok := m[key]; !ok {
-		j.value = nil
-		return j
-	}
-	j.value = m[key]
 	return j
 }
 
 // Index ...
-func (j *js) Index(index int) *js {
+func (j *JSON) Index(index int) *JSON {
 	l, ok := (j.value).([]interface{})
-	if !ok {
+	if ok && index >= 0 && index < len(l) {
+		j.value = l[index]
+	} else {
 		j.value = nil
-		return j
 	}
-
-	if index > len(l)-1 {
-		j.value = nil
-		return j
-	}
-
-	j.value = l[index]
 	return j
 }
 
 // Value ...
-func (j *js) Value() interface{} {
+func (j *JSON) Value() interface{} {
 	return j.value
 }
 
 // ToString ...
-func (j *js) ToString() string {
+func (j *JSON) ToString() string {
 	if j.value == nil {
 		return ""
 	}
 	return fmt.Sprint(j.value)
 }
 
-// ToUint ...
-func (j *js) ToUint() uint64 {
-	v, err := strconv.ParseUint(j.ToString(), 10, 64)
+// ToInt ...
+func (j *JSON) ToInt() int64 {
+	v, err := strconv.ParseInt(j.ToString(), 10, 64)
 	if err != nil {
 		return 0
 	}
@@ -76,7 +66,7 @@ func (j *js) ToUint() uint64 {
 }
 
 // ToJSON ...
-func (j *js) ToJSON() string {
+func (j *JSON) ToJSON() string {
 	if j.value == nil {
 		return ""
 	}
@@ -85,7 +75,7 @@ func (j *js) ToJSON() string {
 }
 
 // ToArray ...
-func (j *js) ToArray() interface{} {
+func (j *JSON) ToArray() interface{} {
 	switch (j.value).(type) {
 	case []interface{}:
 		return (j.value).([]interface{})

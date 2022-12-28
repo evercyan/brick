@@ -6,8 +6,8 @@ import (
 	"strings"
 )
 
-// XML2Map ...
-func XML2Map(s string) (m map[string]string, err error) {
+// XML2Object ...
+func XML2Object(s string) (m map[string]string, err error) {
 	m = make(map[string]string)
 	var (
 		decoder = xml.NewDecoder(strings.NewReader(s))

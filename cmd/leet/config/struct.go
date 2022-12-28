@@ -49,12 +49,14 @@ type QuestionTag struct {
 // QuestionLevel 题目难度
 type QuestionLevel int
 
+// ...
 const (
 	QuestionLevelEasy QuestionLevel = iota + 1
 	QuestionLevelMiddle
 	QuestionLevelHard
 )
 
+// String ...
 func (t QuestionLevel) String() string {
 	switch t {
 	case QuestionLevelEasy:

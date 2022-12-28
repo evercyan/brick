@@ -1,0 +1,174 @@
+package xlog
+
+import (
+	"bytes"
+	"fmt"
+	"io"
+	"strings"
+
+	"github.com/sirupsen/logrus"
+)
+
+// xLogrus ...
+type xLogrus struct {
+	entry  *logrus.Entry
+	writer io.Writer
+}
+
+// newLogrus ...
+func newLogrus(option *Config) Logger {
+	log := logrus.New()
+
+	// 日志输出
+	writers := getLoggerWriters(option)
+	log.SetOutput(io.MultiWriter(writers...))
+
+	// 日志级别
+	log.SetLevel(getLogrusLevel(option.Level))
+
+	// 日志格式
+	if option.Formatter == FormatterJSON {
+		log.SetFormatter(&logrus.JSONFormatter{
+			TimestampFormat: timestampFormat,
+			FieldMap: logrus.FieldMap{
+				logrus.FieldKeyTime:  msgTimeKey,
+				logrus.FieldKeyLevel: msgLevelKey,
+			},
+		})
+	} else {
+		// log.SetFormatter(&logrus.TextFormatter{
+		// 	TimestampFormat: timestampFormat,
+		// })
+		log.SetFormatter(&logrusTextFormatter{})
+	}
+
+	return &xLogrus{
+		entry:  logrus.NewEntry(log),
+		writer: writers[0],
+	}
+}
+
+// ----------------------------------------------------------------
+
+type logrusTextFormatter struct{}
+
+func (t *logrusTextFormatter) Format(entry *logrus.Entry) ([]byte, error) {
+	var b *bytes.Buffer
+	if entry.Buffer != nil {
+		b = entry.Buffer
+	} else {
+		b = &bytes.Buffer{}
+	}
+	b.WriteString(fmt.Sprintf(
+		"[%s] [%s] [%s] %s\n",
+		entry.Time.Format(timestampFormat),
+		strings.ToUpper(entry.Level.String()),
+		entry.Data["caller"],
+		entry.Message,
+	))
+	return b.Bytes(), nil
+}
+
+// ----------------------------------------------------------------
+
+// log ...
+func (t *xLogrus) log(level Level, args ...interface{}) {
+	lv := getLogrusLevel(level)
+	if !t.entry.Logger.IsLevelEnabled(lv) {
+		return
+	}
+	t.entry.WithField(msgCallerKey, loggerCaller(callerSkip)).Log(lv, args...)
+}
+
+// Log ...
+func (t *xLogrus) Log(level Level, args ...interface{}) {
+	t.log(level, args...)
+}
+
+// Logf ...
+func (t *xLogrus) Logf(level Level, format string, args ...interface{}) {
+	t.log(level, fmt.Sprintf(format, args...))
+}
+
+// Trace ...
+func (t *xLogrus) Trace(args ...interface{}) {
+	t.Log(LevelTrace, args...)
+}
+
+// Tracef ...
+func (t *xLogrus) Tracef(format string, args ...interface{}) {
+	t.Logf(LevelTrace, format, args...)
+}
+
+// Debug ...
+func (t *xLogrus) Debug(args ...interface{}) {
+	t.Log(LevelDebug, args...)
+}
+
+// Debugf ...
+func (t *xLogrus) Debugf(format string, args ...interface{}) {
+	t.Logf(LevelDebug, format, args...)
+}
+
+// Info ...
+func (t *xLogrus) Info(args ...interface{}) {
+	t.Log(LevelInfo, args...)
+}
+
+// Infof ...
+func (t *xLogrus) Infof(format string, args ...interface{}) {
+	t.Logf(LevelInfo, format, args...)
+}
+
+// Warn ...
+func (t *xLogrus) Warn(args ...interface{}) {
+	t.Log(LevelWarn, args...)
+}
+
+// Warnf ...
+func (t *xLogrus) Warnf(format string, args ...interface{}) {
+	t.Logf(LevelWarn, format, args...)
+}
+
+// Error ...
+func (t *xLogrus) Error(args ...interface{}) {
+	t.Log(LevelError, args...)
+}
+
+// Errorf ...
+func (t *xLogrus) Errorf(format string, args ...interface{}) {
+	t.Logf(LevelError, format, args...)
+}
+
+// Fatal ...
+func (t *xLogrus) Fatal(args ...interface{}) {
+	t.Log(LevelFatal, args...)
+}
+
+// Fatalf ...
+func (t *xLogrus) Fatalf(format string, args ...interface{}) {
+	t.Logf(LevelFatal, format, args...)
+}
+
+// Panic ...
+func (t *xLogrus) Panic(args ...interface{}) {
+	t.Log(LevelPanic, args...)
+}
+
+// Panicf ...
+func (t *xLogrus) Panicf(format string, args ...interface{}) {
+	t.Logf(LevelPanic, format, args...)
+}
+
+// WithField ...
+func (t *xLogrus) WithField(key string, value interface{}) Logger {
+	return &xLogrus{
+		entry:  t.entry.WithField(key, value),
+		writer: t.writer,
+	}
+}
+
+// Writer ...
+func (t *xLogrus) Writer() io.Writer {
+	return t.writer
+}

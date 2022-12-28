@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 
@@ -156,7 +155,7 @@ func Md5(path string) (string, error) {
 	var size int64 = 1024 * 1024
 	hash := md5.New()
 	if fi.Size() < size {
-		data, err := ioutil.ReadFile(path)
+		data, err := os.ReadFile(path)
 		if err != nil {
 			return "", err
 		}

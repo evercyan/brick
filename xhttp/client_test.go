@@ -38,11 +38,11 @@ package xhttp
 // 	})
 // 	defer patches.Reset()
 //
-// 	// client
-// 	client := NewClient()
+// 	// Client
+// 	Client := New()
 //
 // 	// Get
-// 	res, err := client.Get(ctx, reqUrl, nil)
+// 	res, err := Client.Get(ctx, reqUrl, nil)
 // 	assert.Nil(t, err)
 // 	if err == nil {
 // 		defer res.Body.Close()

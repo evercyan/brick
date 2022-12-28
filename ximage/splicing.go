@@ -9,6 +9,7 @@ import (
 	"github.com/evercyan/brick/xconvert"
 )
 
+// ...
 var (
 	maxRowCount           = 1000  // 最大行数
 	maxColCount           = 1000  // 最大列数
@@ -50,7 +51,7 @@ func WithSplicingPadding(v int) func(option *SplicingOption) {
 // WithSplicingSpace 图片间距, 1-100
 func WithSplicingSpace(v int) func(option *SplicingOption) {
 	return func(option *SplicingOption) {
-		if v >= 1 && v <= 100 {
+		if v >= 0 && v <= 100 {
 			option.Space = v
 		}
 	}

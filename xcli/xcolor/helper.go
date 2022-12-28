@@ -15,12 +15,17 @@ func prefix(c Fg, texts ...string) {
 	fmt.Println(text)
 }
 
-// Success 输出成功提示
-func Success(texts ...string) {
-	prefix(FgGreen, texts...)
+// Success 输出成功
+func Success(args ...string) {
+	prefix(FgGreen, args...)
 }
 
-// Fail 输出失败文字
-func Fail(texts ...string) {
-	prefix(FgRed, texts...)
+// Fail 输出失败
+func Fail(args ...string) {
+	prefix(FgRed, args...)
+}
+
+// Info 输出提示
+func Info(args ...string) {
+	prefix(FgYellow, args...)
 }
