@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/evercyan/brick/xencoding"
+	"github.com/evercyan/brick/xjson"
 	"github.com/evercyan/brick/xtype"
 )
 
@@ -92,14 +92,14 @@ func (t *ConditionGroup) Assert(ctx *Context) (err error) {
 
 // NewConditionSingle 初始化单个条件实例
 func NewConditionSingle(filter []interface{}) (*ConditionSingle, error) {
-	prefix := xencoding.JSONEncode(filter)
+	prefix := xjson.Encode(filter)
 	if len(filter) != 3 {
-		return nil, fmt.Errorf("%s: condition filter must have 3 elements", prefix)
+		return nil, fmt.Errorf("%s: 条件必须有 3 个元素", prefix)
 	}
 	// 解析变量
 	variableName, ok := filter[0].(string)
 	if !ok {
-		return nil, fmt.Errorf("%s: condition filter 1st is not string: %v", prefix, filter[0])
+		return nil, fmt.Errorf("%s: 条件的第 1 个元素必须是字符串: %v", prefix, filter[0])
 	}
 	variable, err := NewVariable(variableName)
 	if err != nil {
@@ -108,7 +108,7 @@ func NewConditionSingle(filter []interface{}) (*ConditionSingle, error) {
 	// 解析操作符
 	operationName, ok := filter[1].(string)
 	if !ok {
-		return nil, fmt.Errorf("%s: condition filter 2nd is not string: %v", prefix, filter[1])
+		return nil, fmt.Errorf("%s: 条件的第 2 个元素必须是字符串: %v", prefix, filter[1])
 	}
 	operation, err := NewOperation(operationName)
 	if err != nil {
@@ -128,25 +128,30 @@ func NewConditionSingle(filter []interface{}) (*ConditionSingle, error) {
 
 // NewConditionGroup 初始化群组条件实例
 func NewConditionGroup(filters []interface{}) (Condition, error) {
-	prefix := xencoding.JSONEncode(filters)
-	if len(filters) < 2 {
-		return nil, fmt.Errorf("%s: condition group must have at least 2 elements", prefix)
+	prefix := xjson.Encode(filters)
+	if len(filters) == 0 {
+		return nil, fmt.Errorf("%s: 条件组至少要有 1 个条件", prefix)
 	}
-	// 末位元素为逻辑关系, and | or
-	logicStr, ok := filters[len(filters)-1].(string)
-	if !ok {
-		return nil, fmt.Errorf("%s: condition group last element must be logic string", prefix)
+
+	// 条件组间逻辑默认为 and
+	logic := LogicAnd
+	if s, ok := filters[len(filters)-1].(string); ok {
+		// 如果最后一位元素是字符串
+		logic = ToLogic(s)
+		filters = filters[:len(filters)-1]
+		if len(filters) == 0 {
+			return nil, fmt.Errorf("%s: 条件组至少要有 1 个条件", prefix)
+		}
 	}
-	filters = filters[:len(filters)-1]
+
 	conditionGroup := &ConditionGroup{
-		Logic:      ToLogic(logicStr),
+		Logic:      logic,
 		Conditions: make([]Condition, 0),
 	}
 	for _, filter := range filters {
 		if !xtype.IsSlice(filter) {
 			return nil, fmt.Errorf(
-				"condition group subitem must be an array: %v",
-				xencoding.JSONEncode(filter),
+				"条件组的元素必须是一个数组: %v", xjson.Encode(filter),
 			)
 		}
 		subCondition, err := NewCondition(filter.([]interface{}))
@@ -160,8 +165,8 @@ func NewConditionGroup(filters []interface{}) (Condition, error) {
 
 // NewCondition 初始化复合条件
 func NewCondition(filters []interface{}) (Condition, error) {
-	conditionSingle, errItem := NewConditionSingle(filters)
-	if errItem == nil {
+	conditionSingle, errSingle := NewConditionSingle(filters)
+	if errSingle == nil {
 		return conditionSingle, nil
 	}
 	conditionGroup, errGroup := NewConditionGroup(filters)
@@ -169,9 +174,8 @@ func NewCondition(filters []interface{}) (Condition, error) {
 		return conditionGroup, nil
 	}
 	return nil, fmt.Errorf(
-		"%s: condition [group err: %v] [item err: %v]",
-		xencoding.JSONEncode(filters),
-		errItem.Error(),
+		"解析失败: (条件: %v) (条件组: %v)",
+		errSingle.Error(),
 		errGroup.Error(),
 	)
 }

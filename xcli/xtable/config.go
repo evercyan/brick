@@ -20,17 +20,19 @@ type border struct {
 
 // 边界样式枚举
 const (
-	Solid  = iota // 实线
-	Dashed        // 虚线(类 mysql 终端表格)
-	Dotted        // 点线
+	Solid    = iota // 实线
+	Dashed          // 虚线(类 mysql 终端表格)
+	Dotted          // 点线
+	Markdown        // markdown 表格
 )
 
 // styles 边界样式字典
 // ref: http://www.tamasoft.co.jp/en/general-info/unicode.html
 var styles = map[int]border{
-	Solid:  {'─', '│', '┼', '┴', '┬', '┤', '├', '┐', '┌', '┘', '└'},
-	Dashed: {'-', '|', '+', '+', '+', '+', '+', '+', '+', '+', '+'},
-	Dotted: {'*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'},
+	Solid:    {'─', '│', '┼', '┴', '┬', '┤', '├', '┐', '┌', '┘', '└'},
+	Dashed:   {'-', '|', '+', '+', '+', '+', '+', '+', '+', '+', '+'},
+	Dotted:   {'*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'},
+	Markdown: {' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
 }
 
 var chineseCharset = []rune{0x2E80, 0x9FD0}

@@ -32,3 +32,10 @@ func Sha1(str string) string {
 	hash.Write([]byte(str))
 	return hex.EncodeToString(hash.Sum(nil))
 }
+
+// Sha256 ...
+func Sha256(str string) string {
+	hash := sha256.New()
+	hash.Write([]byte(str))
+	return hex.EncodeToString(hash.Sum(nil))
+}

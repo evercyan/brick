@@ -76,7 +76,19 @@ func (t *table) Text() (content string) {
 	content += string(headerT) + "\n"
 	if len(t.headers) > 0 {
 		content += string(headerM) + "\n"
-		content += string(headerB) + "\n"
+		if t.style != Markdown {
+			content += string(headerB) + "\n"
+		}
+	}
+
+	if t.style == Markdown {
+		// markdown 表格表头下一行
+		// | --- | --- | --- |
+		content += string(b.V)
+		for range t.widths {
+			content += " --- " + string(b.V)
+		}
+		content += "\n"
 	}
 
 	// 内容区域
@@ -87,7 +99,7 @@ func (t *table) Text() (content string) {
 			body = append(body, []rune(" "+row[i]+repeat(' ', l)+string(b.V))...)
 		}
 		content += string(body) + "\n"
-		if t.border && i != len(t.rows)-1 {
+		if t.border && i != len(t.rows)-1 && t.style != Markdown {
 			content += string(headerB) + "\n"
 		}
 	}

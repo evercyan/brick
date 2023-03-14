@@ -65,3 +65,8 @@ func TestTableCoverage(t *testing.T) {
 	assert.NotNil(t, New(structList).Header([]string{"c1"}).Text())
 	assert.NotNil(t, New(numberList).Header([]string{"c1"}).Text())
 }
+
+func TestTableMarkdown(t *testing.T) {
+	New(structList).Style(Dashed).Border(true).Render()
+	New(structList).Style(Markdown).Border(true).Render()
+}

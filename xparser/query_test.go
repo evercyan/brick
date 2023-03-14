@@ -33,3 +33,12 @@ func TestBuildQuery(t *testing.T) {
 	}
 	assert.Equal(t, "a=a&b=1&c=2", BuildQuery(m))
 }
+
+func TestBuildFormValues(t *testing.T) {
+	m := map[string]interface{}{
+		"c": 2,
+		"a": "a",
+		"b": 1,
+	}
+	assert.NotNil(t, BuildFormValues(m))
+}

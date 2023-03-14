@@ -5,24 +5,17 @@ import (
 )
 
 // Logic 条件组逻辑关系
-type Logic int
+type Logic string
 
 // ...
 const (
-	LogicAnd Logic = iota
-	LogicOr
+	LogicAnd Logic = "and"
+	LogicOr  Logic = "or"
 )
 
 // String ...
 func (t Logic) String() string {
-	switch t {
-	case LogicAnd:
-		return "and"
-	case LogicOr:
-		return "or"
-	default:
-		return ""
-	}
+	return string(t)
 }
 
 // ToLogic ...

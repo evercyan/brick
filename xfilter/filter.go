@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/evercyan/brick/xencoding"
+	"github.com/evercyan/brick/xjson"
 )
 
 // ParseFilter 解析 filter 规则
@@ -44,7 +44,7 @@ func Filter(ctx *Context, list []map[string]interface{}) ([]map[string]interface
 			res = append(res, v)
 			continue
 		}
-		err := Assert(ctx, xencoding.JSONEncode(v["filter"]))
+		err := Assert(ctx, xjson.Encode(v["filter"]))
 		if err != nil {
 			continue
 		}

@@ -140,7 +140,7 @@ func (t *VariableTime) Value(ctx *Context) interface{} {
 func NewVariable(name string) (Variable, error) {
 	variable := _variableFactory.Discovery(name)
 	if variable == nil {
-		return nil, fmt.Errorf("variable unknown [%s]", name)
+		return nil, fmt.Errorf("无效的变量 [%s]", name)
 	}
 	return variable, nil
 }

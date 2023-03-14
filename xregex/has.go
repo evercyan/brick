@@ -40,7 +40,7 @@ func HasTime(s string) bool {
 	return has(patternTime, s)
 }
 
-// HasIdcard ...
-func HasIdcard(s string) bool {
-	return has(patternIdcard, s)
+// HasChinese ...
+func HasChinese(s string) bool {
+	return has(patternChinese, s)
 }

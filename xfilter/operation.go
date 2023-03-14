@@ -161,7 +161,7 @@ func (t *OperationBetween) Name() string {
 func (t *OperationBetween) Expect(value interface{}) (interface{}, error) {
 	section := xtype.ToSlice(value)
 	if len(section) != 2 {
-		return nil, fmt.Errorf("operation [%s] value must be a list with 2 elements", t.Name())
+		return nil, fmt.Errorf("操作符 [%s] 的值只能有 2 个元素", t.Name())
 	}
 	return section, nil
 }
@@ -189,7 +189,7 @@ func (t *OperationHas) Name() string {
 func (t *OperationHas) Expect(value interface{}) (interface{}, error) {
 	list := xtype.ToSlice(value)
 	if len(list) == 0 {
-		return nil, fmt.Errorf("operation [%s] value must be a list", t.Name())
+		return nil, fmt.Errorf("操作符 [%s] 的值必须是数组", t.Name())
 	}
 	return list, nil
 }
@@ -232,7 +232,7 @@ func (t *OperationIn) Name() string {
 func (t *OperationIn) Expect(value interface{}) (interface{}, error) {
 	section := xtype.ToSlice(value)
 	if len(section) == 0 {
-		return nil, fmt.Errorf("operation [%s] value must be a list", t.Name())
+		return nil, fmt.Errorf("操作符 [%s] 的值必须是数组", t.Name())
 	}
 	return section, nil
 }
@@ -281,7 +281,7 @@ func (t *OperationMatch) Name() string {
 func (t *OperationMatch) Expect(value interface{}) (interface{}, error) {
 	s, ok := value.(string)
 	if !ok || s == "" {
-		return nil, fmt.Errorf("operation [%s] value must be a string", t.Name())
+		return nil, fmt.Errorf("操作符 [%s] 的值必须是字符串", t.Name())
 	}
 	// 非 /xxx/ 格式的, 只计算是否 contains
 	if !strings.HasPrefix(s, "/") || !strings.HasSuffix(s, "/") {
@@ -289,11 +289,11 @@ func (t *OperationMatch) Expect(value interface{}) (interface{}, error) {
 	}
 	s = strings.Trim(s, "/")
 	if s == "" {
-		return nil, fmt.Errorf("operation [%s] value is not a valid regexp expression", t.Name())
+		return nil, fmt.Errorf("操作符 [%s] 的值不是一个有效的正则表达式", t.Name())
 	}
 	reg, err := regexp.Compile("(?i)" + s)
 	if err != nil {
-		return nil, fmt.Errorf("operation [%s] value is not a valid regexp expression: %s", t.Name(), err.Error())
+		return nil, fmt.Errorf("操作符 [%s] 的值不是一个有效的正则表达式: %s", t.Name(), err.Error())
 	}
 	return reg, nil
 }
@@ -338,7 +338,7 @@ func (t *OperationNotMatch) Assert(ctx *Context, variable Variable, expect inter
 func NewOperation(operationName string) (Operation, error) {
 	operation := _operationFactory.Discovery(operationName)
 	if operation == nil {
-		return nil, fmt.Errorf("operation unknown [%s]", operationName)
+		return nil, fmt.Errorf("无效的操作符 [%s]", operationName)
 	}
 	return operation, nil
 }

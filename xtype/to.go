@@ -7,36 +7,41 @@ import (
 	"strings"
 )
 
-// ToUint ...
-func ToUint(v interface{}) uint64 {
+// ToInt ...
+func ToInt(v interface{}) int {
+	return int(ToInt64(v))
+}
+
+// ToInt64 ...
+func ToInt64(v interface{}) int64 {
 	if v == nil {
 		return 0
 	}
 	switch val := v.(type) {
 	case int:
-		return uint64(val)
+		return int64(val)
 	case int8:
-		return uint64(val)
+		return int64(val)
 	case int16:
-		return uint64(val)
+		return int64(val)
 	case int32:
-		return uint64(val)
+		return int64(val)
 	case int64:
-		return uint64(val)
-	case uint:
-		return uint64(val)
-	case uint8:
-		return uint64(val)
-	case uint16:
-		return uint64(val)
-	case uint32:
-		return uint64(val)
-	case uint64:
 		return val
+	case uint:
+		return int64(val)
+	case uint8:
+		return int64(val)
+	case uint16:
+		return int64(val)
+	case uint32:
+		return int64(val)
+	case uint64:
+		return int64(val)
 	case float32:
-		return uint64(val)
+		return int64(val)
 	case float64:
-		return uint64(val)
+		return int64(val)
 	case bool:
 		if val {
 			return 1
@@ -46,7 +51,7 @@ func ToUint(v interface{}) uint64 {
 		if val == "" {
 			return 0
 		}
-		value, err := strconv.ParseUint(val, 10, 64)
+		value, err := strconv.ParseInt(val, 10, 64)
 		if err != nil {
 			return 0
 		}
@@ -54,6 +59,16 @@ func ToUint(v interface{}) uint64 {
 	default:
 		return 0
 	}
+}
+
+// ToUint ...
+func ToUint(v interface{}) uint {
+	return uint(ToInt64(v))
+}
+
+// ToUint ...
+func ToUint64(v interface{}) uint64 {
+	return uint64(ToInt64(v))
 }
 
 // ToFloat64 ...
@@ -107,7 +122,7 @@ func ToFloat64(v interface{}) float64 {
 
 // ToString ...
 func ToString(v interface{}) string {
-	return fmt.Sprintf("%v", v)
+	return fmt.Sprint(v)
 }
 
 // ToBool ...

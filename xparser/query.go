@@ -46,3 +46,12 @@ func BuildQuery(m map[string]interface{}) string {
 	sort.Strings(list)
 	return strings.Join(list, "&")
 }
+
+// BuildFormValue ...
+func BuildFormValues(m map[string]interface{}) url.Values {
+	res := make(url.Values)
+	for k, v := range m {
+		res[k] = []string{fmt.Sprint(v)}
+	}
+	return res
+}
