@@ -4,7 +4,7 @@
 
 <div align="center">
 
-[![travis-ci](https://travis-ci.com/evercyan/brick.svg?branch=master)](https://travis-ci.com/github/evercyan/brick)
+[![Go CI](https://github.com/evercyan/brick/actions/workflows/main.yml/badge.svg)](https://github.com/evercyan/brick/actions/workflows/main.yml)
 [![codecov](https://codecov.io/gh/evercyan/brick/branch/master/graph/badge.svg)](https://codecov.io/gh/evercyan/brick)
 [![goreportcard](https://goreportcard.com/badge/github.com/evercyan/brick)](https://goreportcard.com/report/github.com/evercyan/brick)
 
