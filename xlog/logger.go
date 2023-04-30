@@ -1,8 +1,8 @@
 package xlog
 
 import (
+	"context"
 	"io"
-	"sync"
 )
 
 // Logger ...
@@ -19,19 +19,19 @@ type Logger interface {
 	Warnf(format string, args ...interface{})             // 格式化并记录 WarnLevel 级别的日志
 	Error(args ...interface{})                            // 记录 ErrorLevel 级别的日志
 	Errorf(format string, args ...interface{})            // 格式化并记录 ErrorLevel 级别的日志
-	Fatal(args ...interface{})                            // 记录 FatalLevel 级别的日志
-	Fatalf(format string, args ...interface{})            // 格式化并记录 FatalLevel 级别的日志
-	Panic(args ...interface{})                            // 记录 PanicLevel 级别的日志
-	Panicf(format string, args ...interface{})            // 格式化并记录 PanicLevel 级别的日志
-	WithField(key string, value interface{}) Logger       // 为日志添加一个上下文数据
-	Writer() io.Writer                                    // 返回日志 io.Writer
+	//Fatal(args ...interface{})                            // 记录 FatalLevel 级别的日志
+	//Fatalf(format string, args ...interface{})            // 格式化并记录 FatalLevel 级别的日志
+	//Panic(args ...interface{})                            // 记录 PanicLevel 级别的日志
+	//Panicf(format string, args ...interface{})            // 格式化并记录 PanicLevel 级别的日志
+	Writer() io.Writer                      // 返回日志 io.Writer
+	F(key string, value interface{}) Logger // WithField 为日志添加一个上下文数据
+	C(ctx context.Context) Logger           // WithContext 为日志添加一个 context
 }
 
 // ----------------------------------------------------------------
 
 var (
 	logger = newZap(defaultConfig)
-	once   sync.Once
 )
 
 // NewLogger ...
@@ -40,18 +40,15 @@ func NewLogger(options ...Option) Logger {
 	for _, f := range options {
 		f(config)
 	}
-	// 无配置的情况, 不做单例处理
 	if len(options) == 0 {
 		return logger
 	}
-	once.Do(func() {
-		switch config.Type {
-		case TypeLogrus:
-			logger = newLogrus(config)
-		default:
-			logger = newZap(config)
-		}
-	})
+	switch config.Type {
+	case TypeLogrus:
+		logger = newLogrus(config)
+	default:
+		logger = newZap(config)
+	}
 	return logger
 }
 
@@ -62,72 +59,82 @@ func NewLogger(options ...Option) Logger {
 
 // Trace ...
 func Trace(args ...interface{}) {
-	logger.Log(LevelTrace, args...)
+	logger.Trace(args...)
 }
 
 // Tracef ...
 func Tracef(format string, args ...interface{}) {
-	logger.Logf(LevelTrace, format, args...)
+	logger.Tracef(format, args...)
 }
 
 // Debug ...
 func Debug(args ...interface{}) {
-	logger.Log(LevelDebug, args...)
+	logger.Debug(args...)
 }
 
 // Debugf ...
 func Debugf(format string, args ...interface{}) {
-	logger.Logf(LevelDebug, format, args...)
+	logger.Debugf(format, args...)
 }
 
 // Info ...
 func Info(args ...interface{}) {
-	logger.Log(LevelInfo, args...)
+	logger.Info(args...)
 }
 
 // Infof ...
 func Infof(format string, args ...interface{}) {
-	logger.Logf(LevelInfo, format, args...)
+	logger.Infof(format, args...)
 }
 
 // Warn ...
 func Warn(args ...interface{}) {
-	logger.Log(LevelWarn, args...)
+	logger.Warn(args...)
 }
 
 // Warnf ...
 func Warnf(format string, args ...interface{}) {
-	logger.Logf(LevelWarn, format, args...)
+	logger.Warnf(format, args...)
 }
 
 // Error ...
 func Error(args ...interface{}) {
-	logger.Log(LevelError, args...)
+	logger.Error(args...)
 }
 
 // Errorf ...
 func Errorf(format string, args ...interface{}) {
-	logger.Logf(LevelError, format, args...)
+	logger.Errorf(format, args...)
 }
 
-// Fatal ...
-func Fatal(args ...interface{}) {
-	logger.Log(LevelFatal, args...)
+//// Fatal ...
+//func Fatal(args ...interface{}) {
+//	logger.Fatal(args...)
+//}
+//
+//// Fatalf ...
+//func Fatalf(format string, args ...interface{}) {
+//	logger.Fatalf(format, args...)
+//}
+//
+//// Panic ...
+//func Panic(args ...interface{}) {
+//	logger.Panic(args...)
+//}
+//
+//// Panicf ...
+//func Panicf(format string, args ...interface{}) {
+//	logger.Panicf(format, args...)
+//}
+
+// F WithField...
+func F(key string, value interface{}) Logger {
+	return logger.F(key, value)
 }
 
-// Fatalf ...
-func Fatalf(format string, args ...interface{}) {
-	logger.Logf(LevelFatal, format, args...)
-}
-
-// Panic ...
-func Panic(args ...interface{}) {
-	logger.Log(LevelPanic, args...)
-}
-
-// Panicf ...
-func Panicf(format string, args ...interface{}) {
-	logger.Logf(LevelPanic, format, args...)
+// C WithContext...
+func C(ctx context.Context) Logger {
+	return logger.C(ctx)
 }
 
 // Writer ...

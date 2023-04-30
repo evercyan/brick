@@ -6,6 +6,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestMd5(t *testing.T) {
+	assert.Equal(t, "96e79218965eb72c92a549dd5a330112", Md5("111111"))
+}
+
 func TestHash(t *testing.T) {
 	assert.Less(t, uint64(0), Hash("abc", 1))
 	assert.NotEmpty(t, HmacSha256("abc", "def"))

@@ -6,45 +6,32 @@ import (
 	"time"
 )
 
-var (
-	layoutMap = map[string]string{
-		"y": "2006",
-		"m": "01",
-		"d": "02",
-		"h": "15",
-		"i": "04",
-		"s": "05",
-	}
-)
-
-// replaceLayout ...
-func replaceLayout(layout string) string {
+// FormatLayout ...
+func FormatLayout(layout string) string {
 	layout = strings.ToLower(layout)
-	for k, v := range layoutMap {
+	for k, v := range formatMap {
 		layout = strings.ReplaceAll(layout, k, v)
 	}
 	return layout
 }
 
-// ----------------------------------------------------------------
-
 // Format ...
 func Format(t time.Time, layouts ...string) string {
-	layout := "y-m-d h:i:s"
+	layout := FormatTime
 	if len(layouts) > 0 {
 		layout = layouts[0]
 	}
-	return t.Format(replaceLayout(layout))
+	return t.Format(FormatLayout(layout))
 }
 
 // Parse ...
 func Parse(t string, layouts ...string) (time.Time, error) {
-	layout := "y-m-d h:i:s"
+	layout := FormatTime
 	if len(layouts) > 0 {
 		layout = layouts[0]
 	}
 	location, _ := time.LoadLocation("Asia/Shanghai")
-	return time.ParseInLocation(replaceLayout(layout), t, location)
+	return time.ParseInLocation(FormatLayout(layout), t, location)
 }
 
 // First ...
@@ -52,8 +39,8 @@ func First(t time.Time) int64 {
 	if t.IsZero() {
 		t = time.Now()
 	}
-	timeStr := fmt.Sprintf("%s 00:00:00", Format(t, "y-m-d"))
-	tt, _ := Parse(timeStr, "y-m-d h:i:s")
+	timeStr := fmt.Sprintf("%s 00:00:00", Format(t, FormatDateBar))
+	tt, _ := Parse(timeStr, FormatTime)
 	return tt.Unix()
 }
 

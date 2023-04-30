@@ -2,7 +2,6 @@ package xfile
 
 import (
 	"bufio"
-	"bytes"
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
@@ -10,9 +9,23 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path"
+	"strings"
 
+	"github.com/evercyan/brick/xgen"
 	"github.com/evercyan/brick/xtype"
 )
+
+// Temp ...
+func Temp(filenames ...string) string {
+	var filename string
+	if len(filename) > 0 {
+		filename = filenames[0]
+	} else {
+		filename = xgen.Nanoid()
+	}
+	return path.Join(os.TempDir(), filename)
+}
 
 // Read ...
 func Read(filepath string) string {
@@ -58,38 +71,33 @@ func SizeText(size int64) string {
 }
 
 // LineCount ...
-func LineCount(filepath string) (count int) {
+func LineCount(filepath string) int {
 	f, err := os.Open(filepath)
 	if err != nil {
-		return count
+		return 0
 	}
 	defer f.Close()
-	fr := bufio.NewReader(f)
-	buf := make([]byte, 32*1024)
-	separator := []byte("\n")
-	for {
-		b, err := fr.Read(buf)
-		count += bytes.Count(buf[:b], separator)
-		// io.EOF 或异常都直接返回
-		if err != nil {
-			return count
-		}
+	count := 0
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		count++
 	}
+	return count
 }
 
 // LineContent ...
 func LineContent(filepath string, numbers ...int) map[int]string {
-	res := make(map[int]string)
-	file, err := os.Open(filepath)
+	f, err := os.Open(filepath)
 	if err != nil {
-		return res
+		return nil
 	}
-	defer file.Close()
+	defer f.Close()
+	res := make(map[int]string)
 	count := len(numbers)
-	fileScanner := bufio.NewScanner(file)
-	for number := 1; fileScanner.Scan(); number++ {
+	scanner := bufio.NewScanner(f)
+	for number := 1; scanner.Scan(); number++ {
 		if count == 0 || xtype.IsContains(numbers, number) {
-			res[number] = fileScanner.Text()
+			res[number] = scanner.Text()
 		}
 	}
 	return res
@@ -171,4 +179,20 @@ func Md5(path string) (string, error) {
 		}
 	}
 	return hex.EncodeToString(hash.Sum(nil)), nil
+}
+
+// Shadow 根据当前文件名称取其影分身
+// /tmp/abc.txt => /tmp/abc_1.txt
+func Shadow(filepath string) string {
+	ext := path.Ext(filepath)
+	prefix := strings.TrimSuffix(filepath, ext)
+	res := ""
+	for i := 1; ; i++ {
+		f := fmt.Sprintf("%s_%d%s", prefix, i, ext)
+		if !IsExist(f) {
+			res = f
+			break
+		}
+	}
+	return res
 }

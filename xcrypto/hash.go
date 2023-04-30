@@ -2,6 +2,7 @@ package xcrypto
 
 import (
 	"crypto/hmac"
+	"crypto/md5"
 	"crypto/sha1"
 	"crypto/sha256"
 	"encoding/hex"
@@ -9,6 +10,13 @@ import (
 
 	"github.com/spaolacci/murmur3"
 )
+
+// Md5 ...
+func Md5(str string) string {
+	h := md5.New()
+	h.Write([]byte(str))
+	return hex.EncodeToString(h.Sum(nil))
+}
 
 // Hash ...
 func Hash(str string, seed int) uint64 {

@@ -1,8 +1,10 @@
-package ximage
+package ximg
 
 import (
+	"os"
 	"testing"
 
+	"github.com/evercyan/brick/xfile"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -24,4 +26,18 @@ func TestSize(t *testing.T) {
 
 func TestBase64(t *testing.T) {
 	assert.NotEmpty(t, Base64("../logo.png"))
+}
+
+func TestReadWrite(t *testing.T) {
+	img := Read("../logo.png")
+	assert.NotNil(t, img)
+
+	dst1 := xfile.Temp("write.png")
+	defer os.Remove(dst1)
+	assert.NotNil(t, Write(dst1, img))
+
+	dst2 := xfile.Temp("write.jpg")
+	defer os.Remove(dst2)
+	assert.NotNil(t, Write(dst2, img))
+
 }

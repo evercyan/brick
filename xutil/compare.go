@@ -8,8 +8,7 @@ import (
 
 // CompareNumber ...
 func CompareNumber(a, b interface{}) int {
-	fa := xtype.ToFloat64(a)
-	fb := xtype.ToFloat64(b)
+	fa, fb := xtype.ToFloat64(a), xtype.ToFloat64(b)
 	if fa > fb {
 		return 1
 	} else if fa < fb {

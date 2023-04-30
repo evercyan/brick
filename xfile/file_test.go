@@ -1,10 +1,16 @@
 package xfile
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+func TestTemp(t *testing.T) {
+	assert.NotEmpty(t, Temp())
+	assert.NotEmpty(t, Temp("abc"))
+}
 
 func TestSize(t *testing.T) {
 	assert.Equal(t, int64(0), Size("./file_t.go"))
@@ -24,20 +30,17 @@ func TestSizeText(t *testing.T) {
 func TestRead(t *testing.T) {
 	assert.NotEmpty(t, Read("./file.go"))
 	assert.Empty(t, Read("./file_t.go"))
-}
 
-func TestWrite(t *testing.T) {
-	file := "/tmp/letitgo.tmp"
-	content := "letitgo"
-	assert.Nil(t, Write(file, content))
-	assert.Equal(t, content, Read(file))
+	dst := Temp()
+	assert.Nil(t, Write(dst, "hello"))
+	assert.Nil(t, Copy(dst, Temp()))
 }
 
 func TestLine(t *testing.T) {
 	filepath := "../LICENSE"
 
 	assert.Equal(t, 0, LineCount(filepath+"s"))
-	assert.Equal(t, map[int]string{}, LineContent(filepath+"s"))
+	assert.Equal(t, map[int]string(nil), LineContent(filepath+"s"))
 
 	assert.Equal(t, 21, LineCount(filepath))
 	assert.Equal(t, map[int]string{
@@ -63,9 +66,11 @@ func TestJSON(t *testing.T) {
 		Name: "abc",
 		Age:  1,
 	}
-	filepath := "/tmp/file.json"
+	filepath := Temp("file.json")
+	defer os.Remove(filepath)
 
 	assert.Nil(t, WriteJSON(filepath, data))
+	assert.Nil(t, WriteJSON(filepath, data, true))
 	assert.True(t, IsExist(filepath))
 
 	d := &xjson{}
@@ -73,11 +78,19 @@ func TestJSON(t *testing.T) {
 	assert.Equal(t, "abc", d.Name)
 
 	assert.NotNil(t, WriteJSON(filepath, make(chan int)))
-	assert.NotNil(t, ReadJSON("/tmp/abc", d))
+	assert.NotNil(t, ReadJSON("./abc", d))
 }
 
 func TestMd5(t *testing.T) {
 	res, err := Md5("../logo.png")
 	assert.Nil(t, err)
 	assert.NotEmpty(t, res)
+
+	_, err2 := Md5("logo.png")
+	assert.NotNil(t, err2)
+}
+
+func TestShadow(t *testing.T) {
+	src := Temp("hello")
+	assert.Equal(t, src+"_1", Shadow(src))
 }

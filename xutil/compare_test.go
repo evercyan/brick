@@ -15,4 +15,6 @@ func TestCompare(t *testing.T) {
 	assert.Equal(t, 0, Compare(3, 3.0))
 	assert.Equal(t, 0, Compare(1, true))
 	assert.Equal(t, 0, Compare(0, false))
+	assert.Equal(t, 0, Compare(nil, nil))
+	assert.Equal(t, 0, Compare(struct{}{}, struct{}{}))
 }

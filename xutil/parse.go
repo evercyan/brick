@@ -1,4 +1,4 @@
-package xparser
+package xutil
 
 import (
 	"reflect"

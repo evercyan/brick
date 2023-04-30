@@ -1,4 +1,4 @@
-package xgenerator
+package xgen
 
 import (
 	"crypto/rand"
@@ -6,6 +6,7 @@ import (
 
 	"github.com/evercyan/brick/xcrypto"
 	"github.com/evercyan/brick/xencoding"
+	nanoid "github.com/matoous/go-nanoid/v2"
 	"github.com/rs/xid"
 	uuid "github.com/satori/go.uuid"
 )
@@ -25,4 +26,10 @@ func UUID() string {
 // XID ...
 func XID() string {
 	return xid.New().String()
+}
+
+// Nanoid ...
+func Nanoid(l ...int) string {
+	id, _ := nanoid.New(l...)
+	return id
 }

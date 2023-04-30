@@ -55,7 +55,9 @@ func TestToFloat64(t *testing.T) {
 
 func TestToString(t *testing.T) {
 	assert.Equal(t, "1234", ToString(1234))
-	assert.Equal(t, "[1 2 3 4]", ToString([]int{1, 2, 3, 4}))
+	assert.Equal(t, "[1,2,3,4]", ToString([]int{1, 2, 3, 4}))
+	assert.Equal(t, "haha", ToString("haha"))
+	assert.Equal(t, "", ToString(nil))
 }
 
 func TestToBool(t *testing.T) {
@@ -75,4 +77,5 @@ func TestToSlice(t *testing.T) {
 	assert.Equal(t, []interface{}{1, 2, 3}, ToSlice([]int{1, 2, 3}))
 	assert.Equal(t, []interface{}{1, 2, 3}, ToSlice([3]int{1, 2, 3}))
 	assert.Equal(t, []interface{}{1}, ToSlice(map[string]int{"a": 1}))
+	assert.Equal(t, []interface{}{}, ToSlice(""))
 }

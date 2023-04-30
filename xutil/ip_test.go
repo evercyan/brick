@@ -13,6 +13,4 @@ func TestIP(t *testing.T) {
 
 	fmt.Println("GetExternalIP", GetExternalIP())
 	assert.NotNil(t, GetExternalIP())
-
-	assert.False(t, IsExternalIP("127.0.0.1"))
 }

@@ -1,4 +1,4 @@
-package xgenerator
+package xgen
 
 import (
 	"testing"

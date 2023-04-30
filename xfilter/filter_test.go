@@ -23,6 +23,9 @@ func TestFilter(t *testing.T) {
         	["ctx.uid", "=", "2"],
 			"and"
 		]
+	},
+	{
+		"id": "3"
 	}
 ]`
 	list := make([]map[string]interface{}, 0)
@@ -33,8 +36,9 @@ func TestFilter(t *testing.T) {
 
 	res, err := Filter(ctx, list)
 	assert.Nil(t, err)
-	assert.Equal(t, 1, len(res))
+	assert.Equal(t, 2, len(res))
 	assert.Equal(t, "1", res[0]["id"])
+	assert.Equal(t, "3", res[1]["id"])
 }
 
 func TestAssert(t *testing.T) {
@@ -146,4 +150,15 @@ func TestAssertCoverage(t *testing.T) {
 	],
 	"and"
 ]`))
+
+	_, err1 := ParseFilter("")
+	assert.NotNil(t, err1)
+
+	_, err2 := ParseFilter("[]")
+	assert.NotNil(t, err2)
+
+	assert.NotNil(t, Assert(ctx, "[]"))
+
+	_, err3 := Filter(ctx, nil)
+	assert.NotNil(t, err3)
 }

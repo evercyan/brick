@@ -2,10 +2,12 @@ package xlog
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"strings"
 
+	"github.com/evercyan/brick/xjson"
 	"github.com/sirupsen/logrus"
 )
 
@@ -59,12 +61,24 @@ func (t *logrusTextFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	} else {
 		b = &bytes.Buffer{}
 	}
+	caller := entry.Data["caller"]
+	delete(entry.Data, "caller")
+
+	traceId := entry.Data["trace_id"]
+	delete(entry.Data, "trace_id")
+
+	message := ""
+	if len(entry.Data) > 0 {
+		message += xjson.Encode(entry.Data) + " "
+	}
+	message += entry.Message
 	b.WriteString(fmt.Sprintf(
-		"[%s] [%s] [%s] %s\n",
+		"[%s] [%s] [%s] [%s] %s\n",
 		entry.Time.Format(timestampFormat),
 		strings.ToUpper(entry.Level.String()),
-		entry.Data["caller"],
-		entry.Message,
+		traceId,
+		caller,
+		message,
 	))
 	return b.Bytes(), nil
 }
@@ -77,7 +91,10 @@ func (t *xLogrus) log(level Level, args ...interface{}) {
 	if !t.entry.Logger.IsLevelEnabled(lv) {
 		return
 	}
-	t.entry.WithField(msgCallerKey, loggerCaller(callerSkip)).Log(lv, args...)
+	t.entry.
+		WithField(msgCallerKey, loggerCaller(callerSkip)).
+		WithField(msgNameKey, GetTraceId(t.entry.Context)).
+		Log(lv, args...)
 }
 
 // Log ...
@@ -140,30 +157,38 @@ func (t *xLogrus) Errorf(format string, args ...interface{}) {
 	t.Logf(LevelError, format, args...)
 }
 
-// Fatal ...
-func (t *xLogrus) Fatal(args ...interface{}) {
-	t.Log(LevelFatal, args...)
-}
+//// Fatal ...
+//func (t *xLogrus) Fatal(args ...interface{}) {
+//	t.Log(LevelFatal, args...)
+//}
+//
+//// Fatalf ...
+//func (t *xLogrus) Fatalf(format string, args ...interface{}) {
+//	t.Logf(LevelFatal, format, args...)
+//}
+//
+//// Panic ...
+//func (t *xLogrus) Panic(args ...interface{}) {
+//	t.Log(LevelPanic, args...)
+//}
+//
+//// Panicf ...
+//func (t *xLogrus) Panicf(format string, args ...interface{}) {
+//	t.Logf(LevelPanic, format, args...)
+//}
 
-// Fatalf ...
-func (t *xLogrus) Fatalf(format string, args ...interface{}) {
-	t.Logf(LevelFatal, format, args...)
-}
-
-// Panic ...
-func (t *xLogrus) Panic(args ...interface{}) {
-	t.Log(LevelPanic, args...)
-}
-
-// Panicf ...
-func (t *xLogrus) Panicf(format string, args ...interface{}) {
-	t.Logf(LevelPanic, format, args...)
-}
-
-// WithField ...
-func (t *xLogrus) WithField(key string, value interface{}) Logger {
+// F WithField ...
+func (t *xLogrus) F(key string, value interface{}) Logger {
 	return &xLogrus{
 		entry:  t.entry.WithField(key, value),
+		writer: t.writer,
+	}
+}
+
+// C WithContext ...
+func (t *xLogrus) C(ctx context.Context) Logger {
+	return &xLogrus{
+		entry:  t.entry.WithContext(ctx),
 		writer: t.writer,
 	}
 }

@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/evercyan/brick/xparser"
+	"github.com/evercyan/brick/xutil"
 )
 
 // Variable 变量接口
@@ -76,7 +76,7 @@ func (t *VariableCtx) Value(ctx *Context) interface{} {
 		if v, ok := ctx.Get(segments[0]); ok {
 			// 解析数据结构
 			path := strings.TrimPrefix(t.key, segments[0]+".")
-			return xparser.Parse(v, path)
+			return xutil.Parse(v, path)
 		}
 	}
 	return nil

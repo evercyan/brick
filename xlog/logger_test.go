@@ -1,7 +1,12 @@
 package xlog
 
 import (
+	"context"
 	"testing"
+
+	"github.com/evercyan/brick/xfile"
+	"github.com/evercyan/brick/xgen"
+	"github.com/stretchr/testify/assert"
 )
 
 // BenchmarkLogrus-8   	   12340	    103458 ns/op	    5854 B/op	      86 allocs/op
@@ -24,35 +29,97 @@ func BenchmarkZap(b *testing.B) {
 	}
 }
 
+// ----------------------------------------------------------------
+
 func TestLogger(t *testing.T) {
+	// 默认配置见 defaultConfig
 	NewLogger(
-		WithFile("/tmp/xlog.log", false),
-		// WithLevel(LevelInfo),
-		// WithLogger(TypeLogrus),
-		// WithFormatter(FormatterJSON),
+		WithZap(),
+		WithLevel(LevelInfo),
+		WithStdout(true),
+		WithFormatter(FormatterText),
 	)
 
-	// zap
-	// [2022-12-09 15:33:28.023] [INFO] [xlog/logger_test.go:33] what you say: [1 2 3]
-	// {"level":"INFO","time":"2022-12-09 15:36:38.748","caller":"xlog/logger_test.go:37","msg":"what you say: [1 2 3]"}
-
-	// logrus
-	// [2022-12-09 15:46:41.262] [INFO] [xlog/logger_test.go:43] what you say: [1 2 3]
-	// {"caller":"logger_test.go:38","level":"info","msg":"what you say: [1 2 3]","time":"2022-12-09 15:39:54.570"}
-
-	Infof("what you say: %+v", []int{1, 2, 3})
+	// [2023-04-30 13:47:45.897] [INFO] [LKAohqdCZfgEevTpi9URl] [xlog/logger_test.go:49] hello: [1 2]
+	Infof("hello: %+v", []int{1, 2})
 }
 
-func TestLogFunc(t *testing.T) {
+func TestZap(t *testing.T) {
 	NewLogger(
-		WithFile("/tmp/xlog.log", false),
+		WithZap(),
 	)
-	Debug("hello")
-	Debugf("hello %v", "world")
-	Info("hello")
-	Infof("hello %v", "world")
-	Warn("hello")
-	Warnf("hello %v", "world")
-	Error("hello")
-	Errorf("hello %v", "world")
+
+	// Func
+	Trace("zap hello")
+	Tracef("zap hello %v", "world")
+	Debug("zap hello")
+	Debugf("zap hello %v", "world")
+	Info("zap hello")
+	Infof("zap hello %v", "world")
+	Warn("zap hello")
+	Warnf("zap hello %v", "world")
+	Error("zap hello")
+	Errorf("zap hello %v", "world")
+	// Write
+	assert.NotNil(t, Writer())
+
+	// JSON
+	NewLogger(WithFormatter(FormatterJSON))
+	// {"level":"INFO","time":"2023-04-30 13:49:56.609","trace_id":"tJ3glSOBR5xVvs0jrzLQ1","caller":"xlog/logger_test.go:77","msg":"json: [1 2]"}
+	Infof("zap json: %+v", []int{1, 2})
+
+	// Text
+	NewLogger(WithFormatter(FormatterText))
+	// [2023-01-01 13:43:30.312] [INFO] [1fPZBJRNdko1y3lVr5XEv] [xlog/logger_test.go:44] hello: [1 2]
+	Infof("zap text: %+v", []int{1, 2})
+
+	// Ctx
+	ctx := context.WithValue(context.Background(), CtxTraceKey{}, xgen.Nanoid())
+	C(ctx).Info("zap ctx 1")
+	C(ctx).Error("zap ctx 2")
+
+	// Field
+	F("k", "v").Info("zap field")
+}
+
+func TestLogrus(t *testing.T) {
+	NewLogger(
+		WithLogrus(),
+	)
+
+	// Func
+	Trace("logrus hello")
+	Tracef("logrus hello %v", "world")
+	Debug("logrus hello")
+	Debugf("logrus hello %v", "world")
+	Info("logrus hello")
+	Infof("logrus hello %v", "world")
+	Warn("logrus hello")
+	Warnf("logrus hello %v", "world")
+	Error("logrus hello")
+	Errorf("logrus hello %v", "world")
+	// Write
+	assert.NotNil(t, Writer())
+
+	// JSON
+	NewLogger(WithLogrus(), WithFormatter(FormatterJSON))
+	// {"caller":"xlog/logger_test.go:114","level":"info","msg":"json: [1 2]","time":"2023-04-30 13:52:04.883","trace_id":"AQAbZgFtdhk0vfgesUofo"}
+	Infof("logrus json: %+v", []int{1, 2})
+
+	// Text
+	NewLogger(WithLogrus(), WithFormatter(FormatterText))
+	// [2023-04-30 13:52:56.718] [INFO] [lx_pkNU7472dupxeSmAa-] [xlog/logger_test.go:109] text: [1 2]
+	Infof("logrus text: %+v", []int{1, 2})
+
+	// Ctx
+	ctx := context.WithValue(context.Background(), FieldTraceId, xgen.Nanoid())
+	C(ctx).Info("logrus ctx 1")
+	C(ctx).Error("logrus ctx 2")
+
+	// Field
+	F("k", "v").Info("logrus field")
+}
+
+func TestLoggerFile(t *testing.T) {
+	NewLogger(WithFile(xfile.Temp("brick.log")))
 }

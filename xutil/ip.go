@@ -31,27 +31,6 @@ func GetExternalIP() string {
 		return ""
 	}
 	defer resp.Body.Close()
-	content, _ := io.ReadAll(resp.Body)
-	return string(content)
-}
-
-// IsExternalIP 是否是公网 IP
-func IsExternalIP(ip string) bool {
-	IP := net.IP(ip)
-	if IP.IsLoopback() || IP.IsLinkLocalMulticast() || IP.IsLinkLocalUnicast() {
-		return false
-	}
-	if ip4 := IP.To4(); ip4 != nil {
-		switch true {
-		case ip4[0] == 10:
-			return false
-		case ip4[0] == 172 && ip4[1] >= 16 && ip4[1] <= 31:
-			return false
-		case ip4[0] == 192 && ip4[1] == 168:
-			return false
-		default:
-			return true
-		}
-	}
-	return false
+	b, _ := io.ReadAll(resp.Body)
+	return string(b)
 }

@@ -31,6 +31,7 @@ func TestPretty(t *testing.T) {
 	}
 	assert.NotEmpty(t, Pretty(data))
 	assert.NotEmpty(t, Pretty(`{"hello": "world"}`))
+	assert.NotEmpty(t, Pretty(`"{\"hello\": \"world\"}"`))
 }
 
 func TestMinify(t *testing.T) {
@@ -45,4 +46,5 @@ func TestMinify(t *testing.T) {
     "Title": "AAA"
 }`
 	assert.JSONEq(t, `{"Text":"BBB","Title":"AAA"}`, Minify(s))
+	assert.JSONEq(t, `{"hello":"world"}`, Minify(`"{\"hello\": \"world\"}"`))
 }

@@ -35,7 +35,7 @@ func Compare(src string, dst string) int {
 	}
 	for i := 0; i < minLen; i++ {
 		// 无法转换的, 默认为 0, 即 v1.a.3 == v1.0.3
-		srcNum, dstNum := xtype.ToUint(srcs[i]), xtype.ToUint(dsts[i])
+		srcNum, dstNum := xtype.ToInt(srcs[i]), xtype.ToInt(dsts[i])
 		if srcNum < dstNum {
 			return -1
 		} else if srcNum > dstNum {

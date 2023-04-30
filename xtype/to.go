@@ -5,6 +5,8 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+
+	"github.com/evercyan/brick/xencoding"
 )
 
 // ToInt ...
@@ -122,6 +124,12 @@ func ToFloat64(v interface{}) float64 {
 
 // ToString ...
 func ToString(v interface{}) string {
+	if v == nil {
+		return ""
+	}
+	if IsJSONObject(v) {
+		return xencoding.JSONEncode(v)
+	}
 	return fmt.Sprint(v)
 }
 

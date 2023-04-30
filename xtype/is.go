@@ -136,8 +136,7 @@ func IsJSONString(s string) bool {
 
 // IsJSONObject ...
 func IsJSONObject(v interface{}) bool {
-	b, _ := json.Marshal(v)
-	return IsJSONString(string(b))
+	return IsSlice(v) || IsArray(v) || IsMap(v) || IsStruct(v)
 }
 
 // IsContains ...

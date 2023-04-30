@@ -1,154 +1,129 @@
 package xhttp
 
 import (
-	"bytes"
+	"compress/gzip"
 	"context"
-	"crypto/tls"
+	"io"
 	"net/http"
-	"strings"
-	"sync"
+	"net/http/cookiejar"
+
+	"golang.org/x/net/publicsuffix"
 )
 
 // Client ...
 type Client struct {
 	*http.Client
 
-	tlsConfig *tls.Config
-	option    *Option
+	option *Option
+	trace  *Trace
 }
 
 // Get ...
-func (t *Client) Get(
-	ctx context.Context,
-	url string,
-	headers http.Header,
-) (*http.Response, error) {
-	return t.Do(ctx, "GET", url, headers, nil)
+func (t *Client) Get(ctx context.Context, url string, header http.Header) (*Response, error) {
+	return t.Do(ctx, MethodGet, url, header, nil)
 }
 
 // Post ...
-func (t *Client) Post(
-	ctx context.Context,
-	url string,
-	headers http.Header,
-	body []byte,
-) (*http.Response, error) {
-	return t.Do(ctx, "POST", url, headers, body)
+func (t *Client) Post(ctx context.Context, url string, header http.Header, data interface{}) (*Response, error) {
+	return t.Do(ctx, MethodPost, url, header, data)
 }
 
 // Put ...
-func (t *Client) Put(
-	ctx context.Context,
-	url string,
-	headers http.Header,
-	body []byte,
-) (*http.Response, error) {
-	return t.Do(ctx, "PUT", url, headers, body)
+func (t *Client) Put(ctx context.Context, url string, header http.Header, data interface{}) (*Response, error) {
+	return t.Do(ctx, MethodPut, url, header, data)
 }
 
 // Delete ...
-func (t *Client) Delete(
-	ctx context.Context,
-	url string,
-	headers http.Header,
-) (*http.Response, error) {
-	return t.Do(ctx, "DELETE", url, headers, nil)
+func (t *Client) Delete(ctx context.Context, url string, header http.Header) (*Response, error) {
+	return t.Do(ctx, MethodDelete, url, header, nil)
+}
+
+// Patch ...
+func (t *Client) Patch(ctx context.Context, url string, header http.Header) (*Response, error) {
+	return t.Do(ctx, MethodPatch, url, header, nil)
 }
 
 // Do ...
 func (t *Client) Do(
-	ctx context.Context,
-	method string,
-	url string,
-	headers http.Header,
-	body []byte,
-) (*http.Response, error) {
-	// https
-	if strings.HasPrefix(url, "https") {
-		if transport, ok := t.Client.Transport.(*http.Transport); ok {
-			transport.TLSClientConfig = t.tlsConfig
+	ctx context.Context, method string, url string, header http.Header, data interface{},
+) (*Response, error) {
+	defer func() {
+		if t.trace != nil {
+			t.trace.Finish()
 		}
+	}()
+	if header == nil {
+		header = http.Header{}
+		header.Set(HeaderKeyContentType, HeaderKeyContentTypeValueJSON)
+	}
+	// trace
+	if t.option.TraceEnable {
+		t.trace = new(Trace)
+		ctx = t.trace.WithClientTrace(ctx)
+	}
+	var (
+		resp *http.Response
+		err  error
+	)
+	var body io.Reader
+	m, ok := data.(map[string]interface{})
+	if ok && header.Get(HeaderKeyContentType) == HeaderKeyContentTypeValueFormData {
+		header, body = BuildFormData(header, m)
+	} else {
+		body = BuildReader(data, header.Get(HeaderKeyContentType))
 	}
 
-	// header
-	if headers == nil {
-		headers = make(http.Header)
-	}
-	if _, ok := headers["Accept"]; !ok {
-		headers["Accept"] = []string{"*/*"}
-	}
-	if _, ok := headers["Accept-Encoding"]; !ok && t.option.Compressed {
-		headers["Accept-Encoding"] = []string{"deflate, gzip"}
-	}
-
-	// request
-	req, err := http.NewRequest(method, url, bytes.NewBuffer(body))
+	req, err := http.NewRequestWithContext(ctx, method, url, body)
 	if err != nil {
 		return nil, err
 	}
-	req = req.WithContext(ctx)
-	req.Header = headers
-
-	// inject trace
-
-	// retry request
-	var (
-		res    *http.Response
-		resErr error
-	)
+	req.Header = header
+	// retry
 	for i := 0; i < t.option.RetryTimes; i++ {
-		res, resErr = t.Client.Do(req)
-		if resErr == nil {
+		resp, err = t.Client.Do(req)
+		if err == nil {
 			break
 		}
 	}
-	if resErr != nil {
-		return nil, resErr
-	}
-
-	// compress
-	respBody, err := GetDecompressBody(res.Header.Get("Content-Encoding"), res.Body)
 	if err != nil {
-		res.Body.Close()
 		return nil, err
 	}
-	res.Body = respBody
-
+	reader := resp.Body
+	res := &Response{
+		Response: resp,
+		trace:    t.trace,
+	}
+	// gzip
+	if resp.Header.Get(HeaderKeyContentEncoding) == HeaderKeyContentEncodingValueGzip {
+		if _, ok := body.(*gzip.Reader); ok {
+			reader, err = gzip.NewReader(reader)
+			if err != nil {
+				return nil, err
+			}
+			defer reader.Close()
+		}
+	}
+	if res.body, err = io.ReadAll(reader); err != nil {
+		return nil, err
+	}
 	return res, nil
 }
 
 // ----------------------------------------------------------------
 
-var (
-	defaultClient     *Client
-	defaultClientOnce sync.Once
-)
-
 // New ...
-func New() *Client {
-	defaultClientOnce.Do(func() {
-		defaultClient = NewWithtions(defaultOption)
-	})
-	return defaultClient
-}
-
-// NewWithtions ...
-func NewWithtions(option *Option) *Client {
-	option = setOptionDefaultValue(option)
-	client := &Client{
+func New(options ...OptionFn) *Client {
+	config := defaultOption
+	for _, fn := range options {
+		fn(config)
+	}
+	cookieJar, _ := cookiejar.New(&cookiejar.Options{PublicSuffixList: publicsuffix.List})
+	return &Client{
 		Client: &http.Client{
-			Transport: &http.Transport{
-				MaxIdleConnsPerHost:   option.ConnsPerHost,
-				TLSHandshakeTimeout:   option.HandshakeTimeout,
-				ResponseHeaderTimeout: option.ResponseHeaderTimeout,
-				DisableCompression:    !option.Compressed,
-			},
+			Timeout:   config.RequestTimeout,
+			Transport: config.Transport,
+			Jar:       cookieJar,
 		},
-		option: option,
+		option: config,
 	}
-	if option.SSLEnabled {
-		client.Client.Timeout = option.RequestTimeout
-		client.tlsConfig = option.TLSConfig
-	}
-	return client
 }

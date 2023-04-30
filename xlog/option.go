@@ -3,13 +3,31 @@ package xlog
 // Option ...
 type Option func(*Config)
 
+// WithLogrus ...
+func WithLogrus() Option {
+	return func(c *Config) {
+		c.Type = TypeLogrus
+	}
+}
+
+// WithZap ...
+func WithZap() Option {
+	return func(c *Config) {
+		c.Type = TypeZap
+	}
+}
+
 // WithFile ...
-func WithFile(filepath string, stdouts ...bool) Option {
+func WithFile(filepath string) Option {
 	return func(c *Config) {
 		c.Filepath = filepath
-		if len(stdouts) > 0 {
-			c.Stdout = stdouts[0]
-		}
+	}
+}
+
+// WithStdout ...
+func WithStdout(v bool) Option {
+	return func(c *Config) {
+		c.Stdout = v
 	}
 }
 
@@ -17,13 +35,6 @@ func WithFile(filepath string, stdouts ...bool) Option {
 func WithLevel(level Level) Option {
 	return func(c *Config) {
 		c.Level = level
-	}
-}
-
-// WithLogger ...
-func WithLogger(logger Type) Option {
-	return func(c *Config) {
-		c.Type = logger
 	}
 }
 

@@ -1,6 +1,7 @@
 package xlog
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"strings"
@@ -14,6 +15,7 @@ import (
 type xZap struct {
 	entry  *zap.Logger
 	writer io.Writer
+	ctx    context.Context
 }
 
 // newZap ...
@@ -64,7 +66,10 @@ func newZap(config *Config) Logger {
 		EncodeCaller: func(caller zapcore.EntryCaller, enc zapcore.PrimitiveArrayEncoder) {
 			enc.AppendString(getFormatterValue(caller.TrimmedPath()))
 		},
-		EncodeName: zapcore.FullNameEncoder,
+		// name 显示 zapcore.FullNameEncoder
+		EncodeName: func(v string, enc zapcore.PrimitiveArrayEncoder) {
+			enc.AppendString(getFormatterValue(v))
+		},
 		// 各元素间隔区域
 		ConsoleSeparator: " ",
 	}
@@ -95,22 +100,22 @@ func (t *xZap) log(level Level, args string) {
 	if !t.entry.Core().Enabled(lv) {
 		return
 	}
-
+	l := t.entry.Named(GetTraceId(t.ctx))
 	switch lv {
 	case zapcore.DebugLevel:
-		t.entry.Debug(args)
+		l.Debug(args)
 	case zapcore.InfoLevel:
-		t.entry.Info(args)
+		l.Info(args)
 	case zapcore.WarnLevel:
-		t.entry.Warn(args)
+		l.Warn(args)
 	case zapcore.ErrorLevel:
-		t.entry.Error(args)
+		l.Error(args)
 	case zapcore.PanicLevel:
-		t.entry.Panic(args)
+		l.Panic(args)
 	case zapcore.FatalLevel:
-		t.entry.Fatal(args)
+		l.Fatal(args)
 	default:
-		t.entry.Info(args)
+		l.Info(args)
 	}
 }
 
@@ -174,31 +179,41 @@ func (t *xZap) Errorf(format string, args ...interface{}) {
 	t.Logf(LevelError, format, args...)
 }
 
-// Fatal ...
-func (t *xZap) Fatal(args ...interface{}) {
-	t.Log(LevelFatal, args...)
-}
+//// Fatal ...
+//func (t *xZap) Fatal(args ...interface{}) {
+//	t.Log(LevelFatal, args...)
+//}
+//
+//// Fatalf ...
+//func (t *xZap) Fatalf(format string, args ...interface{}) {
+//	t.Logf(LevelFatal, format, args...)
+//}
+//
+//// Panic ...
+//func (t *xZap) Panic(args ...interface{}) {
+//	t.Log(LevelPanic, args...)
+//}
+//
+//// Panicf ...
+//func (t *xZap) Panicf(format string, args ...interface{}) {
+//	t.Logf(LevelPanic, format, args...)
+//}
 
-// Fatalf ...
-func (t *xZap) Fatalf(format string, args ...interface{}) {
-	t.Logf(LevelFatal, format, args...)
-}
-
-// Panic ...
-func (t *xZap) Panic(args ...interface{}) {
-	t.Log(LevelPanic, args...)
-}
-
-// Panicf ...
-func (t *xZap) Panicf(format string, args ...interface{}) {
-	t.Logf(LevelPanic, format, args...)
-}
-
-// WithField ...
-func (t *xZap) WithField(key string, value interface{}) Logger {
+// F WithField ...
+func (t *xZap) F(key string, value interface{}) Logger {
 	return &xZap{
 		entry:  t.entry.With(zap.Any(key, value)),
 		writer: t.writer,
+		ctx:    t.ctx,
+	}
+}
+
+// C WithContext ...
+func (t *xZap) C(ctx context.Context) Logger {
+	return &xZap{
+		entry:  t.entry,
+		writer: t.writer,
+		ctx:    ctx,
 	}
 }
 

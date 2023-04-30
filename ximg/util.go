@@ -1,4 +1,4 @@
-package ximage
+package ximg
 
 import (
 	"fmt"
@@ -50,7 +50,7 @@ func Read(filepath string) image.Image {
 }
 
 // Write ...
-func Write(filepath string, img image.Image) error {
+func Write(filepath string, src image.Image) error {
 	file, err := os.Create(filepath)
 	if err != nil {
 		return err
@@ -59,11 +59,11 @@ func Write(filepath string, img image.Image) error {
 	ext := xfile.GetFileExt(filepath)
 	switch ext {
 	case "jpg", "jpeg":
-		return jpeg.Encode(file, img, &jpeg.Options{
+		return jpeg.Encode(file, src, &jpeg.Options{
 			Quality: jpeg.DefaultQuality,
 		})
 	case "png":
-		return png.Encode(file, img)
+		return png.Encode(file, src)
 	default:
 		return fmt.Errorf("invalid image type: %s", ext)
 	}

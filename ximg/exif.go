@@ -1,4 +1,4 @@
-package ximage
+package ximg
 
 import (
 	"github.com/barasher/go-exiftool"

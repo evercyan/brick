@@ -2,8 +2,8 @@ package xjson
 
 import (
 	"encoding/json"
-	"fmt"
-	"strconv"
+
+	"github.com/evercyan/brick/xtype"
 )
 
 // JSON ...
@@ -13,33 +13,32 @@ type JSON struct {
 
 // New ...
 func New(s string) *JSON {
-	j := new(JSON)
-	var v interface{}
-	if err := json.Unmarshal([]byte(s), &v); err == nil {
-		j.value = v
+	j := &JSON{}
+	if err := json.Unmarshal([]byte(s), &j.value); err != nil {
+		j.value = nil
 	}
 	return j
 }
 
 // Key ...
 func (j *JSON) Key(key string) *JSON {
-	m, ok := (j.value).(map[string]interface{})
-	if ok {
-		j.value = m[key]
-	} else {
-		j.value = nil
+	if m, ok := j.value.(map[string]interface{}); ok {
+		if v, ok := m[key]; ok {
+			j.value = v
+			return j
+		}
 	}
+	j.value = nil
 	return j
 }
 
 // Index ...
 func (j *JSON) Index(index int) *JSON {
-	l, ok := (j.value).([]interface{})
-	if ok && index >= 0 && index < len(l) {
+	if l, ok := j.value.([]interface{}); ok && index >= 0 && index < len(l) {
 		j.value = l[index]
-	} else {
-		j.value = nil
+		return j
 	}
+	j.value = nil
 	return j
 }
 
@@ -50,19 +49,12 @@ func (j *JSON) Value() interface{} {
 
 // ToString ...
 func (j *JSON) ToString() string {
-	if j.value == nil {
-		return ""
-	}
-	return fmt.Sprint(j.value)
+	return xtype.ToString(j.value)
 }
 
 // ToInt ...
-func (j *JSON) ToInt() int64 {
-	v, err := strconv.ParseInt(j.ToString(), 10, 64)
-	if err != nil {
-		return 0
-	}
-	return v
+func (j *JSON) ToInt64() int64 {
+	return xtype.ToInt64(j.value)
 }
 
 // ToJSON ...
@@ -74,11 +66,19 @@ func (j *JSON) ToJSON() string {
 	return string(b)
 }
 
-// ToArray ...
-func (j *JSON) ToArray() interface{} {
+// ToSlice ...
+func (j *JSON) ToSlice() []interface{} {
 	switch (j.value).(type) {
 	case []interface{}:
 		return (j.value).([]interface{})
+	default:
+		return nil
+	}
+}
+
+// ToMap ...
+func (j *JSON) ToMap() map[string]interface{} {
+	switch (j.value).(type) {
 	case map[string]interface{}:
 		return (j.value).(map[string]interface{})
 	default:

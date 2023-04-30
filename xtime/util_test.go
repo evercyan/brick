@@ -2,6 +2,7 @@ package xtime
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -19,6 +20,9 @@ func TestFormat(t *testing.T) {
 	assert.Equal(t, int64(1609516799), Last(tt))
 
 	assert.True(t, IsLeapYear(2000))
+
+	var t1 time.Time
+	assert.Less(t, int64(0), First(t1))
 }
 
 func TestCheck(t *testing.T) {

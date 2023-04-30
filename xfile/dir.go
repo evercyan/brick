@@ -51,46 +51,46 @@ func GetConfigDir(paths ...string) (string, error) {
 	return filePath, nil
 }
 
-// ListFiles ...
-func ListFiles(dir string, match string, recurse ...bool) []string {
-	res := make([]string, 0)
-	files, err := os.ReadDir(dir)
+// ListDirs ...
+func ListDirs(dir string, isRecursive ...bool) []string {
+	fs, err := os.ReadDir(dir)
 	if err != nil {
-		return res
+		return nil
 	}
+	l := make([]string, 0)
+	for _, f := range fs {
+		fp := fmt.Sprintf("%s/%s", strings.TrimRight(dir, "/"), f.Name())
+		if !f.IsDir() {
+			continue
+		}
+		l = append(l, fp)
+		if len(isRecursive) > 0 {
+			l = append(l, ListDirs(fp, isRecursive...)...)
+		}
+	}
+	return l
+}
+
+// ListFiles ...
+func ListFiles(dir string, match string, isRecursive ...bool) []string {
+	fs, err := os.ReadDir(dir)
+	if err != nil {
+		return nil
+	}
+	l := make([]string, 0)
 	re := regexp.MustCompile(match)
-	for _, file := range files {
-		fp := fmt.Sprintf("%s/%s", strings.TrimRight(dir, "/"), file.Name())
-		if file.IsDir() {
-			if len(recurse) > 0 {
-				res = append(res, ListFiles(fp, match, recurse...)...)
+	for _, f := range fs {
+		fp := fmt.Sprintf("%s/%s", strings.TrimRight(dir, "/"), f.Name())
+		if f.IsDir() {
+			if len(isRecursive) > 0 {
+				l = append(l, ListFiles(fp, match, isRecursive...)...)
 			}
 			continue
 		}
-		if match != "" && !re.MatchString(file.Name()) {
+		if match != "" && !re.MatchString(f.Name()) {
 			continue
 		}
-		res = append(res, fp)
+		l = append(l, fp)
 	}
-	return res
-}
-
-// ListDirs ...
-func ListDirs(dir string, recurse ...bool) []string {
-	res := make([]string, 0)
-	files, err := os.ReadDir(dir)
-	if err != nil {
-		return res
-	}
-	for _, file := range files {
-		fp := fmt.Sprintf("%s/%s", strings.TrimRight(dir, "/"), file.Name())
-		if !file.IsDir() {
-			continue
-		}
-		res = append(res, fp)
-		if len(recurse) > 0 {
-			res = append(res, ListDirs(fp, recurse...)...)
-		}
-	}
-	return res
+	return l
 }

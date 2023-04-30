@@ -1,6 +1,7 @@
 package xlog
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -9,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/evercyan/brick/xgen"
 	rotatelogs "github.com/lestrrat/go-file-rotatelogs"
 	"github.com/sirupsen/logrus"
 	"go.uber.org/zap/zapcore"
@@ -79,4 +81,17 @@ func getZapLevel(lv Level) zapcore.Level {
 	default:
 		return zapcore.InfoLevel
 	}
+}
+
+// GetTraceId ...
+func GetTraceId(ctx context.Context) string {
+	if ctx != nil {
+		if v, ok := ctx.Value(CtxTraceKey{}).(string); ok {
+			return v
+		}
+		if v, ok := ctx.Value(FieldTraceId).(string); ok {
+			return v
+		}
+	}
+	return xgen.Nanoid()
 }

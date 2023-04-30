@@ -4,12 +4,11 @@ import (
 	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
-	"encoding/base64"
 	"encoding/hex"
 )
 
-// AesEcbEncrypt ...
-func AesEcbEncrypt(text, key string) string {
+// AesECBEncrypt ...
+func AesECBEncrypt(text, key string) string {
 	bt, bk := []byte(text), []byte(key)
 	cip, err := aes.NewCipher(aesEcbKey(bk))
 	if err != nil {
@@ -30,8 +29,8 @@ func AesEcbEncrypt(text, key string) string {
 	return string(encrypted)
 }
 
-// AesEcbDecrypt ...
-func AesEcbDecrypt(text, key string) string {
+// AesECBDecrypt ...
+func AesECBDecrypt(text, key string) string {
 	bt, bk := []byte(text), []byte(key)
 	cip, err := aes.NewCipher(aesEcbKey(bk))
 	if err != nil {
@@ -66,58 +65,52 @@ func aesEcbKey(key []byte) []byte {
 
 // ----------------------------------------------------------------
 
-// AesCbcEncrypt ...
-func AesCbcEncrypt(text, key string) string {
-	bt, bk := []byte(text), []byte(key)
-	block, err := aes.NewCipher(bk)
-	if err != nil {
-		return ""
-	}
-	blockSize := block.BlockSize()
-	data := aesCbcPKCS7Padding(bt, blockSize)
-	blockMode := cipher.NewCBCEncrypter(block, bk[:blockSize])
-	encrypted := make([]byte, len(data))
-	blockMode.CryptBlocks(encrypted, data)
-	return base64.StdEncoding.EncodeToString(encrypted)
-}
-
-// AesCbcDecrypt ...
-func AesCbcDecrypt(text string, key string) string {
-	bt, err := base64.StdEncoding.DecodeString(text)
-	if err != nil {
-		return ""
-	}
-	bk := []byte(key)
-	block, err := aes.NewCipher(bk)
-	if err != nil {
-		return ""
-	}
-	blockSize := block.BlockSize()
-	blockMode := cipher.NewCBCDecrypter(block, bk[:blockSize])
-	decrypted := make([]byte, len(bt))
-	blockMode.CryptBlocks(decrypted, bt)
-	return string(aecCbcPKCS7UnPadding(decrypted))
-}
-
-// aesCbcPKCS7Padding ...
-func aesCbcPKCS7Padding(text []byte, blockSize int) []byte {
-	padding := blockSize - len(text)%blockSize
+// PKCS7Padding ...
+func PKCS7Padding(ciphertext []byte, blockSize int) []byte {
+	padding := blockSize - len(ciphertext)%blockSize
 	padtext := bytes.Repeat([]byte{byte(padding)}, padding)
-	return append(text, padtext...)
+	return append(ciphertext, padtext...)
 }
 
-// aecCbcPKCS7UnPadding ...
-func aecCbcPKCS7UnPadding(text []byte) []byte {
-	length := len(text)
-	unpadding := int(text[length-1])
-	return text[:(length - unpadding)]
+// PKCS7UnPadding ...
+func PKCS7UnPadding(origData []byte) []byte {
+	length := len(origData)
+	unpadding := int(origData[length-1])
+	return origData[:(length - unpadding)]
+}
+
+// AesCBCEncrypt AES-128-CBC 加密
+func AesCBCEncrypt(data, key, iv []byte) ([]byte, error) {
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
+	}
+	blockSize := block.BlockSize()
+	data = PKCS7Padding(data, blockSize)
+	blockMode := cipher.NewCBCEncrypter(block, iv)
+	crypted := make([]byte, len(data))
+	blockMode.CryptBlocks(crypted, data)
+	return crypted, nil
+}
+
+// AesCBCDecrypt ase-128-cbc 解密
+func AesCBCDecrypt(crypted, key, iv []byte) ([]byte, error) {
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
+	}
+	blockMode := cipher.NewCBCDecrypter(block, iv)
+	data := make([]byte, len(crypted))
+	blockMode.CryptBlocks(data, crypted)
+	data = PKCS7UnPadding(data)
+	return data, nil
 }
 
 // ----------------------------------------------------------------
 
 // AesMysqlEncrypt 同 mysql hex(aes_encrypt('text', 'key'))
 func AesMysqlEncrypt(text, key string) string {
-	return hex.EncodeToString([]byte(AesEcbEncrypt(text, key)))
+	return hex.EncodeToString([]byte(AesECBEncrypt(text, key)))
 }
 
 // AesMysqlDecrypt 同 mysql aes_decrypt(unhex('text'), 'key')
@@ -126,7 +119,7 @@ func AesMysqlDecrypt(text, key string) string {
 	if err != nil {
 		return text
 	}
-	decrypted := AesEcbDecrypt(string(b), key)
+	decrypted := AesECBDecrypt(string(b), key)
 	if decrypted == "" {
 		return text
 	}

@@ -10,11 +10,11 @@ import (
 // base64.RawStdEncoding 		常规编码, 末尾不补 =
 // base64.RawURLEncoding 		URL safe 编码, 末尾不补 =
 func encoding(encodings ...*base64.Encoding) *base64.Encoding {
-	encoding := base64.StdEncoding
+	model := base64.StdEncoding
 	if len(encodings) > 0 {
-		encoding = encodings[0]
+		model = encodings[0]
 	}
-	return encoding
+	return model
 }
 
 // Base64Encode ...

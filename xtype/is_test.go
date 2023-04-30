@@ -52,6 +52,7 @@ func TestIsJson(t *testing.T) {
 	assert.True(t, IsJSONString("[1, 2, 3]"))
 	assert.False(t, IsJSONString("["))
 	assert.True(t, IsJSONObject(struct{}{}))
+	assert.False(t, IsJSONObject(1))
 }
 
 func TestIsContains(t *testing.T) {

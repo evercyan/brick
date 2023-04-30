@@ -1,74 +1,159 @@
 package xhttp
 
 import (
-	"compress/gzip"
+	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
+	"mime/multipart"
 	"net/http"
+	"net/url"
+	"os"
+	"path/filepath"
+	"sort"
+	"strings"
 
-	"github.com/evercyan/brick/xtype"
+	"github.com/evercyan/brick/xfile"
 )
 
-// Get ...
-func Get(ctx context.Context, url string) string {
-	return ToString(New().Get(ctx, url, nil))
+// ParseURL ...
+func ParseURL(str string) (*url.URL, error) {
+	return url.Parse(str)
 }
 
-// Post ...
-func Post(ctx context.Context, url string, body interface{}) string {
-	return ToString(New().Post(ctx, url, http.Header{
-		"Content-Type": []string{
-			"application/json",
-		},
-	}, Encode(body)))
+// ParseQuery ...
+func ParseQuery(str string) map[string]string {
+	res := make(map[string]string)
+	values, err := url.ParseQuery(str)
+	if err != nil {
+		return res
+	}
+	for k, v := range values {
+		res[k] = v[0]
+	}
+	return res
 }
 
-// Encode ...
-func Encode(body interface{}) []byte {
-	if s, sok := body.(string); sok {
-		return []byte(s)
-	} else if b, bok := body.([]byte); bok {
-		return b
-	} else if xtype.IsJSONObject(body) {
-		b1, err := json.Marshal(body)
+// BuildURL ...
+func BuildURL(url string, m map[string]interface{}) string {
+	list := make([]string, 0)
+	for k, v := range m {
+		list = append(list, fmt.Sprintf("%s=%v", k, v))
+	}
+	sort.Strings(list)
+	query := strings.Join(list, "&")
+	if url == "" {
+		return query
+	}
+	symbol := "?"
+	if strings.Contains(url, "?") {
+		symbol = "&"
+	}
+	return url + symbol + query
+}
+
+// BuildValues ...
+func BuildValues(m map[string]interface{}) url.Values {
+	res := make(url.Values)
+	for k, v := range m {
+		res[k] = []string{fmt.Sprint(v)}
+	}
+	return res
+}
+
+// BuildFormData ...
+func BuildFormData(header http.Header, m map[string]interface{}) (http.Header, io.Reader) {
+	b := new(bytes.Buffer)
+	w := multipart.NewWriter(b)
+	for k, v := range m {
+		if vv, ok := v.(string); ok &&
+			strings.HasPrefix(vv, "@") &&
+			xfile.IsExist(strings.TrimPrefix(vv, "@")) {
+			fpath := strings.TrimPrefix(vv, "@")
+			f, err := os.Open(fpath)
+			if err != nil {
+				continue
+			}
+			part, err := w.CreateFormFile(k, filepath.Base(fpath))
+			if err != nil {
+				f.Close()
+				continue
+			}
+			io.Copy(part, f)
+			f.Close()
+			continue
+		}
+		w.WriteField(k, fmt.Sprintf("%v", v))
+	}
+	defer w.Close()
+	header.Set(HeaderKeyContentType, w.FormDataContentType())
+	return header, b
+}
+
+// BuildReader ...
+func BuildReader(data interface{}, types ...string) io.Reader {
+	if r, ok := data.(io.Reader); ok {
+		return r
+	}
+	if s, ok := data.(string); ok {
+		return strings.NewReader(s)
+	}
+	if b, ok := data.([]byte); ok {
+		return bytes.NewBuffer(b)
+	}
+	contentType := ""
+	if len(types) > 0 {
+		contentType = types[0]
+	}
+	switch contentType {
+	case HeaderKeyContentTypeValueForm:
+		if v, ok := data.(url.Values); ok {
+			return strings.NewReader(v.Encode())
+		}
+		if m, ok := data.(map[string]interface{}); ok {
+			return strings.NewReader(BuildValues(m).Encode())
+		}
+	default:
+		b, err := json.Marshal(data)
 		if err != nil {
 			return nil
 		}
-		return b1
+		return bytes.NewBuffer(b)
 	}
 	return nil
 }
 
-// ToBytes ...
-func ToBytes(res *http.Response, err error) []byte {
+// Get ...
+func Get(ctx context.Context, url string) string {
+	res, err := New().Get(ctx, url, nil)
 	if err != nil {
-		return nil
+		return ""
 	}
-	defer res.Body.Close()
+	return res.String()
+}
 
-	b, err := io.ReadAll(res.Body)
+// Post ...
+func Post(ctx context.Context, url string, data interface{}) string {
+	res, err := New().Post(ctx, url, nil, data)
 	if err != nil {
-		return nil
+		return ""
 	}
-	return b
+	return res.String()
 }
 
 // ToString ...
-func ToString(res *http.Response, err error) string {
-	return string(ToBytes(res, err))
+func ToString(r *Response, err error) string {
+	if err != nil {
+		return ""
+	}
+	return r.String()
 }
 
-// GetDecompressBody ...
-func GetDecompressBody(compressType string, body io.ReadCloser) (io.ReadCloser, error) {
-	switch compressType {
-	case "gzip":
-		reader, err := gzip.NewReader(body)
-		if err != nil {
-			return nil, err
-		}
-		return reader, nil
-	default:
-		return body, nil
+// ToResponse ...
+func ToResponse(r *Response, err error) (*http.Response, error) {
+	if err != nil {
+		return nil, err
 	}
+	return r.Response, nil
 }

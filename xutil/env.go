@@ -6,26 +6,30 @@ import (
 	"strings"
 )
 
-// GetEnv ...
-func GetEnv(name string, defaults ...string) string {
-	value := os.Getenv(name)
+// Setenv ...
+func Setenv(key, value string) error {
+	return os.Setenv(key, value)
+}
+
+// Getenv ...
+func Getenv(key string, defaults ...string) string {
+	value := os.Getenv(key)
 	if value == "" && len(defaults) > 0 {
 		value = defaults[0]
 	}
 	return value
 }
 
-// GetEnvMap ...
-func GetEnvMap() map[string]string {
-	envList := os.Environ()
-	envMap := make(map[string]string, len(envList))
-	for _, str := range envList {
+// GetenvMap ...
+func GetenvMap() map[string]string {
+	res := make(map[string]string)
+	for _, str := range os.Environ() {
 		nodes := strings.SplitN(str, "=", 2)
 		if len(nodes) >= 2 {
-			envMap[nodes[0]] = nodes[1]
+			res[nodes[0]] = nodes[1]
 		}
 	}
-	return envMap
+	return res
 }
 
 // IsWin ...

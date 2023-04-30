@@ -1,4 +1,4 @@
-package xgenerator
+package xgen
 
 import (
 	"fmt"
@@ -16,4 +16,7 @@ func TestID(t *testing.T) {
 
 	assert.NotEmpty(t, XID())
 	fmt.Println("XID:", XID())
+
+	assert.NotEmpty(t, Nanoid())
+	fmt.Println("Nanoid:", Nanoid())
 }
