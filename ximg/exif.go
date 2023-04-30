@@ -4,6 +4,9 @@ import (
 	"github.com/barasher/go-exiftool"
 )
 
+// ATTENTION
+// go-exiftool 需要安装 exiftool(https://exiftool.org/)
+
 // ReadExif ...
 func ReadExif(filepath string) map[string]interface{} {
 	exif, err := exiftool.NewExiftool()
