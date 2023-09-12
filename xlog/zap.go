@@ -16,6 +16,7 @@ type xZap struct {
 	entry  *zap.Logger
 	writer io.Writer
 	ctx    context.Context
+	caller int
 }
 
 // newZap ...
@@ -27,10 +28,8 @@ func newZap(config *Config) Logger {
 		writeSyncers = append(writeSyncers, zapcore.AddSync(writer))
 	}
 	writer := zapcore.NewMultiWriteSyncer(writeSyncers...)
-
 	// 日志级别
 	level := getZapLevel(config.Level)
-
 	// 根据 Formatter 来做格式化
 	getFormatterValue := func(s string) string {
 		if config.Formatter == FormatterJSON {
@@ -79,13 +78,9 @@ func newZap(config *Config) Logger {
 	} else {
 		encoder = zapcore.NewConsoleEncoder(encoderConfig)
 	}
-
 	core := zapcore.NewCore(encoder, writer, level)
 	zl := zap.New(core)
-
 	zl = zl.WithOptions(zap.AddCaller())
-	zl = zl.WithOptions(zap.AddCallerSkip(callerSkip - 1))
-
 	return &xZap{
 		entry:  zl,
 		writer: writers[0],
@@ -100,7 +95,12 @@ func (t *xZap) log(level Level, args string) {
 	if !t.entry.Core().Enabled(lv) {
 		return
 	}
-	l := t.entry.Named(GetTraceId(t.ctx))
+	skip := callerSkip - 1
+	if t.caller > 0 {
+		skip = t.caller
+	}
+	entry := t.entry.WithOptions(zap.AddCallerSkip(skip))
+	l := entry.Named(GetTraceId(t.ctx))
 	switch lv {
 	case zapcore.DebugLevel:
 		l.Debug(args)
@@ -199,21 +199,23 @@ func (t *xZap) Errorf(format string, args ...interface{}) {
 //	t.Logf(LevelPanic, format, args...)
 //}
 
-// F WithField ...
-func (t *xZap) F(key string, value interface{}) Logger {
+// Field WithField ...
+func (t *xZap) Field(key string, value interface{}) Logger {
 	return &xZap{
 		entry:  t.entry.With(zap.Any(key, value)),
 		writer: t.writer,
 		ctx:    t.ctx,
+		caller: callerSkip - 2,
 	}
 }
 
-// C WithContext ...
-func (t *xZap) C(ctx context.Context) Logger {
+// Ctx WithContext ...
+func (t *xZap) Ctx(ctx context.Context) Logger {
 	return &xZap{
 		entry:  t.entry,
 		writer: t.writer,
 		ctx:    ctx,
+		caller: callerSkip - 2,
 	}
 }
 

@@ -92,15 +92,27 @@ func Intersect[V comparable](list []V, target []V) []V {
 
 // Diff ...
 func Diff[V comparable](list []V, target []V) []V {
-	res := make([]V, 0)
 	m := make(map[V]struct{})
 	for _, v := range target {
 		m[v] = struct{}{}
 	}
+	res := make([]V, 0)
 	for _, v := range list {
 		if _, ok := m[v]; !ok {
 			res = append(res, v)
 		}
+	}
+	return res
+}
+
+// First 取切片第一个元素, 不然取默认值第一个元素, 再则取对应类型的零值
+func First[V any](list []V, defaults ...V) V {
+	var res V
+	if len(list) > 0 {
+		res = list[0]
+	}
+	if len(defaults) > 0 {
+		return defaults[0]
 	}
 	return res
 }

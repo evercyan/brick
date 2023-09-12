@@ -61,3 +61,17 @@ func TestIsContains(t *testing.T) {
 	assert.True(t, IsContains(map[int]int{1: 1, 2: 2}, 1))
 	assert.False(t, IsContains(map[int]int{1: 1, 2: 2}, 3))
 }
+
+func TestIsZero(t *testing.T) {
+	var v1 string
+	assert.True(t, IsZero(v1))
+	assert.True(t, IsZero(""))
+
+	var v2 int64
+	assert.True(t, IsZero(v2))
+	assert.True(t, IsZero(0))
+
+	assert.True(t, IsZero(false))
+
+	assert.True(t, IsZero(struct{}{}))
+}

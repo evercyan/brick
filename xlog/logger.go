@@ -23,9 +23,9 @@ type Logger interface {
 	//Fatalf(format string, args ...interface{})            // 格式化并记录 FatalLevel 级别的日志
 	//Panic(args ...interface{})                            // 记录 PanicLevel 级别的日志
 	//Panicf(format string, args ...interface{})            // 格式化并记录 PanicLevel 级别的日志
-	Writer() io.Writer                      // 返回日志 io.Writer
-	F(key string, value interface{}) Logger // WithField 为日志添加一个上下文数据
-	C(ctx context.Context) Logger           // WithContext 为日志添加一个 context
+	Writer() io.Writer                          // 返回日志 io.Writer
+	Field(key string, value interface{}) Logger // WithField 为日志添加一个上下文数据
+	Ctx(ctx context.Context) Logger             // WithContext 为日志添加一个 context
 }
 
 // ----------------------------------------------------------------
@@ -127,14 +127,14 @@ func Errorf(format string, args ...interface{}) {
 //	logger.Panicf(format, args...)
 //}
 
-// F WithField...
-func F(key string, value interface{}) Logger {
-	return logger.F(key, value)
+// Field WithField...
+func Field(key string, value interface{}) Logger {
+	return logger.Field(key, value)
 }
 
-// C WithContext...
-func C(ctx context.Context) Logger {
-	return logger.C(ctx)
+// Ctx WithContext...
+func Ctx(ctx context.Context) Logger {
+	return logger.Ctx(ctx)
 }
 
 // Writer ...

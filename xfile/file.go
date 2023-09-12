@@ -11,15 +11,18 @@ import (
 	"os"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/evercyan/brick/xgen"
+	"github.com/evercyan/brick/xlodash"
+	"github.com/evercyan/brick/xtime"
 	"github.com/evercyan/brick/xtype"
 )
 
 // Temp ...
 func Temp(filenames ...string) string {
 	var filename string
-	if len(filename) > 0 {
+	if len(filenames) > 0 {
 		filename = filenames[0]
 	} else {
 		filename = xgen.Nanoid()
@@ -182,17 +185,27 @@ func Md5(path string) (string, error) {
 }
 
 // Shadow 根据当前文件名称取其影分身
-// /tmp/abc.txt => /tmp/abc_1.txt
-func Shadow(filepath string) string {
-	ext := path.Ext(filepath)
-	prefix := strings.TrimSuffix(filepath, ext)
-	res := ""
-	for i := 1; ; i++ {
-		f := fmt.Sprintf("%s_%d%s", prefix, i, ext)
-		if !IsExist(f) {
-			res = f
-			break
+func Shadow(fpath string, joins ...string) string {
+	ext := path.Ext(fpath)
+	prefix := strings.TrimSuffix(fpath, ext)
+	join := xlodash.First(joins)
+	// 入参: /tmp/abc.txt
+	switch join {
+	case xtime.FormatDate:
+		// /tmp/abc_20060102.txt
+		suffix := xtime.Format(time.Now(), xtime.FormatDate)
+		return fmt.Sprintf("%s_%s%s", prefix, suffix, ext)
+	case xtime.FormatTimeJoin:
+		// /tmp/abc_20060102150405.txt
+		suffix := xtime.Format(time.Now(), xtime.FormatTimeJoin)
+		return fmt.Sprintf("%s_%s%s", prefix, suffix, ext)
+	default:
+		// /tmp/abc_1.txt
+		for i := 1; ; i++ {
+			f := fmt.Sprintf("%s_%d%s", prefix, i, ext)
+			if !IsExist(f) {
+				return f
+			}
 		}
 	}
-	return res
 }

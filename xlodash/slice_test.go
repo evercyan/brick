@@ -133,3 +133,12 @@ func TestUnion(t *testing.T) {
 		[]int{2, 3, 4},
 	))
 }
+
+func TestFirst(t *testing.T) {
+	assert.Equal(t, 0, First([]int{}))
+	assert.Equal(t, 1, First([]int{1}))
+	assert.Equal(t, "", First([]string{}))
+	assert.Equal(t, "a", First([]string{"a"}))
+	assert.Equal(t, []int(nil), First([][]int{}))
+	assert.Equal(t, []int{1}, First([][]int{{1}}))
+}

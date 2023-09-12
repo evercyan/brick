@@ -31,7 +31,7 @@ const (
 	// 3: logrus.go t.log(level, args...)
 	// 4: logrus.go t.Log(LevelInfo, args...)
 	// 5: 调用方...
-	callerSkip = 4
+	callerSkip = 5
 
 	timestampFormat = "2006-01-02 15:04:05.000"
 )

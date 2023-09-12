@@ -19,8 +19,12 @@ func WriteImage(filepath string) {
 }
 
 // Read ...
-func Read() string {
-	return string(clipboard.Read(clipboard.FmtText))
+func Read(isImage ...bool) string {
+	t := clipboard.FmtText
+	if len(isImage) > 0 && isImage[0] {
+		t = clipboard.FmtImage
+	}
+	return string(clipboard.Read(t))
 }
 
 // ReadImage ...

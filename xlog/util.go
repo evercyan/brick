@@ -95,3 +95,17 @@ func GetTraceId(ctx context.Context) string {
 	}
 	return xgen.Nanoid()
 }
+
+// GetTraceCtx ...
+func GetTraceCtx(ctx context.Context, args ...string) context.Context {
+	traceId := ""
+	if len(args) > 0 {
+		traceId = args[0]
+	} else {
+		traceId = xgen.Nanoid()
+	}
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	return context.WithValue(ctx, CtxTraceKey{}, traceId)
+}

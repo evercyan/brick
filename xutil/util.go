@@ -3,6 +3,8 @@ package xutil
 import (
 	"strings"
 	"unicode/utf8"
+
+	"github.com/evercyan/brick/xtype"
 )
 
 // If 三目运算
@@ -24,4 +26,12 @@ func Replace(s string, replace map[string]string) string {
 // Len ..
 func Len(s string) int {
 	return utf8.RuneCountInString(s)
+}
+
+// Default ...
+func Default[V comparable](v V, de V) V {
+	if xtype.IsZero(v) {
+		return de
+	}
+	return v
 }

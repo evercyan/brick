@@ -15,6 +15,7 @@ import (
 type xLogrus struct {
 	entry  *logrus.Entry
 	writer io.Writer
+	caller int
 }
 
 // newLogrus ...
@@ -91,8 +92,12 @@ func (t *xLogrus) log(level Level, args ...interface{}) {
 	if !t.entry.Logger.IsLevelEnabled(lv) {
 		return
 	}
+	skip := callerSkip
+	if t.caller > 0 {
+		skip = t.caller
+	}
 	t.entry.
-		WithField(msgCallerKey, loggerCaller(callerSkip)).
+		WithField(msgCallerKey, loggerCaller(skip)).
 		WithField(msgNameKey, GetTraceId(t.entry.Context)).
 		Log(lv, args...)
 }
@@ -177,19 +182,21 @@ func (t *xLogrus) Errorf(format string, args ...interface{}) {
 //	t.Logf(LevelPanic, format, args...)
 //}
 
-// F WithField ...
-func (t *xLogrus) F(key string, value interface{}) Logger {
+// Field WithField ...
+func (t *xLogrus) Field(key string, value interface{}) Logger {
 	return &xLogrus{
 		entry:  t.entry.WithField(key, value),
 		writer: t.writer,
+		caller: callerSkip - 1,
 	}
 }
 
-// C WithContext ...
-func (t *xLogrus) C(ctx context.Context) Logger {
+// Ctx WithContext ...
+func (t *xLogrus) Ctx(ctx context.Context) Logger {
 	return &xLogrus{
 		entry:  t.entry.WithContext(ctx),
 		writer: t.writer,
+		caller: callerSkip - 1,
 	}
 }
 

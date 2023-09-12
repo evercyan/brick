@@ -75,11 +75,11 @@ func TestZap(t *testing.T) {
 
 	// Ctx
 	ctx := context.WithValue(context.Background(), CtxTraceKey{}, xgen.Nanoid())
-	C(ctx).Info("zap ctx 1")
-	C(ctx).Error("zap ctx 2")
+	Ctx(ctx).Info("zap ctx 1")
+	Ctx(ctx).Error("zap ctx 2")
 
 	// Field
-	F("k", "v").Info("zap field")
+	Field("k", "v").Info("zap field")
 }
 
 func TestLogrus(t *testing.T) {
@@ -113,11 +113,11 @@ func TestLogrus(t *testing.T) {
 
 	// Ctx
 	ctx := context.WithValue(context.Background(), FieldTraceId, xgen.Nanoid())
-	C(ctx).Info("logrus ctx 1")
-	C(ctx).Error("logrus ctx 2")
+	Ctx(ctx).Info("logrus ctx 1")
+	Ctx(ctx).Error("logrus ctx 2")
 
 	// Field
-	F("k", "v").Info("logrus field")
+	Field("k", "v").Info("logrus field")
 }
 
 func TestLoggerFile(t *testing.T) {

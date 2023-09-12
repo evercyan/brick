@@ -66,7 +66,7 @@ func TestPost(t *testing.T) {
 		        "Content-Type": "application/json",
 		        "Host": "httpbin.org",
 		        "User-Agent": "Go-http-client/2.0",
-		        "X-Amzn-Trace-Id": "Root=1-6444ff64-5d0f1a6e2a1ca2812bb8d9e2"
+		        "X-Amzn-Trace-ID": "Root=1-6444ff64-5d0f1a6e2a1ca2812bb8d9e2"
 		    },
 		    "json": {
 		        "name": "brick",
@@ -100,7 +100,7 @@ func TestPost(t *testing.T) {
 		        "Content-Type": "application/x-www-form-urlencoded",
 		        "Host": "httpbin.org",
 		        "User-Agent": "Go-http-client/2.0",
-		        "X-Amzn-Trace-Id": "Root=1-6444ff65-6fbdbb991b5eef675e2c4c82"
+		        "X-Amzn-Trace-ID": "Root=1-6444ff65-6fbdbb991b5eef675e2c4c82"
 		    },
 		    "json": null,
 		    "origin": "103.88.46.208",
@@ -136,7 +136,7 @@ func TestUploadFile(t *testing.T) {
 		        "Content-Type": "multipart/form-data; boundary=8ddbc5f48344bbfe44818557a3d7b567163a7493b38a297de14447efc788",
 		        "Host": "httpbin.org",
 		        "User-Agent": "Go-http-client/2.0",
-		        "X-Amzn-Trace-Id": "Root=1-6444ff3b-1912fb5716c711334c613b09"
+		        "X-Amzn-Trace-ID": "Root=1-6444ff3b-1912fb5716c711334c613b09"
 		    },
 		    "json": null,
 		    "origin": "103.88.46.208",
@@ -176,7 +176,7 @@ func TestCookies(t *testing.T) {
 		        "Content-Type": "application/json",
 		        "Host": "httpbin.org",
 		        "User-Agent": "Go-http-client/2.0",
-		        "X-Amzn-Trace-Id": "Root=1-644deada-3512ae9802549aa317f5916c"
+		        "X-Amzn-Trace-ID": "Root=1-644deada-3512ae9802549aa317f5916c"
 		    },
 		    "method": "GET",
 		    "origin": "45.90.208.27"

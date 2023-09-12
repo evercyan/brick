@@ -43,3 +43,11 @@ func TestJwt(t *testing.T) {
 		assert.NotNil(t, err)
 	}
 }
+
+func TestParseJWTPayload(t *testing.T) {
+	encrypted, err := GetJWT(key, payload, expire)
+	assert.Nil(t, err)
+	payload, err := ParseJWTPayload(encrypted)
+	assert.Nil(t, err)
+	assert.NotNil(t, payload)
+}
