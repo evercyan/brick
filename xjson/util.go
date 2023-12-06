@@ -2,10 +2,12 @@ package xjson
 
 import (
 	"encoding/json"
+	"regexp"
 	"strconv"
 	"strings"
 
 	"github.com/evercyan/brick/xencoding"
+	"github.com/evercyan/brick/xtype"
 )
 
 // ...
@@ -41,4 +43,17 @@ func Minify(v interface{}) string {
 		}
 	}
 	return Encode(v)
+}
+
+// Format ...
+func Format(v string) string {
+	if xtype.IsJSONString(v) {
+		return v
+	}
+	if regexp.MustCompile(`[^\\]"`).MatchString(v) {
+		return v
+	}
+	v = strings.ReplaceAll(v, `\"`, `"`)
+	v = strings.ReplaceAll(v, `\\`, `\`)
+	return v
 }
