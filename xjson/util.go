@@ -45,7 +45,7 @@ func Minify(v interface{}) string {
 	return Encode(v)
 }
 
-// Format ...
+// Format 格式化成可用 JSON 字符串
 func Format(v string) string {
 	if xtype.IsJSONString(v) {
 		return v
