@@ -40,7 +40,7 @@ func Shell(cmd string) string {
 	return string(b)
 }
 
-// ExecCB ...
+// ExecCB 适用于执行持续输出的终端命令 e.g. ping baidu.com
 func ExecCB(command string, cb func(string)) error {
 	cmd := exec.Command("sh", "-c", command)
 	output, _ := cmd.StdoutPipe()
