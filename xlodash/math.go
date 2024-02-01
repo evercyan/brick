@@ -5,31 +5,31 @@ import (
 )
 
 // Min ...
-func Min[V constraints.Ordered](nums ...V) V {
-	var min V
+func Min[T constraints.Ordered](nums ...T) T {
+	var res T
 	if len(nums) == 0 {
-		return min
+		return res
 	}
-	min = nums[0]
+	res = nums[0]
 	for i := 1; i < len(nums); i++ {
-		if nums[i] < min {
-			min = nums[i]
+		if nums[i] < res {
+			res = nums[i]
 		}
 	}
-	return min
+	return res
 }
 
 // Max ...
-func Max[V constraints.Ordered](nums ...V) V {
-	var max V
+func Max[T constraints.Ordered](nums ...T) T {
+	var res T
 	if len(nums) == 0 {
-		return max
+		return res
 	}
-	max = nums[0]
+	res = nums[0]
 	for i := 1; i < len(nums); i++ {
-		if nums[i] > max {
-			max = nums[i]
+		if nums[i] > res {
+			res = nums[i]
 		}
 	}
-	return max
+	return res
 }

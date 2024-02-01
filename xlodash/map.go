@@ -1,7 +1,7 @@
 package xlodash
 
 // Keys ...
-func Keys[K comparable, V any](m map[K]V) []K {
+func Keys[K comparable, T any](m map[K]T) []K {
 	res := make([]K, 0, len(m))
 	for k, _ := range m {
 		res = append(res, k)
@@ -10,8 +10,8 @@ func Keys[K comparable, V any](m map[K]V) []K {
 }
 
 // Values ...
-func Values[K comparable, V any](m map[K]V) []V {
-	res := make([]V, 0, len(m))
+func Values[K comparable, T any](m map[K]T) []T {
+	res := make([]T, 0, len(m))
 	for _, v := range m {
 		res = append(res, v)
 	}
