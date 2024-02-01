@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+
+	"github.com/evercyan/brick/xlodash"
 )
 
 // NewIcon ...
@@ -19,11 +21,11 @@ func NewIcon(path string, types ...IconType) *Icon {
 }
 
 // NewItem ...
-func NewItem(title, subtitle string) *Item {
+func NewItem(title, subtitle string, args ...string) *Item {
 	return &Item{
 		Title:    title,
 		Subtitle: subtitle,
-		Arg:      subtitle,
+		Arg:      xlodash.First(args, subtitle),
 	}
 }
 
@@ -50,6 +52,9 @@ func Row(title, subtitle string) {
 		}},
 	})
 }
+
+// Error 错误
+var Error = Row
 
 // Notice 通知, 适用于 Post Notification
 func Notice(title, content string) {

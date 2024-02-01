@@ -110,9 +110,8 @@ func First[V any](list []V, defaults ...V) V {
 	var res V
 	if len(list) > 0 {
 		res = list[0]
-	}
-	if len(defaults) > 0 {
-		return defaults[0]
+	} else if len(defaults) > 0 {
+		res = defaults[0]
 	}
 	return res
 }

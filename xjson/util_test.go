@@ -3,6 +3,7 @@ package xjson
 import (
 	"testing"
 
+	"github.com/evercyan/brick/xtype"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -47,4 +48,10 @@ func TestMinify(t *testing.T) {
 }`
 	assert.JSONEq(t, `{"Text":"BBB","Title":"AAA"}`, Minify(s))
 	assert.JSONEq(t, `{"hello":"world"}`, Minify(`"{\"hello\": \"world\"}"`))
+}
+
+func TestFormat(t *testing.T) {
+	assert.True(t, xtype.IsJSONString(Format(`{"list":["a","b"],"name":"abc"}`)))
+	assert.True(t, xtype.IsJSONString(Format(`"{\"name\":\"abc\",\"list\":[\"a\", \"b\"]}"`)))
+	//assert.True(t, xtype.IsJSONString(Format(`{List:[a b] Name:abc}`)))
 }
