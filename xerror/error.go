@@ -1,22 +1,45 @@
 package xerror
 
 import (
-	"encoding/json"
+	"errors"
+	"fmt"
 )
 
-// Error ...
-type Error struct {
-	Code int    `json:"code"`
-	Msg  string `json:"msg"`
+// New ...
+func New(code int, msg string) *xError {
+	return &xError{
+		Code:    code,
+		Message: msg,
+	}
 }
 
-// Error ...
-func (e *Error) Error() string {
-	b, _ := json.Marshal(e)
-	return string(b)
+// IsXErr ...
+func IsXErr(err error) bool {
+	var xerr *xError
+	return errors.As(err, &xerr)
 }
 
-// WithMsg 自定义错误文案
-func (e *Error) WithMsg(msg string) *Error {
-	return New(e.Code, msg)
+// ToXErr ...
+func ToXErr(err error) *xError {
+	var xerr *xError
+	if errors.As(err, &xerr) {
+		return xerr
+	}
+	return nil
+}
+
+// Wrap ...
+func Wrap(err1, err2 error) error {
+	if xerr := ToXErr(err1); xerr != nil {
+		return xerr.Wrap(err2)
+	}
+	return fmt.Errorf("%s ::: %w", err1.Error(), err2)
+}
+
+// Unwrap ...
+func Unwrap(err error) error {
+	if xerr := ToXErr(err); xerr != nil {
+		return xerr.Unwrap()
+	}
+	return errors.Unwrap(err)
 }
