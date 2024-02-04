@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/evercyan/brick/xjson"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -17,11 +16,6 @@ func TestError(t *testing.T) {
 func TestIsError(t *testing.T) {
 	assert.True(t, IsXErr(New(1, "error")))
 	assert.False(t, IsXErr(errors.New("error")))
-}
-
-func TestStack(t *testing.T) {
-	err := New(1, "error")
-	fmt.Println(xjson.Encode(err))
 }
 
 func TestXErrWrap(t *testing.T) {
