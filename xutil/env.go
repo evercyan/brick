@@ -32,17 +32,22 @@ func GetenvMap() map[string]string {
 	return res
 }
 
+// GetOs ...
+func GetOs() string {
+	return runtime.GOOS
+}
+
 // IsWin ...
 func IsWin() bool {
-	return runtime.GOOS == "windows"
+	return GetOs() == "windows"
 }
 
 // IsMac ...
 func IsMac() bool {
-	return runtime.GOOS == "darwin"
+	return GetOs() == "darwin"
 }
 
 // IsLinux ...
 func IsLinux() bool {
-	return runtime.GOOS == "linux"
+	return GetOs() == "linux"
 }
