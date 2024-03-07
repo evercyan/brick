@@ -191,13 +191,13 @@ func Shadow(fpath string, joins ...string) string {
 	join := xlodash.First(joins)
 	// 入参: /tmp/abc.txt
 	switch join {
-	case xtime.Date:
+	case string(xtime.DateJoin):
 		// /tmp/abc_20060102.txt
-		suffix := xtime.Format(time.Now(), xtime.Date)
+		suffix := xtime.Format(time.Now(), xtime.DateJoin)
 		return fmt.Sprintf("%s_%s%s", prefix, suffix, ext)
-	case xtime.FormatTimeJoin:
+	case string(xtime.DateTimeJoin):
 		// /tmp/abc_20060102150405.txt
-		suffix := xtime.Format(time.Now(), xtime.FormatTimeJoin)
+		suffix := xtime.Format(time.Now(), xtime.DateTimeJoin)
 		return fmt.Sprintf("%s_%s%s", prefix, suffix, ext)
 	default:
 		// /tmp/abc_1.txt
