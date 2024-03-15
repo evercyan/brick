@@ -12,4 +12,6 @@ func TestFormat(t *testing.T) {
 	assert.Equal(t, 2024, tt.Year())
 
 	assert.Equal(t, "2024-01-01 01:02:03", Format(tt, DateTime))
+
+	assert.Equal(t, "2024-01-01 01:02:03", Format(tt, "his"))
 }

@@ -8,10 +8,10 @@ import (
 
 // Format ...
 func Format(t time.Time, patterns ...Pattern) string {
-	return t.Format(string(xlodash.First(patterns, DateTime)))
+	return t.Format(xlodash.First(patterns, DateTime).Desc())
 }
 
 // Parse ...
 func Parse(t string, patterns ...Pattern) (time.Time, error) {
-	return time.ParseInLocation(string(xlodash.First(patterns, DateTime)), t, time.Local)
+	return time.ParseInLocation(xlodash.First(patterns, DateTime).Desc(), t, time.Local)
 }
