@@ -6,6 +6,11 @@ import (
 	"github.com/evercyan/brick/xlodash"
 )
 
+// Now ...
+func Now(patterns ...Pattern) string {
+	return time.Now().Format(xlodash.First(patterns, DateTime).Desc())
+}
+
 // Format ...
 func Format(t time.Time, patterns ...Pattern) string {
 	return t.Format(xlodash.First(patterns, DateTime).Desc())

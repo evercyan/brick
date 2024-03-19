@@ -3,6 +3,7 @@ package xtype
 import (
 	"encoding/json"
 	"reflect"
+	"strings"
 	"time"
 )
 
@@ -130,6 +131,9 @@ func IsEmpty(v interface{}) bool {
 
 // IsJSONString ...
 func IsJSONString(s string) bool {
+	if !strings.Contains(s, "{") && !strings.Contains(s, "[") {
+		return false
+	}
 	var raw json.RawMessage
 	return json.Unmarshal([]byte(s), &raw) == nil
 }
