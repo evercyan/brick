@@ -1,9 +1,9 @@
 package xjson
 
 import (
+	"fmt"
 	"testing"
 
-	"github.com/evercyan/brick/xtype"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -51,7 +51,9 @@ func TestMinify(t *testing.T) {
 }
 
 func TestFormat(t *testing.T) {
-	assert.True(t, xtype.IsJSONString(Format(`{"list":["a","b"],"name":"abc"}`)))
-	assert.True(t, xtype.IsJSONString(Format(`"{\"name\":\"abc\",\"list\":[\"a\", \"b\"]}"`)))
-	//assert.True(t, xtype.IsJSONString(Format(`{List:[a b] Name:abc}`)))
+	target := `{"name":"abc","list":["a", "b"]}`
+
+	assert.Equal(t, target, Format(target))
+	assert.Equal(t, target, Format(fmt.Sprintf("111%s222", target)))
+	assert.Equal(t, target, Format(`{\"name\":\"abc\",\"list\":[\"a\", \"b\"]}`))
 }

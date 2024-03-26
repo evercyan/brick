@@ -2,7 +2,6 @@ package xjson
 
 import (
 	"encoding/json"
-	"regexp"
 	"strconv"
 	"strings"
 
@@ -41,15 +40,43 @@ func Minify(v interface{}) string {
 	return Encode(format(v))
 }
 
+// FilterPrefix 过滤前置字符直到 { 或 [
+func FilterPrefix(s string) string {
+	for i := 0; i < len(s); i++ {
+		if s[i] == '{' || s[i] == '[' {
+			s = s[i:]
+			break
+		}
+	}
+	return s
+}
+
+// FilterSuffix 过滤后置字符直到 } 或 ]
+func FilterSuffix(s string) string {
+	for i := len(s) - 1; i >= 0; i-- {
+		if s[i] == '}' || s[i] == ']' {
+			s = s[:i+1]
+			break
+		}
+	}
+	return s
+}
+
+// FilterPrefix 过滤转义字符
+func FilterTransfer(s string) string {
+	s = strings.ReplaceAll(s, `\"`, `"`)
+	s = strings.ReplaceAll(s, `\\`, `\`)
+	return s
+}
+
 // Format 格式化成可用 JSON 字符串
-func Format(v string) string {
-	if xtype.IsJSONString(v) {
-		return v
+func Format(s string) string {
+	filters := []func(string) string{FilterPrefix, FilterSuffix, FilterTransfer}
+	for _, fn := range filters {
+		if xtype.IsJSONString(s) {
+			break
+		}
+		s = fn(s)
 	}
-	if regexp.MustCompile(`[^\\]"`).MatchString(v) {
-		return v
-	}
-	v = strings.ReplaceAll(v, `\"`, `"`)
-	v = strings.ReplaceAll(v, `\\`, `\`)
-	return v
+	return s
 }
