@@ -2,6 +2,7 @@ package xjson
 
 import (
 	"encoding/json"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -17,16 +18,15 @@ var (
 
 // format ...
 func format(v interface{}) interface{} {
-	if vv, ok := v.(string); ok {
-		if vvv, err := strconv.Unquote(vv); err == nil {
-			vv = vvv
-		}
-		var raw interface{}
-		if err := json.Unmarshal([]byte(vv), &raw); err == nil {
-			v = raw
-		}
+	vv, ok := v.(string)
+	if !ok {
+		return v
 	}
-	return v
+	var vvv interface{}
+	if err := json.Unmarshal([]byte(vv), &vvv); err != nil {
+		return v
+	}
+	return vvv
 }
 
 // Pretty ...
@@ -62,8 +62,11 @@ func FilterSuffix(s string) string {
 	return s
 }
 
-// FilterPrefix 过滤转义字符
-func FilterTransfer(s string) string {
+// FilterUnquote 过滤转义字符
+func FilterUnquote(s string) string {
+	if v, err := strconv.Unquote(s); err == nil {
+		return v
+	}
 	s = strings.ReplaceAll(s, `\"`, `"`)
 	s = strings.ReplaceAll(s, `\\`, `\`)
 	return s
@@ -71,7 +74,7 @@ func FilterTransfer(s string) string {
 
 // Format 格式化成可用 JSON 字符串
 func Format(s string) string {
-	filters := []func(string) string{FilterPrefix, FilterSuffix, FilterTransfer}
+	filters := []func(string) string{FilterPrefix, FilterSuffix, FilterUnquote}
 	for _, fn := range filters {
 		if xtype.IsJSONString(s) {
 			break
@@ -79,4 +82,33 @@ func Format(s string) string {
 		s = fn(s)
 	}
 	return s
+}
+
+// Sort ...
+func Sort(s string) string {
+	var list []interface{}
+	if err := json.Unmarshal([]byte(s), &list); err != nil {
+		return s
+	}
+	if len(list) == 0 {
+		return s
+	}
+	switch list[0].(type) {
+	case float64:
+		sort.Slice(list, func(i, j int) bool {
+			return xtype.ToFloat64(list[i]) < xtype.ToFloat64(list[j])
+		})
+		return Encode(list)
+	case string:
+		isNumber := xtype.ToInt64(list[0]) > 0
+		sort.Slice(list, func(i, j int) bool {
+			if isNumber {
+				return xtype.ToFloat64(list[i]) < xtype.ToFloat64(list[j])
+			}
+			return xtype.ToString(list[i]) < xtype.ToString(list[j])
+		})
+		return Encode(list)
+	default:
+		return s
+	}
 }
