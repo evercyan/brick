@@ -1,4 +1,4 @@
-package xdraw
+package ximg
 
 import (
 	"bytes"
@@ -9,13 +9,12 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/evercyan/brick/ximg"
 	"github.com/evercyan/brick/xtype"
 )
 
 // Compress 图片压缩, quality 取值范围 1-100
 func Compress(fpath string, quality int) (image.Image, error) {
-	img, imgType, err := ximg.Parse(fpath)
+	img, imgType, err := Parse(fpath)
 	if err != nil {
 		return nil, err
 	}

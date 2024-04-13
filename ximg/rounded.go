@@ -1,4 +1,4 @@
-package xdraw
+package ximg
 
 import (
 	"image"
