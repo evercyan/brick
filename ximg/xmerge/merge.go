@@ -5,7 +5,7 @@ import (
 	"image"
 	"image/draw"
 
-	"github.com/evercyan/brick/ximg/xdraw"
+	"github.com/evercyan/brick/ximg"
 )
 
 // Merge 拼接图片
@@ -64,7 +64,7 @@ func Merge(images []image.Image, row int, col int, options ...func(*Option)) (im
 		x0 := opt.Padding + rowIndex*opt.Space + rowIndex*width
 		y0 := opt.Padding + colIndex*opt.Space + colIndex*height
 		// 将原图重置大小
-		resizeImg := xdraw.Resize(img, width, height)
+		resizeImg := ximg.Resize(img, width, height)
 		// 画图
 		draw.Draw(
 			dstImg,
@@ -116,7 +116,7 @@ func MergeToRow(images []image.Image, options ...func(*Option)) (image.Image, er
 		y0 := opt.Padding
 		// 将原图重置大小
 		targetW := img.Bounds().Dx() * opt.Quality / 100
-		resizeImg := xdraw.Resize(img, targetW, targetH)
+		resizeImg := ximg.Resize(img, targetW, targetH)
 		// 画图
 		draw.Draw(
 			dstImg,
@@ -169,7 +169,7 @@ func MergeToCol(images []image.Image, options ...func(*Option)) (image.Image, er
 		y0 := opt.Padding + index*opt.Space + preHeight
 		// 将原图重置大小
 		targetH := img.Bounds().Dy() * opt.Quality / 100
-		resizeImg := xdraw.Resize(img, targetW, targetH)
+		resizeImg := ximg.Resize(img, targetW, targetH)
 		// 画图
 		draw.Draw(
 			dstImg,
