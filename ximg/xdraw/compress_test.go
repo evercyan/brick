@@ -22,14 +22,14 @@ func TestCompress(t *testing.T) {
 		fmt.Println(time.Since(b).String())
 	}(time.Now())
 
-	name := "004"
+	name := "001"
 
-	target, err := Compress("/Users/Cyan/Downloads/img/"+name+".png", 1)
+	target, err := Compress("/Users/Cyan/Downloads/img/"+name+".jpg", 10)
 	if err != nil {
 		fmt.Println(err)
 		t.Fatal(err)
 	}
-	tpath := "/Users/Cyan/Downloads/img/" + name + "_c.png"
+	tpath := "/Users/Cyan/Downloads/img/" + name + "_c.jpg"
 	ximg.Write(tpath, target)
 	fmt.Println(tpath)
 }
