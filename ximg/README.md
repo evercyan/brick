@@ -12,7 +12,7 @@ sudo apt-get install exiftool
 
 
 
-- 图片压缩
+- 图片压缩, 1
 - logo 生成(porn youtube)
 - 图片转换
 - ICO 生成

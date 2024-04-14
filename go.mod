@@ -5,6 +5,7 @@ go 1.21
 require (
 	github.com/360EntSecGroup-Skylar/excelize v1.4.1
 	github.com/barasher/go-exiftool v1.7.0
+	github.com/cespare/xxhash/v2 v2.3.0
 	github.com/disintegration/imaging v1.6.2
 	github.com/disintegration/letteravatar v0.0.0-20160912210445-1a457b860450
 	github.com/fogleman/gg v1.3.0

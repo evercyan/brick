@@ -1,4 +1,4 @@
-package xlogo
+package xavatar
 
 import (
 	"fmt"
@@ -9,21 +9,17 @@ import (
 	"github.com/disintegration/letteravatar"
 	"github.com/evercyan/brick/xfont"
 	"github.com/evercyan/brick/ximg"
-	"github.com/evercyan/brick/ximg/xdraw"
 	"github.com/evercyan/brick/xregex"
 	"github.com/evercyan/brick/xutil"
 )
 
-// styleSingle ...
-type styleSingle struct {
-	*styleBase
+// xLetter ...
+type xLetter struct {
+	*xBase
 }
 
 // Image ...
-func (t *styleSingle) Image(char string) (image.Image, error) {
-	if t.opt.Width != t.opt.Height {
-		return nil, fmt.Errorf("width and height must be equal")
-	}
+func (t *xLetter) Image(char string) (image.Image, error) {
 	if xutil.Len(char) != 1 {
 		return nil, fmt.Errorf("char must contain only one letter")
 	}
@@ -35,18 +31,18 @@ func (t *styleSingle) Image(char string) (image.Image, error) {
 		opt.Font = xfont.LoadAlimamaFangYuanTiVF()
 	}
 	firstLetter, _ := utf8.DecodeRuneInString(char)
-	img, err := letteravatar.Draw(t.opt.Width, firstLetter, opt)
+	img, err := letteravatar.Draw(t.opt.Size, firstLetter, opt)
 	if err != nil {
 		return nil, err
 	}
 	if t.opt.Radious > 0 {
-		img = xdraw.Rounded(img, t.opt.Radious)
+		img = ximg.Rounded(img, t.opt.Radious)
 	}
 	return img, nil
 }
 
 // Save ...
-func (t *styleSingle) Save(char, fpath string) error {
+func (t *xLetter) Save(char, fpath string) error {
 	img, err := t.Image(char)
 	if err != nil {
 		return err
@@ -56,9 +52,9 @@ func (t *styleSingle) Save(char, fpath string) error {
 
 // ----------------------------------------------------------------
 
-func newStyleSingle(opt *option) Logo {
-	return &styleSingle{
-		styleBase: &styleBase{
+func newLetter(opt *option) Avatar {
+	return &xLetter{
+		xBase: &xBase{
 			opt: opt,
 		},
 	}

@@ -20,12 +20,18 @@ import (
 )
 
 // Temp ...
-func Temp(filenames ...string) string {
+func Temp(args ...string) string {
 	var filename string
-	if len(filenames) > 0 {
-		filename = filenames[0]
-	} else {
+	if len(args) == 0 {
 		filename = xgen.Nanoid()
+	} else if len(args) == 1 {
+		if strings.HasPrefix(args[0], ".") {
+			filename = xgen.Nanoid() + args[0]
+		} else {
+			filename = args[0]
+		}
+	} else {
+		filename = strings.Join(args, "")
 	}
 	return path.Join(os.TempDir(), filename)
 }

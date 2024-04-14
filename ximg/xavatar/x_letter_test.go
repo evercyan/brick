@@ -1,4 +1,4 @@
-package xlogo
+package xavatar
 
 import (
 	"fmt"
