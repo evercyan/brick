@@ -17,7 +17,7 @@ func TestStyleSingle(t *testing.T) {
 	fmt.Println("fpath1", fpath1)
 
 	fpath2 := xfile.Temp() + ".png"
-	err2 := logo.Save("革", fpath2)
+	err2 := logo.Save("中", fpath2)
 	assert.Nil(t, err2)
 	fmt.Println("fpath2", fpath2)
 }

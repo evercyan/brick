@@ -43,11 +43,7 @@ func (t *xLetter) Image(char string) (image.Image, error) {
 
 // Save ...
 func (t *xLetter) Save(char, fpath string) error {
-	img, err := t.Image(char)
-	if err != nil {
-		return err
-	}
-	return ximg.Write(fpath, img)
+	return t.xBase.Save(char, fpath)
 }
 
 // ----------------------------------------------------------------

@@ -46,20 +46,16 @@ func (t *xSquare) Generate(char string) (image.Image, error) {
 			ri++
 		}
 	}
-	var targetImg image.Image = img
+	var dst image.Image = img
 	if t.opt.Radious > 0 {
-		targetImg = ximg.Rounded(img, t.opt.Radious)
+		dst = ximg.Rounded(img, t.opt.Radious)
 	}
-	return targetImg, nil
+	return dst, nil
 }
 
 // Save ...
 func (t *xSquare) Save(char, fpath string) error {
-	img, err := t.Generate(char)
-	if err != nil {
-		return err
-	}
-	return ximg.Write(fpath, img)
+	return t.xBase.Save(char, fpath)
 }
 
 // ----------------------------------------------------------------

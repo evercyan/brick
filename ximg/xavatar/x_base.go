@@ -20,7 +20,11 @@ func (t *xBase) Generate(char string) (image.Image, error) {
 }
 
 func (t *xBase) Save(char, fpath string) error {
-	return nil
+	img, err := t.Image(char)
+	if err != nil {
+		return err
+	}
+	return ximg.Write(fpath, img)
 }
 
 // Radious 设置圆角

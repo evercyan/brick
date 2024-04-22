@@ -89,12 +89,24 @@ func MergeToRow(images []image.Image, options ...func(*Option)) (image.Image, er
 	for _, fn := range options {
 		fn(opt)
 	}
-	// 取图片总宽, 校验图片高度
-	height, sumWidth := images[0].Bounds().Dy(), 0
+	// 如果图片高度不一致时, 取最小高度, 其余图片按比例缩放
+	minHeight := images[0].Bounds().Dy()
 	for _, img := range images {
-		if height != img.Bounds().Dy() {
-			return nil, fmt.Errorf("image height should same when row is 1")
+		if img.Bounds().Dy() < minHeight {
+			minHeight = img.Bounds().Dy()
 		}
+	}
+	for k, img := range images {
+		if img.Bounds().Dy() > minHeight {
+			images[k] = ximg.Resize(img, minHeight*img.Bounds().Dx()/img.Bounds().Dy(), minHeight)
+		}
+	}
+	// 取图片总宽, 校验图片高度
+	height, sumWidth := minHeight, 0
+	for _, img := range images {
+		//if height != img.Bounds().Dy() {
+		//	return nil, fmt.Errorf("image height should same when row is 1")
+		//}
 		sumWidth += img.Bounds().Dx()
 	}
 	// 计算总画布宽: 边距*2 + (图片数量-1)*间距 + 图片总宽
@@ -142,12 +154,24 @@ func MergeToCol(images []image.Image, options ...func(*Option)) (image.Image, er
 	for _, fn := range options {
 		fn(opt)
 	}
-	// 取图片总高, 校验图片宽度
-	width, sumHeight := images[0].Bounds().Dx(), 0
+	// 如果图片宽度不一致时, 取最小宽度, 其余图片按比例缩放
+	minWidth := images[0].Bounds().Dx()
 	for _, img := range images {
-		if width != img.Bounds().Dx() {
-			return nil, fmt.Errorf("image width should same when col is 1")
+		if img.Bounds().Dx() < minWidth {
+			minWidth = img.Bounds().Dx()
 		}
+	}
+	for k, img := range images {
+		if img.Bounds().Dx() > minWidth {
+			images[k] = ximg.Resize(img, minWidth, minWidth*img.Bounds().Dy()/img.Bounds().Dx())
+		}
+	}
+	// 取图片总高
+	width, sumHeight := minWidth, 0
+	for _, img := range images {
+		//if width != img.Bounds().Dx() {
+		//	return nil, fmt.Errorf("image width should same when col is 1")
+		//}
 		sumHeight += img.Bounds().Dy()
 	}
 	// 计算总画布宽: 边距*2 + 图片宽度

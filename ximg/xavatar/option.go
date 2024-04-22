@@ -19,30 +19,6 @@ type Option func(o *option)
 
 // ----------------------------------------------------------------
 
-// Style ...
-type Style int
-
-const (
-	StyleLetter Style = iota
-	StyleSquare
-	StylePornhub
-)
-
-func (t Style) String() string {
-	switch t {
-	case StyleLetter:
-		return "letter"
-	case StyleSquare:
-		return "square"
-	case StylePornhub:
-		return "pornhub"
-	default:
-		return ""
-	}
-}
-
-// ----------------------------------------------------------------
-
 // WithStyle 设置绘制样式
 func WithStyle(style Style) Option {
 	return func(o *option) {
