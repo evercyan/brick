@@ -56,6 +56,7 @@ func TestFormat(t *testing.T) {
 	assert.Equal(t, target, Format(target))
 	assert.Equal(t, target, Format(fmt.Sprintf("111%s222", target)))
 	assert.Equal(t, target, Format(`{\"name\":\"abc\",\"list\":[\"a\", \"b\"]}`))
+	assert.Equal(t, target, Format(`"{\"name\":\"abc\",\"list\":[\"a\", \"b\"]}"`))
 }
 
 func TestSort(t *testing.T) {

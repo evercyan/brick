@@ -3,7 +3,6 @@ package xalfred
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 
 	"github.com/evercyan/brick/xlodash"
 )
@@ -83,5 +82,4 @@ func Dict(v *Var) {
 func Output(v interface{}) {
 	b, _ := json.MarshalIndent(v, "", "  ")
 	fmt.Println(string(b))
-	os.Exit(0)
 }

@@ -131,7 +131,7 @@ func IsEmpty(v interface{}) bool {
 
 // IsJSONString ...
 func IsJSONString(s string) bool {
-	if !strings.Contains(s, "{") && !strings.Contains(s, "[") {
+	if !strings.HasPrefix(s, "{") && !strings.HasPrefix(s, "[") {
 		return false
 	}
 	var raw json.RawMessage
