@@ -15,8 +15,11 @@ func SQLPretty(sql string) string {
 		return sql
 	}
 	cfg := tree.DefaultPrettyCfg()
-	// custom config
-	return cfg.Pretty(stmt.AST)
+	// 此处可自定义 cfg
+	sql = cfg.Pretty(stmt.AST)
+	// 此处会根据 LineWidth 作 LEFT JOIN ON 截断, 单独处理
+	sql = regexp.MustCompile(`ON\s+`).ReplaceAllString(sql, "ON ")
+	return sql
 }
 
 // SQLMinify ...
