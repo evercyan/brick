@@ -10,6 +10,7 @@ import (
 func TestTemp(t *testing.T) {
 	assert.NotEmpty(t, Temp())
 	assert.NotEmpty(t, Temp("abc"))
+	assert.NotEmpty(t, Temp(".png"))
 }
 
 func TestSize(t *testing.T) {

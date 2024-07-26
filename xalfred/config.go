@@ -70,12 +70,12 @@ func (t ModKey) Plus(k ModKey) ModKey {
 
 // ModItem ...
 type ModItem struct {
-	Key       string   `json:"key,omitempty"`
-	Subtitle  string   `json:"subtitle,omitempty"`
-	Icon      *Icon    `json:"icon,omitempty"`
-	Valid     bool     `json:"valid,omitempty"`
-	Arg       []string `json:"arg,omitempty"`
-	Variables *Var     `json:"variables,omitempty"`
+	Key       string `json:"key,omitempty"`
+	Subtitle  string `json:"subtitle,omitempty"`
+	Icon      *Icon  `json:"icon,omitempty"`
+	Valid     bool   `json:"valid,omitempty"`
+	Arg       string `json:"arg,omitempty"`
+	Variables *Var   `json:"variables,omitempty"`
 }
 
 // ----------------------------------------------------------------
@@ -113,3 +113,5 @@ type Icon struct {
 
 // Var ...
 type Var map[string]interface{}
+
+// ----------------------------------------------------------------

@@ -6,10 +6,12 @@ import (
 	"image/color"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 // Hex2RGB ...
 func Hex2RGB(s string) (int, int, int) {
+	s = strings.TrimPrefix(s, "#")
 	re := regexp.MustCompile(`^([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$`)
 	if !re.MatchString(s) {
 		return 0, 0, 0

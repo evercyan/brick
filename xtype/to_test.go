@@ -79,3 +79,19 @@ func TestToSlice(t *testing.T) {
 	assert.Equal(t, []interface{}{1}, ToSlice(map[string]int{"a": 1}))
 	assert.Equal(t, []interface{}{}, ToSlice(""))
 }
+
+func BenchmarkBytes2String(b *testing.B) {
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = Bytes2String([]byte("hello"))
+	}
+}
+
+func BenchmarkString(b *testing.B) {
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = string([]byte("hello"))
+	}
+}

@@ -1,28 +1,39 @@
 package xgen
 
 import (
-	"math/rand"
-	"time"
+	_ "unsafe"
+
+	"github.com/evercyan/brick/xlodash"
+	"github.com/evercyan/brick/xtype"
 )
 
-// RandNumber ...
-func RandNumber(min, max int) int {
-	if min > max {
-		return 0
-	}
-	rand.Seed(time.Now().UnixNano())
-	return min + rand.Intn(max+1-min)
+//go:noescape
+//go:linkname fastrand runtime.fastrand
+func fastrand() uint32
+
+// randUint32Max returns pseudorandom uint32 in the range [0-max]
+func randUint32Max(max uint32) uint32 {
+	return uint32((uint64(fastrand()) * uint64(max)) >> 32)
 }
 
-// RandString ...
-func RandString(length int) string {
-	rand.Seed(time.Now().UnixNano())
-	bytes := make([]byte, length)
-	for i := 0; i < length; i++ {
-		b := rand.Intn(26) + 65
-		bytes[i] = byte(b)
+// RandInt ...
+func RandInt(min, max int) int {
+	if max < min {
+		min, max = max, min
 	}
-	return string(bytes)
+	return min + int(randUint32Max(uint32(max+1-min)))
+}
+
+// RandStr ...
+func RandStr(length int, tpl ...string) string {
+	chars := xlodash.First(tpl, "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	b := make([]byte, length)
+	l := len(chars) - 1
+	for i := length - 1; i >= 0; i-- {
+		idx := RandInt(0, l)
+		b[i] = chars[idx]
+	}
+	return xtype.Bytes2String(b)
 }
 
 // Range ...

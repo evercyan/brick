@@ -1,44 +1,49 @@
 package xerror
 
 import (
-	"sort"
-	"sync"
+	"fmt"
 )
 
-var (
-	errors = make(map[int]*Error)
-	mu     sync.Mutex
-)
-
-// New ...
-func New(code int, msg string) *Error {
-	err := &Error{
-		Code: code,
-		Msg:  msg,
-	}
-	mu.Lock()
-	defer mu.Unlock()
-	if _, ok := errors[code]; !ok {
-		errors[code] = err
-	}
-	return err
+// xError ...
+type xError struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	wrapped error
 }
 
-// Errors 返回所有 error 列表
-// 按 code 升序
-// 通过 WithMsg 声明的错误码不重复显示
-func Errors() []*Error {
-	res := make([]*Error, 0)
-	if len(errors) == 0 {
-		return res
+// Error ...
+func (e *xError) Error() string {
+	errorMsg := fmt.Sprintf("[%d] %s", e.Code, e.Message)
+	if e.wrapped == nil {
+		return errorMsg
 	}
-	codes := make([]int, 0)
-	for code := range errors {
-		codes = append(codes, code)
+	return fmt.Sprintf("%s ::: %s", errorMsg, e.wrapped.Error())
+}
+
+// WithMsg ...
+func (e *xError) WithMsg(message string) *xError {
+	xerr := e.Clone()
+	xerr.Message = message
+	return xerr
+}
+
+// Wrap ...
+func (e *xError) Wrap(err error) *xError {
+	xerr := e.Clone()
+	xerr.wrapped = err
+	return xerr
+}
+
+// Unwrap ...
+func (e *xError) Unwrap() error {
+	return e.wrapped
+}
+
+// Clone ...
+func (e *xError) Clone() *xError {
+	return &xError{
+		Code:    e.Code,
+		Message: e.Message,
+		wrapped: e.wrapped,
 	}
-	sort.Ints(codes)
-	for _, code := range codes {
-		res = append(res, errors[code])
-	}
-	return res
 }

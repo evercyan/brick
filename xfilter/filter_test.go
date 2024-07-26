@@ -46,6 +46,8 @@ func TestAssert(t *testing.T) {
 	[
 		["year", "=", 2022],
 		["year", "=", 2023],
+		["year", "=", 2024],
+		["year", "=", 2025],
 		"or"
 	],
 	[

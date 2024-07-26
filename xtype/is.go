@@ -3,11 +3,12 @@ package xtype
 import (
 	"encoding/json"
 	"reflect"
+	"strings"
 	"time"
 )
 
-// is ...
-func is(v interface{}, types ...reflect.Kind) bool {
+// Is ...
+func Is(v interface{}, types ...reflect.Kind) bool {
 	elemType := reflect.ValueOf(v).Kind()
 	for _, t := range types {
 		if t == elemType {
@@ -19,7 +20,7 @@ func is(v interface{}, types ...reflect.Kind) bool {
 
 // IsInt ...
 func IsInt(v interface{}) bool {
-	return is(
+	return Is(
 		v,
 		reflect.Int,
 		reflect.Int8,
@@ -31,7 +32,7 @@ func IsInt(v interface{}) bool {
 
 // IsUint ...
 func IsUint(v interface{}) bool {
-	return is(
+	return Is(
 		v,
 		reflect.Uint,
 		reflect.Uint8,
@@ -44,7 +45,7 @@ func IsUint(v interface{}) bool {
 
 // IsFloat ...
 func IsFloat(v interface{}) bool {
-	return is(
+	return Is(
 		v,
 		reflect.Float32,
 		reflect.Float64,
@@ -53,7 +54,7 @@ func IsFloat(v interface{}) bool {
 
 // IsNumeric ...
 func IsNumeric(v interface{}) bool {
-	return is(
+	return Is(
 		v,
 		reflect.Int,
 		reflect.Int8,
@@ -73,42 +74,42 @@ func IsNumeric(v interface{}) bool {
 
 // IsBool ...
 func IsBool(v interface{}) bool {
-	return is(v, reflect.Bool)
+	return Is(v, reflect.Bool)
 }
 
 // IsString ...
 func IsString(v interface{}) bool {
-	return is(v, reflect.String)
+	return Is(v, reflect.String)
 }
 
 // IsSlice ...
 func IsSlice(v interface{}) bool {
-	return is(v, reflect.Slice)
+	return Is(v, reflect.Slice)
 }
 
 // IsArray ...
 func IsArray(v interface{}) bool {
-	return is(v, reflect.Array)
+	return Is(v, reflect.Array)
 }
 
 // IsStruct ...
 func IsStruct(v interface{}) bool {
-	return is(v, reflect.Struct)
+	return Is(v, reflect.Struct)
 }
 
 // IsMap ...
 func IsMap(v interface{}) bool {
-	return is(v, reflect.Map)
+	return Is(v, reflect.Map)
 }
 
 // IsFunc ...
 func IsFunc(v interface{}) bool {
-	return is(v, reflect.Func)
+	return Is(v, reflect.Func)
 }
 
 // IsChannel ...
 func IsChannel(v interface{}) bool {
-	return is(v, reflect.Chan)
+	return Is(v, reflect.Chan)
 }
 
 // IsTime ...
@@ -130,6 +131,9 @@ func IsEmpty(v interface{}) bool {
 
 // IsJSONString ...
 func IsJSONString(s string) bool {
+	if !strings.HasPrefix(s, "{") && !strings.HasPrefix(s, "[") {
+		return false
+	}
 	var raw json.RawMessage
 	return json.Unmarshal([]byte(s), &raw) == nil
 }
@@ -151,6 +155,7 @@ func IsContains(src, v interface{}) bool {
 		}
 	case reflect.Map:
 		return srcValue.MapIndex(reflect.ValueOf(v)).IsValid()
+	default:
 	}
 	return false
 }

@@ -7,12 +7,11 @@ import (
 )
 
 func TestRand(t *testing.T) {
-	assert.Equal(t, 0, RandNumber(2, 1))
-	assert.LessOrEqual(t, 1, RandNumber(1, 10))
-	assert.GreaterOrEqual(t, 10, RandNumber(1, 10))
+	assert.LessOrEqual(t, 1, RandInt(1, 10))
+	assert.GreaterOrEqual(t, 10, RandInt(1, 10))
 
-	assert.LessOrEqual(t, -10, RandNumber(-10, 10))
-	assert.GreaterOrEqual(t, 10, RandNumber(-10, 10))
+	assert.LessOrEqual(t, -10, RandInt(-10, 10))
+	assert.GreaterOrEqual(t, 10, RandInt(-10, 10))
 }
 
 func TestRange(t *testing.T) {
@@ -21,6 +20,24 @@ func TestRange(t *testing.T) {
 }
 
 func TestRandString(t *testing.T) {
-	assert.Equal(t, 6, len(RandString(6)))
-	assert.NotEqual(t, RandString(6), RandString(6))
+	assert.Equal(t, 6, len(RandStr(6)))
+	assert.NotEqual(t, RandStr(6), RandStr(6))
+}
+
+// BenchmarkRandInt-8    51310586    24.29 ns/op    0 B/op    0 allocs/op
+func BenchmarkRandInt(b *testing.B) {
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		RandInt(10, 99)
+	}
+}
+
+// BenchmarkRandInt-8    51310586    24.29 ns/op    0 B/op    0 allocs/op
+func BenchmarkRandStr(b *testing.B) {
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		RandStr(10)
+	}
 }

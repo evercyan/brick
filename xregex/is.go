@@ -12,7 +12,7 @@ func IsIPV6(s string) bool {
 
 // IsIP ...
 func IsIP(s string) bool {
-	return IsIPV4(s) || IsIPV4(s)
+	return IsIPV4(s) || IsIPV6(s)
 }
 
 // IsMacAddress ...
