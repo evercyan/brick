@@ -1,12 +1,15 @@
 package ximg
 
 import (
+	"encoding/base64"
 	"fmt"
 	"image"
 	_ "image/gif" // ...
 	"image/jpeg"
 	"image/png"
 	"os"
+	"regexp"
+	"strings"
 
 	"github.com/evercyan/brick/xencoding"
 	"github.com/evercyan/brick/xfile"
@@ -69,11 +72,26 @@ func Write(filepath string, src image.Image) error {
 	}
 }
 
-// Base64 ...
-func Base64(filepath string) string {
+// Base64Encode ...
+func Base64Encode(filepath string) string {
 	return fmt.Sprintf(
 		"data:image/%s;base64,%s",
 		Type(filepath),
 		xencoding.Base64Encode(xfile.Read(filepath)),
 	)
+}
+
+// base64Regexp ...
+var base64Regexp = regexp.MustCompile(`data:image/[^;]+;base64,`)
+
+// Base64Decode ...
+func Base64Decode(encoded string, filepath string) error {
+	if strings.HasPrefix(encoded, "data:image/") {
+		encoded = base64Regexp.ReplaceAllString(encoded, "")
+	}
+	imageData, err := base64.StdEncoding.DecodeString(encoded)
+	if err != nil {
+		return err
+	}
+	return xfile.Write(filepath, string(imageData))
 }

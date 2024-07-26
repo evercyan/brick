@@ -23,7 +23,9 @@ func TestSize(t *testing.T) {
 }
 
 func TestBase64(t *testing.T) {
-	assert.NotEmpty(t, Base64("../logo.png"))
+	encoded := Base64Encode("../logo.png")
+	assert.NotEmpty(t, encoded)
+	assert.Nil(t, Base64Decode(encoded, "./decoded.png"))
 }
 
 //func TestReadWrite(t *testing.T) {
