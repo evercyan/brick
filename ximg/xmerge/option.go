@@ -24,7 +24,7 @@ func WithColor(v string) func(option *Option) {
 // WithPadding 边距, 1-100
 func WithPadding(v int) func(option *Option) {
 	return func(option *Option) {
-		if v >= 1 && v <= 100 {
+		if v >= 0 && v <= 100 {
 			option.Padding = v
 		}
 	}
