@@ -1,6 +1,7 @@
 package ximg
 
 import (
+	"context"
 	"encoding/base64"
 	"fmt"
 	"image"
@@ -13,6 +14,7 @@ import (
 
 	"github.com/evercyan/brick/xencoding"
 	"github.com/evercyan/brick/xfile"
+	"github.com/evercyan/brick/xhttp"
 )
 
 // Parse ...
@@ -94,4 +96,13 @@ func Base64Decode(encoded string, filepath string) error {
 		return err
 	}
 	return xfile.Write(filepath, string(imageData))
+}
+
+// Download ...
+func Download(ctx context.Context, imgURL, imgPath string) error {
+	resp, err := xhttp.New().Get(ctx, imgURL, nil)
+	if err != nil {
+		return err
+	}
+	return xfile.Write(imgPath, resp.String())
 }

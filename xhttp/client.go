@@ -3,6 +3,7 @@ package xhttp
 import (
 	"compress/gzip"
 	"context"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/cookiejar"
@@ -52,7 +53,7 @@ func (t *Client) Do(
 			t.trace.Finish()
 		}
 	}()
-	if header == nil {
+	if method == MethodPost && header == nil {
 		header = http.Header{}
 		header.Set(HeaderKeyContentType, HeaderKeyContentTypeValueJSON)
 	}
@@ -66,13 +67,14 @@ func (t *Client) Do(
 		err  error
 	)
 	var body io.Reader
-	m, ok := data.(map[string]interface{})
-	if ok && header.Get(HeaderKeyContentType) == HeaderKeyContentTypeValueFormData {
-		header, body = BuildFormData(header, m)
-	} else {
-		body = BuildReader(data, header.Get(HeaderKeyContentType))
+	if method != MethodGet {
+		m, ok := data.(map[string]interface{})
+		if ok && header.Get(HeaderKeyContentType) == HeaderKeyContentTypeValueFormData {
+			header, body = BuildFormData(header, m)
+		} else {
+			body = BuildReader(data, header.Get(HeaderKeyContentType))
+		}
 	}
-
 	req, err := http.NewRequestWithContext(ctx, method, url, body)
 	if err != nil {
 		return nil, err
@@ -87,6 +89,9 @@ func (t *Client) Do(
 	}
 	if err != nil {
 		return nil, err
+	}
+	if resp == nil {
+		return nil, fmt.Errorf("response is nil")
 	}
 	reader := resp.Body
 	res := &Response{

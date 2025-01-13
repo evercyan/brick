@@ -1,6 +1,6 @@
 module github.com/evercyan/brick
 
-go 1.21
+go 1.23.4
 
 require (
 	github.com/360EntSecGroup-Skylar/excelize v1.4.1
@@ -10,6 +10,7 @@ require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/disintegration/letteravatar v0.0.0-20160912210445-1a457b860450
 	github.com/fogleman/gg v1.3.0
+	github.com/gdanko/gorm-sqlcipher v0.0.0-20240818172314-97e237fc6bca
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
 	github.com/lestrrat/go-file-rotatelogs v0.0.0-20180223000712-d3151e2a480f
@@ -26,8 +27,9 @@ require (
 	golang.org/x/exp v0.0.0-20220328175248-053ad81199eb
 	golang.org/x/image v0.5.0
 	golang.org/x/net v0.17.0
-	golang.org/x/text v0.13.0
+	golang.org/x/text v0.14.0
 	golang.org/x/time v0.5.0
+	gorm.io/gorm v1.25.12
 )
 
 require (
@@ -45,6 +47,8 @@ require (
 	github.com/golang/protobuf v1.4.3 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0 // indirect
 	github.com/jehiah/go-strftime v0.0.0-20171201141054-1d33003b3869 // indirect
+	github.com/jinzhu/inflection v1.0.0 // indirect
+	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/jonboulle/clockwork v0.3.0 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
@@ -52,6 +56,7 @@ require (
 	github.com/lestrrat/go-strftime v0.0.0-20180220042222-ba3bf9c1d042 // indirect
 	github.com/lib/pq v1.9.0 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
+	github.com/mutecomm/go-sqlcipher v0.0.0-20190227152316-55dbde17881f // indirect
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
 	github.com/noelyahan/impexp v0.0.0-20201209034304-ee159d84b42f // indirect
 	github.com/noelyahan/mergitrans v0.0.0-20190507035323-73e76dcd7d2a // indirect

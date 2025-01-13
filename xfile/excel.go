@@ -2,6 +2,7 @@ package xfile
 
 import (
 	"context"
+	"encoding/csv"
 	"fmt"
 	"os"
 	"strings"
@@ -31,14 +32,14 @@ func ToCSV(ctx context.Context, fpath string, list [][]string) error {
 }
 
 // ToXLSX ...
-func ToXLSX(ctx context.Context, fpath string, list [][]string) error {
+func ToXLSX(ctx context.Context, fpath string, list [][]string, forces ...bool) error {
 	if len(list) == 0 {
 		return nil
 	}
 	if !strings.HasSuffix(fpath, ".xlsx") {
 		fpath += ".xlsx"
 	}
-	if IsExist(fpath) {
+	if !xlodash.First(forces) && IsExist(fpath) {
 		return fmt.Errorf("file exist")
 	}
 	f := excelize.NewFile()
@@ -48,4 +49,40 @@ func ToXLSX(ctx context.Context, fpath string, list [][]string) error {
 		f.SetSheetRow(sheet1, fmt.Sprintf("A%d", k+1), &v)
 	}
 	return f.SaveAs(fpath)
+}
+
+// ReadXLSX 读取 xlsx 纪录
+func ReadXLSX(ctx context.Context, fpath string, sheets ...string) ([][]string, error) {
+	if !IsExist(fpath) {
+		return nil, fmt.Errorf("文件不存在: %s", fpath)
+	}
+	f, err := excelize.OpenFile(fpath)
+	if err != nil {
+		return nil, err
+	}
+	if len(sheets) == 0 {
+		sheetMap := f.GetSheetMap()
+		for _, sheet := range sheetMap {
+			sheets = append(sheets, sheet)
+		}
+	}
+	list := make([][]string, 0)
+	for _, sheet := range sheets {
+		rows := f.GetRows(sheet)
+		if len(rows) == 0 {
+			continue
+		}
+		list = append(list, rows...)
+	}
+	return list, nil
+}
+
+// ReadCSV 读取 csv 纪录
+func ReadCSV(ctx context.Context, fpath string) ([][]string, error) {
+	file, err := os.Open(fpath)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	return csv.NewReader(file).ReadAll()
 }

@@ -115,3 +115,25 @@ func First[T any](list []T, defaults ...T) T {
 	}
 	return res
 }
+
+// Last 取切片第一个元素, 不然取默认值第一个元素, 再则取对应类型的零值
+func Last[T any](list []T, defaults ...T) T {
+	var res T
+	if len(list) > 0 {
+		res = list[len(list)-1]
+	} else if len(defaults) > 0 {
+		res = defaults[0]
+	}
+	return res
+}
+
+// MoveToFront 指定下标元素移动到最前
+func MoveToFront[T any](list []T, index int) []T {
+	if index < 0 || index >= len(list) {
+		return list
+	}
+	element := list[index]
+	list = append(list[:index], list[index+1:]...)
+	list = append([]T{element}, list...)
+	return list
+}

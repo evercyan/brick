@@ -142,3 +142,20 @@ func TestFirst(t *testing.T) {
 	assert.Equal(t, []int(nil), First([][]int{}))
 	assert.Equal(t, []int{1}, First([][]int{{1}}))
 }
+
+func TestLast(t *testing.T) {
+	assert.Equal(t, 0, Last([]int{}))
+	assert.Equal(t, 1, Last([]int{1}))
+	assert.Equal(t, "", Last([]string{}))
+	assert.Equal(t, "a", Last([]string{"a"}))
+	assert.Equal(t, []int(nil), Last([][]int{}))
+	assert.Equal(t, []int{1}, Last([][]int{{1}}))
+	assert.Equal(t, 2, Last([]int{1, 2}))
+}
+
+func TestMoveToFront(t *testing.T) {
+	assert.Equal(t, []int{0, 1, 2, 3}, MoveToFront([]int{0, 1, 2, 3}, 0))
+	assert.Equal(t, []int{1, 0, 2, 3}, MoveToFront([]int{0, 1, 2, 3}, 1))
+	assert.Equal(t, []int{2, 0, 1, 3}, MoveToFront([]int{0, 1, 2, 3}, 2))
+	assert.Equal(t, []int{3, 0, 1, 2}, MoveToFront([]int{0, 1, 2, 3}, 3))
+}
