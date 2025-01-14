@@ -14,12 +14,14 @@ var dbMap = new(sync.Map)
 
 // New ...
 func New(dbPath string, options ...Option) (*gorm.DB, error) {
-	if v, ok := dbMap.Load(dbPath); ok {
-		return v.(*gorm.DB), nil
-	}
 	cfg := defaultConfig
 	for _, f := range options {
 		f(cfg)
+	}
+	if !cfg.Force {
+		if v, ok := dbMap.Load(dbPath); ok {
+			return v.(*gorm.DB), nil
+		}
 	}
 	if cfg.Password != "" {
 		dbPath = fmt.Sprintf(

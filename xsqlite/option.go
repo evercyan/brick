@@ -34,3 +34,10 @@ func WithDebug() Option {
 		c.Debug = true
 	}
 }
+
+// WithDebug 强制重连
+func WithForce() Option {
+	return func(c *Config) {
+		c.Force = true
+	}
+}

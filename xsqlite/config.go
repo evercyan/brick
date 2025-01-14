@@ -10,6 +10,7 @@ type Config struct {
 	Models   []interface{}    `json:"models"`
 	Logger   logger.Interface `json:"logger"`
 	Debug    bool             `json:"debug"`
+	Force    bool             `json:"force"`
 }
 
 // defaultConfig  默认配置
@@ -19,4 +20,5 @@ var defaultConfig = &Config{
 	//Logger:   logger.Default.LogMode(logger.Info),
 	Logger: logger.Discard,
 	Debug:  false,
+	Force:  false,
 }
