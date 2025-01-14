@@ -16,6 +16,7 @@ type Config struct {
 var defaultConfig = &Config{
 	Password: "",
 	Models:   nil,
-	Logger:   logger.Default.LogMode(logger.Info),
-	Debug:    false,
+	//Logger:   logger.Default.LogMode(logger.Info),
+	Logger: logger.Discard,
+	Debug:  false,
 }
