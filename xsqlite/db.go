@@ -2,16 +2,17 @@ package xsqlite
 
 import (
 	"fmt"
-	sqlcipher "github.com/gdanko/gorm-sqlcipher"
-	"gorm.io/gorm"
 	"net/url"
 	"sync"
+
+	sqlcipher "github.com/gdanko/gorm-sqlcipher"
+	"gorm.io/gorm"
 )
 
 // dbMap 数据库实例
 var dbMap = new(sync.Map)
 
-// NewDB ...
+// New ...
 func New(dbPath string, options ...Option) (*gorm.DB, error) {
 	if v, ok := dbMap.Load(dbPath); ok {
 		return v.(*gorm.DB), nil
@@ -20,15 +21,12 @@ func New(dbPath string, options ...Option) (*gorm.DB, error) {
 	for _, f := range options {
 		f(cfg)
 	}
-	var dialector gorm.Dialector
-	if cfg.Password == "" {
-		dialector = sqlcipher.Open(dbPath)
-	} else {
-		fmt.Println(url.QueryEscape(cfg.Password))
-		dbname := fmt.Sprintf("%s?_pragma_key=%s&_pragma_cipher_page_size=4096", dbPath, url.QueryEscape(cfg.Password))
-		dialector = sqlcipher.Open(dbname)
+	if cfg.Password != "" {
+		dbPath = fmt.Sprintf(
+			"%s?_pragma_key=%s&_pragma_cipher_page_size=4096", dbPath, url.QueryEscape(cfg.Password),
+		)
 	}
-	db, err := gorm.Open(dialector, &gorm.Config{
+	db, err := gorm.Open(sqlcipher.Open(dbPath), &gorm.Config{
 		Logger: cfg.Logger,
 	})
 	if err != nil {

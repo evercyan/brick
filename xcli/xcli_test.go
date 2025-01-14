@@ -2,6 +2,7 @@ package xcli
 
 import (
 	"testing"
+	"time"
 )
 
 func TestCursor(t *testing.T) {
@@ -19,4 +20,11 @@ func TestExecCB(t *testing.T) {
 	//ExecCB("ping baidu.com", func(res string) {
 	//	fmt.Println(strings.TrimSuffix(res, "\n"))
 	//})
+}
+
+func TestProgress(t *testing.T) {
+	for i := 0; i <= 100; i++ {
+		Progress("下载中", float64(i)/float64(100), 100, "haha")
+		time.Sleep(time.Second * 1)
+	}
 }

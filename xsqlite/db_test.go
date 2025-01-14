@@ -29,7 +29,6 @@ func TestNew(t *testing.T) {
 	}
 	db, err := New("test1.db", options...)
 	assert.Nil(t, err)
-
 	{
 		err := db.Create(&Record{
 			Name: "hello",
