@@ -11,15 +11,25 @@ import (
 	"github.com/evercyan/brick/xlodash"
 )
 
-// ToCSV ...
-func ToCSV(ctx context.Context, fpath string, list [][]string) error {
+// ReadCsv ...
+func ReadCsv(ctx context.Context, fpath string) ([][]string, error) {
+	file, err := os.Open(fpath)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	return csv.NewReader(file).ReadAll()
+}
+
+// WriteCsv ...
+func WriteCsv(ctx context.Context, fpath string, list [][]string, forces ...bool) error {
 	if len(list) == 0 {
 		return nil
 	}
 	if !strings.HasSuffix(fpath, ".csv") {
 		fpath += ".csv"
 	}
-	if IsExist(fpath) {
+	if !xlodash.First(forces) && IsExist(fpath) {
 		return fmt.Errorf("file exist")
 	}
 	lines := xlodash.Map(list, func(k int, v []string) string {
@@ -31,30 +41,10 @@ func ToCSV(ctx context.Context, fpath string, list [][]string) error {
 	return os.WriteFile(fpath, []byte(strings.Join(lines, "\n")), 0755)
 }
 
-// ToXLSX ...
-func ToXLSX(ctx context.Context, fpath string, list [][]string, forces ...bool) error {
-	if len(list) == 0 {
-		return nil
-	}
-	if !strings.HasSuffix(fpath, ".xlsx") {
-		fpath += ".xlsx"
-	}
-	if !xlodash.First(forces) && IsExist(fpath) {
-		return fmt.Errorf("file exist")
-	}
-	f := excelize.NewFile()
-	sheet1 := "Sheet1"
-	f.SetActiveSheet(f.NewSheet(sheet1))
-	for k, v := range list {
-		f.SetSheetRow(sheet1, fmt.Sprintf("A%d", k+1), &v)
-	}
-	return f.SaveAs(fpath)
-}
-
-// ReadXLSX 读取 xlsx 纪录
-func ReadXLSX(ctx context.Context, fpath string, sheets ...string) ([][]string, error) {
+// ReadXlsx ...
+func ReadXlsx(ctx context.Context, fpath string, sheets ...string) ([][]string, error) {
 	if !IsExist(fpath) {
-		return nil, fmt.Errorf("文件不存在: %s", fpath)
+		return nil, fmt.Errorf("file not exist")
 	}
 	f, err := excelize.OpenFile(fpath)
 	if err != nil {
@@ -77,12 +67,22 @@ func ReadXLSX(ctx context.Context, fpath string, sheets ...string) ([][]string, 
 	return list, nil
 }
 
-// ReadCSV 读取 csv 纪录
-func ReadCSV(ctx context.Context, fpath string) ([][]string, error) {
-	file, err := os.Open(fpath)
-	if err != nil {
-		return nil, err
+// WriteXlsx ...
+func WriteXlsx(ctx context.Context, fpath string, list [][]string, forces ...bool) error {
+	if len(list) == 0 {
+		return nil
 	}
-	defer file.Close()
-	return csv.NewReader(file).ReadAll()
+	if !strings.HasSuffix(fpath, ".xlsx") {
+		fpath += ".xlsx"
+	}
+	if !xlodash.First(forces) && IsExist(fpath) {
+		return fmt.Errorf("file exist")
+	}
+	f := excelize.NewFile()
+	sheet1 := "Sheet1"
+	f.SetActiveSheet(f.NewSheet(sheet1))
+	for k, v := range list {
+		f.SetSheetRow(sheet1, fmt.Sprintf("A%d", k+1), &v)
+	}
+	return f.SaveAs(fpath)
 }
