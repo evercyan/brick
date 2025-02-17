@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/evercyan/brick/xfile"
+	"github.com/evercyan/brick/xgen"
 	"github.com/evercyan/brick/xurl"
 )
 
@@ -111,4 +112,9 @@ func ToResponse(r *Response, err error) (*http.Response, error) {
 		return nil, err
 	}
 	return r.Response, nil
+}
+
+// GetUserAgent ...
+func GetUserAgent() string {
+	return UserAgents[xgen.RandInt(0, len(UserAgents)-1)]
 }

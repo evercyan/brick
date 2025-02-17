@@ -47,6 +47,12 @@ func Read(filepath string) string {
 
 // Write ...
 func Write(filepath, str string) error {
+	fdir := GetFileDir(filepath)
+	if !IsExist(fdir) {
+		os.MkdirAll(fdir, os.ModePerm)
+	} else if !IsDir(fdir) {
+		return fmt.Errorf("%s is not a directory", fdir)
+	}
 	return os.WriteFile(filepath, []byte(str), 0755)
 }
 

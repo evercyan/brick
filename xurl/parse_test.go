@@ -29,3 +29,12 @@ func TestParse(t *testing.T) {
 	assert.Equal(t, "path", Path(s))
 	assert.Equal(t, "http://baidu.com", Domain(s))
 }
+
+func TestName(t *testing.T) {
+	url := "http://baidu.com/a.a/b.b/c.c.html"
+	assert.Equal(t, "c.c.html", Name(url))
+	assert.Equal(t, "c.c", Name(url, false))
+
+	assert.Equal(t, "a.a_b.b_c.c.html", FullName(url))
+	assert.Equal(t, "a.a_b.b_c.c", FullName(url, false))
+}
