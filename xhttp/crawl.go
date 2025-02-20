@@ -42,8 +42,8 @@ func CrawlPage(url string) (string, error) {
 // Crawl ...
 func Crawl(url string, caches ...bool) (string, error) {
 	cache := xlodash.First(caches, true)
-	upath := xurl.FullName(url, false)
-	fpath := path.Join(os.TempDir(), upath, "index.html")
+	upath := xurl.FullName(url)
+	fpath := path.Join(os.TempDir(), "crawl", upath)
 	if cache {
 		if upath == "" {
 			return "", fmt.Errorf("invalid url path")
