@@ -68,7 +68,7 @@ func ReadXlsx(ctx context.Context, fpath string, sheets ...string) ([][]string, 
 }
 
 // WriteXlsx ...
-func WriteXlsx(ctx context.Context, fpath string, list [][]string, forces ...bool) error {
+func WriteXlsx(ctx context.Context, fpath string, list [][]interface{}, forces ...bool) error {
 	if len(list) == 0 {
 		return nil
 	}

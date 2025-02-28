@@ -7,7 +7,10 @@ import (
 	"io"
 	"net/http"
 	"net/http/cookiejar"
+	"sync"
 
+	"github.com/evercyan/brick/xcrypto"
+	"github.com/evercyan/brick/xjson"
 	"golang.org/x/net/publicsuffix"
 )
 
@@ -116,11 +119,21 @@ func (t *Client) Do(
 
 // ----------------------------------------------------------------
 
+// ...
+var (
+	clientMap sync.Map
+)
+
 // New ...
 func New(options ...OptionFn) *Client {
 	config := defaultOption
 	for _, fn := range options {
 		fn(config)
+	}
+	// 根据配置计算唯一 key
+	key := xcrypto.Md5(xjson.Encode(config))
+	if v, ok := clientMap.Load(key); ok {
+		return v.(*Client)
 	}
 	cookieJar, _ := cookiejar.New(&cookiejar.Options{PublicSuffixList: publicsuffix.List})
 	return &Client{

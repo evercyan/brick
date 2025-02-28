@@ -33,3 +33,12 @@ func BuildValues(m map[string]interface{}) url.Values {
 	}
 	return res
 }
+
+// BuildCookie ...
+func BuildCookie(cookies map[string]string) string {
+	pairs := make([]string, 0)
+	for k, v := range cookies {
+		pairs = append(pairs, k+"="+v)
+	}
+	return strings.Join(pairs, ";")
+}
