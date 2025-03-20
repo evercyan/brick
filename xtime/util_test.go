@@ -27,3 +27,23 @@ func TestPastDaysInWeek(t *testing.T) {
 	}
 	assert.Equal(t, 7, PastDaysInWeek(now))
 }
+
+func TestAge(t *testing.T) {
+	start := ToTime("2024-06-12", DateOnly)
+	dates := map[string]string{
+		"2024-06-12": "第1天",
+		"2024-06-14": "第3天",
+		"2024-07-11": "第30天",
+		"2024-07-12": "满月",
+		"2024-07-20": "1个月零8天",
+		"2024-08-12": "2个月整",
+		"2025-03-20": "9个月零8天",
+		"2025-06-12": "周岁",
+		"2025-06-13": "1岁零1天",
+		"2025-07-12": "1岁1个月整",
+		"2025-07-13": "1岁1个月零1天",
+	}
+	for date, age := range dates {
+		assert.Equal(t, age, Age(start, ToTime(date, DateOnly)))
+	}
+}
