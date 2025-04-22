@@ -3,11 +3,14 @@ package xtype
 import (
 	"fmt"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
+	"time"
 	"unsafe"
 
 	"github.com/evercyan/brick/xencoding"
+	"github.com/evercyan/brick/xtime"
 )
 
 // ToInt ...
@@ -222,4 +225,48 @@ func ToSlice(v interface{}) []interface{} {
 // string(): 31958134     37.09 ns/op    0 B/op    0 allocs/op
 func Bytes2String(b []byte) string {
 	return *(*string)(unsafe.Pointer(&b))
+}
+
+// ----------------------------------------------------------------
+
+// ...
+var (
+	timeExcelRe      = regexp.MustCompile(`^\d+\.\d+$`)
+	timeSecondRe     = regexp.MustCompile(`^\d{10}$`)
+	timeMillSecondRe = regexp.MustCompile(`^\d{13}$`)
+	timeDateTimeRe   = regexp.MustCompile(`^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$`)
+	timeDateOnlyRe   = regexp.MustCompile(`^\d{4}-\d{2}-\d{2}$`)
+)
+
+// ToTime 转换成时间, 错误时为时间零值
+func ToTime(t string, patterns ...xtime.Pattern) time.Time {
+	if len(patterns) == 0 {
+		// Excel 时间处理
+		if timeExcelRe.MatchString(t) {
+			baseTime := time.Date(1899, 12, 30, 0, 0, 0, 0, time.UTC)
+			excelSerial := ToFloat64(t)
+			days := int(excelSerial)
+			timeFraction := excelSerial - float64(days)
+			return baseTime.AddDate(0, 0, days).Add(time.Duration(int64(timeFraction * 86400 * 1e9)))
+		}
+		// 时间戳到秒处理
+		if timeSecondRe.MatchString(t) {
+			return time.Unix(ToInt64(t), 0)
+		}
+		// 时间戳到毫秒处理
+		if timeMillSecondRe.MatchString(t) {
+			return time.UnixMilli(ToInt64(t))
+		}
+		// 其他格式化模板
+		if timeDateOnlyRe.MatchString(t) {
+			patterns = append(patterns, xtime.DateOnly)
+		} else if timeDateTimeRe.MatchString(t) {
+			patterns = append(patterns, xtime.DateTime)
+		}
+	}
+	tt, err := xtime.Parse(t, patterns...)
+	if err != nil {
+		return time.Time{}
+	}
+	return tt
 }

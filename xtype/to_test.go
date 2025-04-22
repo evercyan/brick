@@ -3,6 +3,7 @@ package xtype
 import (
 	"testing"
 
+	"github.com/evercyan/brick/xtime"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -94,4 +95,14 @@ func BenchmarkString(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_ = string([]byte("hello"))
 	}
+}
+
+func TestToTime(t *testing.T) {
+	assert.Equal(t, "0001-01-01 00:00:00", xtime.Format(ToTime("")))
+	assert.Equal(t, "2006-01-02 15:04:05", xtime.Format(ToTime("2006-01-02 15:04:05")))
+	assert.Equal(t, "2006-01-02 00:00:00", xtime.Format(ToTime("2006-01-02")))
+	assert.Equal(t, "2025-03-27 10:27:50", xtime.Format(ToTime("45743.436006944")))
+	assert.Equal(t, "2025-04-03 09:40:18", xtime.Format(ToTime("1743644418")))
+	assert.Equal(t, "2025-04-03 09:40:18", xtime.Format(ToTime("1743644418000")))
+	assert.Equal(t, "2006-01-02 00:00:00", xtime.Format(ToTime("20060102", xtime.DateJoin)))
 }

@@ -1,7 +1,6 @@
 package xfile
 
 import (
-	"archive/zip"
 	"bufio"
 	"crypto/md5"
 	"encoding/hex"
@@ -11,7 +10,6 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"path/filepath"
 	"strings"
 	"time"
 
@@ -231,39 +229,4 @@ func ModTime(filepath string) time.Time {
 		return time.Time{}
 	}
 	return f.ModTime()
-}
-
-// WriteZIP 将多个文件压缩到一个 ZIP 文件中
-func WriteZIP(zpath string, fpaths []string) error {
-	zipfile, err := os.Create(zpath)
-	if err != nil {
-		return err
-	}
-	defer zipfile.Close()
-	zw := zip.NewWriter(zipfile)
-	defer zw.Close()
-	for _, fpath := range fpaths {
-		file, err := os.Open(fpath)
-		if err != nil {
-			return err
-		}
-		defer file.Close()
-		info, err := file.Stat()
-		if err != nil {
-			return err
-		}
-		header, err := zip.FileInfoHeader(info)
-		if err != nil {
-			return err
-		}
-		header.Name = filepath.Base(fpath)
-		writer, err := zw.CreateHeader(header)
-		if err != nil {
-			return err
-		}
-		if _, err = io.Copy(writer, file); err != nil {
-			return err
-		}
-	}
-	return nil
 }
