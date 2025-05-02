@@ -3,14 +3,15 @@ package xhttp
 import (
 	"context"
 	"fmt"
-	"github.com/evercyan/brick/xfile"
-	"github.com/evercyan/brick/xlodash"
-	"github.com/evercyan/brick/xurl"
 	"io"
 	"net/http"
 	"os"
 	"path"
 	"time"
+
+	"github.com/evercyan/brick/xfile"
+	"github.com/evercyan/brick/xlodash"
+	"github.com/evercyan/brick/xurl"
 )
 
 // GET ...
