@@ -128,7 +128,10 @@ func MergeToRow(images []image.Image, options ...func(*Option)) (image.Image, er
 		y0 := opt.Padding
 		// 将原图重置大小
 		targetW := img.Bounds().Dx() * opt.Quality / 100
-		resizeImg := ximg.Resize(img, targetW, targetH)
+		resizeImg := img
+		if opt.Quality < 100 {
+			resizeImg = ximg.Resize(img, targetW, targetH)
+		}
 		// 画图
 		draw.Draw(
 			dstImg,
@@ -193,7 +196,10 @@ func MergeToCol(images []image.Image, options ...func(*Option)) (image.Image, er
 		y0 := opt.Padding + index*opt.Space + preHeight
 		// 将原图重置大小
 		targetH := img.Bounds().Dy() * opt.Quality / 100
-		resizeImg := ximg.Resize(img, targetW, targetH)
+		resizeImg := img
+		if opt.Quality < 100 {
+			resizeImg = ximg.Resize(img, targetW, targetH)
+		}
 		// 画图
 		draw.Draw(
 			dstImg,

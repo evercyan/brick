@@ -21,15 +21,6 @@ func GetCurrentDir() string {
 	return strings.Replace(dir, "\\", "/", -1)
 }
 
-// GetHomeDir ...
-func GetHomeDir() string {
-	dir, err := user.Current()
-	if err != nil {
-		return ""
-	}
-	return dir.HomeDir
-}
-
 // GetConfigDir ...
 func GetConfigDir(paths ...string) (string, error) {
 	userPath, err := user.Current()

@@ -31,7 +31,7 @@ func Temp(args ...string) string {
 			filename = args[0]
 		}
 	} else {
-		filename = strings.Join(args, "")
+		filename = strings.Join(args, "/")
 	}
 	return path.Join(os.TempDir(), filename)
 }
@@ -47,6 +47,12 @@ func Read(filepath string) string {
 
 // Write ...
 func Write(filepath, str string) error {
+	fdir := GetFileDir(filepath)
+	if !IsExist(fdir) {
+		os.MkdirAll(fdir, os.ModePerm)
+	} else if !IsDir(fdir) {
+		return fmt.Errorf("%s is not a directory", fdir)
+	}
 	return os.WriteFile(filepath, []byte(str), 0755)
 }
 
@@ -146,7 +152,7 @@ func WriteJSON(filepath string, data interface{}, pretty ...bool) error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(filepath, b, 0664)
+	return Write(filepath, string(b))
 }
 
 // ReadJSON read JSON file data
@@ -214,4 +220,13 @@ func Shadow(fpath string, joins ...string) string {
 			}
 		}
 	}
+}
+
+// ModTime ...
+func ModTime(filepath string) time.Time {
+	f, err := os.Stat(filepath)
+	if err != nil {
+		return time.Time{}
+	}
+	return f.ModTime()
 }

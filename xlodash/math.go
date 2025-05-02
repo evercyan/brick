@@ -2,6 +2,7 @@ package xlodash
 
 import (
 	"golang.org/x/exp/constraints"
+	"reflect"
 )
 
 // Min ...
@@ -32,4 +33,13 @@ func Max[T constraints.Ordered](nums ...T) T {
 		}
 	}
 	return res
+}
+
+// IF ...
+func IF[T any](condition T, value interface{}) interface{} {
+	if reflect.DeepEqual(condition, reflect.Zero(reflect.TypeOf(condition)).Interface()) {
+		var res T
+		return res
+	}
+	return value
 }

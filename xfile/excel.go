@@ -2,6 +2,7 @@ package xfile
 
 import (
 	"context"
+	"encoding/csv"
 	"fmt"
 	"os"
 	"strings"
@@ -10,15 +11,25 @@ import (
 	"github.com/evercyan/brick/xlodash"
 )
 
-// ToCSV ...
-func ToCSV(ctx context.Context, fpath string, list [][]string) error {
+// ReadCsv ...
+func ReadCsv(ctx context.Context, fpath string) ([][]string, error) {
+	file, err := os.Open(fpath)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	return csv.NewReader(file).ReadAll()
+}
+
+// WriteCsv ...
+func WriteCsv(ctx context.Context, fpath string, list [][]string, forces ...bool) error {
 	if len(list) == 0 {
 		return nil
 	}
 	if !strings.HasSuffix(fpath, ".csv") {
 		fpath += ".csv"
 	}
-	if IsExist(fpath) {
+	if !xlodash.First(forces) && IsExist(fpath) {
 		return fmt.Errorf("file exist")
 	}
 	lines := xlodash.Map(list, func(k int, v []string) string {
@@ -30,15 +41,41 @@ func ToCSV(ctx context.Context, fpath string, list [][]string) error {
 	return os.WriteFile(fpath, []byte(strings.Join(lines, "\n")), 0755)
 }
 
-// ToXLSX ...
-func ToXLSX(ctx context.Context, fpath string, list [][]string) error {
+// ReadXlsx ...
+func ReadXlsx(ctx context.Context, fpath string, sheets ...string) ([][]string, error) {
+	if !IsExist(fpath) {
+		return nil, fmt.Errorf("file not exist")
+	}
+	f, err := excelize.OpenFile(fpath)
+	if err != nil {
+		return nil, err
+	}
+	if len(sheets) == 0 {
+		sheetMap := f.GetSheetMap()
+		for _, sheet := range sheetMap {
+			sheets = append(sheets, sheet)
+		}
+	}
+	list := make([][]string, 0)
+	for _, sheet := range sheets {
+		rows := f.GetRows(sheet)
+		if len(rows) == 0 {
+			continue
+		}
+		list = append(list, rows...)
+	}
+	return list, nil
+}
+
+// WriteXlsx ...
+func WriteXlsx(ctx context.Context, fpath string, list [][]interface{}, forces ...bool) error {
 	if len(list) == 0 {
 		return nil
 	}
 	if !strings.HasSuffix(fpath, ".xlsx") {
 		fpath += ".xlsx"
 	}
-	if IsExist(fpath) {
+	if !xlodash.First(forces) && IsExist(fpath) {
 		return fmt.Errorf("file exist")
 	}
 	f := excelize.NewFile()

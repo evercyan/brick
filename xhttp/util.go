@@ -11,56 +11,12 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 
 	"github.com/evercyan/brick/xfile"
+	"github.com/evercyan/brick/xgen"
+	"github.com/evercyan/brick/xurl"
 )
-
-// ParseURL ...
-func ParseURL(str string) (*url.URL, error) {
-	return url.Parse(str)
-}
-
-// ParseQuery ...
-func ParseQuery(str string) map[string]string {
-	res := make(map[string]string)
-	values, err := url.ParseQuery(str)
-	if err != nil {
-		return res
-	}
-	for k, v := range values {
-		res[k] = v[0]
-	}
-	return res
-}
-
-// BuildURL ...
-func BuildURL(url string, m map[string]interface{}) string {
-	list := make([]string, 0)
-	for k, v := range m {
-		list = append(list, fmt.Sprintf("%s=%v", k, v))
-	}
-	sort.Strings(list)
-	query := strings.Join(list, "&")
-	if url == "" {
-		return query
-	}
-	symbol := "?"
-	if strings.Contains(url, "?") {
-		symbol = "&"
-	}
-	return url + symbol + query
-}
-
-// BuildValues ...
-func BuildValues(m map[string]interface{}) url.Values {
-	res := make(url.Values)
-	for k, v := range m {
-		res[k] = []string{fmt.Sprint(v)}
-	}
-	return res
-}
 
 // BuildFormData ...
 func BuildFormData(header http.Header, m map[string]interface{}) (http.Header, io.Reader) {
@@ -112,7 +68,7 @@ func BuildReader(data interface{}, types ...string) io.Reader {
 			return strings.NewReader(v.Encode())
 		}
 		if m, ok := data.(map[string]interface{}); ok {
-			return strings.NewReader(BuildValues(m).Encode())
+			return strings.NewReader(xurl.BuildValues(m).Encode())
 		}
 	default:
 		b, err := json.Marshal(data)
@@ -156,4 +112,9 @@ func ToResponse(r *Response, err error) (*http.Response, error) {
 		return nil, err
 	}
 	return r.Response, nil
+}
+
+// GetUserAgent ...
+func GetUserAgent() string {
+	return UserAgents[xgen.RandInt(0, len(UserAgents)-1)]
 }

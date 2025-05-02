@@ -4,15 +4,33 @@ import (
 	"strings"
 )
 
+// ...
 var (
-	angleMap = map[string]string{
-		"，": ",",
-		"。": ".",
-		"！": "!",
-		"？": "?",
-		"、": ",",
-		"；": ";",
-		"：": ":",
+	fullAngleMap = map[string]string{
+		",": "，",
+		".": "。",
+		"!": "！",
+		"?": "？",
+		";": "；",
+		":": "：",
+		"~": "～",
+		"'": "‘",
+		`"`: "“",
+		"(": "（",
+		")": "）",
+		"<": "《",
+		">": "》",
+		"[": "【",
+		"]": "】",
+	}
+	halfAngleMap = map[string]string{
+		"，": ", ",
+		"。": ". ",
+		"！": "! ",
+		"？": "? ",
+		"、": ", ",
+		"；": "; ",
+		"：": ": ",
 		"～": "~",
 		"‘": "'",
 		"“": `"`,
@@ -40,15 +58,15 @@ func Chr(s int) string {
 
 // FullAngle ...
 func FullAngle(s string) string {
-	for k, v := range angleMap {
-		s = strings.ReplaceAll(s, v, k)
+	for k, v := range fullAngleMap {
+		s = strings.ReplaceAll(s, k, v)
 	}
 	return s
 }
 
 // HalfAngle ...
 func HalfAngle(s string) string {
-	for k, v := range angleMap {
+	for k, v := range halfAngleMap {
 		s = strings.ReplaceAll(s, k, v)
 	}
 	return s

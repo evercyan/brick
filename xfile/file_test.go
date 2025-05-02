@@ -1,6 +1,7 @@
 package xfile
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
@@ -11,6 +12,11 @@ func TestTemp(t *testing.T) {
 	assert.NotEmpty(t, Temp())
 	assert.NotEmpty(t, Temp("abc"))
 	assert.NotEmpty(t, Temp(".png"))
+
+	fmt.Println(Temp())
+	fmt.Println(Temp("abc"))
+	fmt.Println(Temp("abc.png"))
+	fmt.Println(Temp("ddd", "abc.png"))
 }
 
 func TestSize(t *testing.T) {

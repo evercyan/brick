@@ -3,10 +3,14 @@ package xhttp
 import (
 	"compress/gzip"
 	"context"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/cookiejar"
+	"sync"
 
+	"github.com/evercyan/brick/xcrypto"
+	"github.com/evercyan/brick/xjson"
 	"golang.org/x/net/publicsuffix"
 )
 
@@ -52,7 +56,7 @@ func (t *Client) Do(
 			t.trace.Finish()
 		}
 	}()
-	if header == nil {
+	if method == MethodPost && header == nil {
 		header = http.Header{}
 		header.Set(HeaderKeyContentType, HeaderKeyContentTypeValueJSON)
 	}
@@ -66,13 +70,14 @@ func (t *Client) Do(
 		err  error
 	)
 	var body io.Reader
-	m, ok := data.(map[string]interface{})
-	if ok && header.Get(HeaderKeyContentType) == HeaderKeyContentTypeValueFormData {
-		header, body = BuildFormData(header, m)
-	} else {
-		body = BuildReader(data, header.Get(HeaderKeyContentType))
+	if method != MethodGet {
+		m, ok := data.(map[string]interface{})
+		if ok && header.Get(HeaderKeyContentType) == HeaderKeyContentTypeValueFormData {
+			header, body = BuildFormData(header, m)
+		} else {
+			body = BuildReader(data, header.Get(HeaderKeyContentType))
+		}
 	}
-
 	req, err := http.NewRequestWithContext(ctx, method, url, body)
 	if err != nil {
 		return nil, err
@@ -87,6 +92,9 @@ func (t *Client) Do(
 	}
 	if err != nil {
 		return nil, err
+	}
+	if resp == nil {
+		return nil, fmt.Errorf("response is nil")
 	}
 	reader := resp.Body
 	res := &Response{
@@ -111,11 +119,21 @@ func (t *Client) Do(
 
 // ----------------------------------------------------------------
 
+// ...
+var (
+	clientMap sync.Map
+)
+
 // New ...
 func New(options ...OptionFn) *Client {
 	config := defaultOption
 	for _, fn := range options {
 		fn(config)
+	}
+	// 根据配置计算唯一 key
+	key := xcrypto.Md5(xjson.Encode(config))
+	if v, ok := clientMap.Load(key); ok {
+		return v.(*Client)
 	}
 	cookieJar, _ := cookiejar.New(&cookiejar.Options{PublicSuffixList: publicsuffix.List})
 	return &Client{

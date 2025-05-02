@@ -1,0 +1,66 @@
+package xhttp
+
+import (
+	"context"
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"path"
+	"time"
+
+	"github.com/evercyan/brick/xfile"
+	"github.com/evercyan/brick/xlodash"
+	"github.com/evercyan/brick/xurl"
+)
+
+// GET ...
+func GET(url string) (string, error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+	return string(body), nil
+}
+
+// CrawlPage ...
+func CrawlPage(url string) (string, error) {
+	client := New(WithRequestTimeout(time.Second * 30))
+	resp, err := client.Get(context.Background(), url, http.Header{
+		HeaderKeyUserAgent: []string{GetUserAgent()},
+	})
+	if err != nil {
+		return "", err
+	}
+	return resp.String(), nil
+}
+
+// Crawl ...
+func Crawl(url string, caches ...bool) (string, error) {
+	cache := xlodash.First(caches, true)
+	upath := xurl.FullName(url)
+	fpath := path.Join(os.TempDir(), "crawl", upath)
+	if cache {
+		if upath == "" {
+			return "", fmt.Errorf("invalid url path")
+		}
+		if xfile.IsExist(fpath) {
+			return xfile.Read(fpath), nil
+		}
+	}
+	resp, err := CrawlPage(url)
+	if err != nil {
+		return "", err
+	}
+	if cache {
+		if err := xfile.Write(fpath, resp); err != nil {
+			return "", err
+		}
+	}
+	return resp, nil
+}

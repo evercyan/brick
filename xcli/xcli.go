@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 )
 
 // HideCursor ...
@@ -56,4 +57,19 @@ func ExecCB(command string, cb func(string)) error {
 		cb(string(buf[:n]))
 	}
 	return cmd.Wait()
+}
+
+// Progress ...
+func Progress(prefix string, percent float64, blocks int, suffixs ...string) {
+	pos := int(percent * float64(blocks))
+	s := fmt.Sprintf(
+		"[%s] %s%*s %6.2f%% \t%s",
+		prefix,
+		strings.Repeat("■", pos),
+		blocks-pos,
+		"",
+		percent*100,
+		strings.Join(suffixs, ""),
+	)
+	fmt.Print("\r" + s)
 }
