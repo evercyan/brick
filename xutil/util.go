@@ -1,6 +1,7 @@
 package xutil
 
 import (
+	"math"
 	"strings"
 	"unicode/utf8"
 
@@ -34,4 +35,10 @@ func Default[V comparable](v V, de V) V {
 		return de
 	}
 	return v
+}
+
+// Round ...
+func Round(x float64, length int) float64 {
+	factor := math.Pow10(length)
+	return math.Round(x*factor) / factor
 }
