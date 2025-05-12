@@ -1,4 +1,4 @@
-package xapi
+package xeastmoney
 
 import (
 	"strings"
