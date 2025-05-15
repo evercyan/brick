@@ -1,4 +1,4 @@
-package xeastmoney
+package xstock
 
 import (
 	"fmt"

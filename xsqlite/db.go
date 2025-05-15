@@ -43,3 +43,12 @@ func New(dbPath string, options ...Option) (*gorm.DB, error) {
 	dbMap.Store(dbPath, db)
 	return db, nil
 }
+
+// DB ...
+func DB(dbPath string, options ...Option) *gorm.DB {
+	db, err := New(dbPath, options...)
+	if err != nil {
+		panic(err)
+	}
+	return db
+}

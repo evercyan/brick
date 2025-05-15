@@ -1,8 +1,9 @@
 package xlodash
 
 import (
-	"golang.org/x/exp/constraints"
 	"reflect"
+
+	"golang.org/x/exp/constraints"
 )
 
 // Min ...
@@ -42,4 +43,13 @@ func IF[T any](condition T, value interface{}) interface{} {
 		return res
 	}
 	return value
+}
+
+// Sum ...
+func Sum[T constraints.Ordered](nums ...T) T {
+	var res T
+	for _, num := range nums {
+		res += num
+	}
+	return res
 }

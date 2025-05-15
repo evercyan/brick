@@ -1,4 +1,4 @@
-package xeastmoney
+package xstock
 
 import (
 	"context"
@@ -52,11 +52,11 @@ type LineDetail struct {
 // FetchKlineList 查询单只股票的日行情
 func FetchKlineList(ctx context.Context, code, begin, end string) ([]*LineDetail, error) {
 	url := fmt.Sprintf(TradeListURL, TradeListFields1, TradeListFields2, GetCode(code), begin, end)
-	response, err := xhttp.New().Get(ctx, url, Header)
+	response, err := xhttp.New().Get(ctx, url, xhttp.RandomHeader())
 	if err != nil {
 		return nil, err
 	}
-	xlog.Debugf("FetchKlineList url: %s, response: %s", url, response.String())
+	xlog.Ctx(ctx).Debugf("FetchKlineList url: %s, response: %s", url, response.String())
 	resp := &FetchKlineListResp{}
 	if err := json.Unmarshal(response.Bytes(), resp); err != nil {
 		return nil, err

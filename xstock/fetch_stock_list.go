@@ -1,4 +1,4 @@
-package xeastmoney
+package xstock
 
 import (
 	"context"
@@ -89,11 +89,11 @@ type StockDetail struct {
 // FetchStockList ...
 func FetchStockList(ctx context.Context, codes []string) ([]*StockDetail, error) {
 	url := fmt.Sprintf(StockListURL, GetCode(codes...), StockListFields)
-	response, err := xhttp.New().Get(ctx, url, Header)
+	response, err := xhttp.New().Get(ctx, url, xhttp.RandomHeader())
 	if err != nil {
 		return nil, err
 	}
-	xlog.Infof("FetchStockList url: %s, response: %s", url, response.String())
+	xlog.Ctx(ctx).Debugf("FetchStockList url: %s, response: %s", url, response.String())
 	resp := &FetchStockListResp{}
 	if err := json.Unmarshal(response.Bytes(), resp); err != nil {
 		return nil, err

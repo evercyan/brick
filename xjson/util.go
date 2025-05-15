@@ -2,11 +2,13 @@ package xjson
 
 import (
 	"encoding/json"
+	"fmt"
 	"sort"
 	"strconv"
 	"strings"
 
 	"github.com/evercyan/brick/xencoding"
+	"github.com/evercyan/brick/xlodash"
 	"github.com/evercyan/brick/xtype"
 )
 
@@ -30,9 +32,13 @@ func format(v interface{}) interface{} {
 }
 
 // Pretty ...
-func Pretty(v interface{}) string {
+func Pretty(v interface{}, prints ...bool) string {
 	b, _ := json.MarshalIndent(format(v), "", strings.Repeat(" ", 4))
-	return string(b)
+	r := string(b)
+	if xlodash.First(prints, false) {
+		fmt.Println(r)
+	}
+	return r
 }
 
 // Minify ...

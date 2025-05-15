@@ -14,6 +14,7 @@ require (
 	github.com/gdanko/gorm-sqlcipher v0.0.0-20240818172314-97e237fc6bca
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
+	github.com/jung-kurt/gofpdf v1.16.2
 	github.com/lestrrat/go-file-rotatelogs v0.0.0-20180223000712-d3151e2a480f
 	github.com/matoous/go-nanoid/v2 v2.0.0
 	github.com/noelyahan/mergi v0.0.0-20190514155713-69271a4267fb

@@ -118,3 +118,10 @@ func ToResponse(r *Response, err error) (*http.Response, error) {
 func GetUserAgent() string {
 	return UserAgents[xgen.RandInt(0, len(UserAgents)-1)]
 }
+
+// RandomHeader ...
+func RandomHeader() http.Header {
+	return http.Header{
+		"User-Agent": []string{GetUserAgent()},
+	}
+}
