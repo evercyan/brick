@@ -17,6 +17,7 @@ require (
 	github.com/jung-kurt/gofpdf v1.16.2
 	github.com/lestrrat/go-file-rotatelogs v0.0.0-20180223000712-d3151e2a480f
 	github.com/matoous/go-nanoid/v2 v2.0.0
+	github.com/mozillazg/go-pinyin v0.20.0
 	github.com/noelyahan/mergi v0.0.0-20190514155713-69271a4267fb
 	github.com/rs/xid v1.3.0
 	github.com/satori/go.uuid v1.2.0

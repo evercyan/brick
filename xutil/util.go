@@ -6,6 +6,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/evercyan/brick/xtype"
+	"github.com/mozillazg/go-pinyin"
 )
 
 // If 三目运算
@@ -41,4 +42,20 @@ func Default[V comparable](v V, de V) V {
 func Round(x float64, length int) float64 {
 	factor := math.Pow10(length)
 	return math.Round(x*factor) / factor
+}
+
+// Abbr ...
+func Abbr(name string) string {
+	items := pinyin.LazyConvert(name, nil)
+	if len(items) == 0 {
+		return ""
+	}
+	abbrs := make([]string, 0)
+	for _, item := range items {
+		if len(item) == 0 {
+			continue
+		}
+		abbrs = append(abbrs, string(item[0]))
+	}
+	return strings.Join(abbrs, "")
 }
