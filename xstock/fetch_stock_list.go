@@ -9,6 +9,7 @@ import (
 	"github.com/evercyan/brick/xhttp"
 	"github.com/evercyan/brick/xlog"
 	"github.com/evercyan/brick/xtype"
+	"github.com/evercyan/brick/xutil"
 )
 
 // ...
@@ -16,7 +17,7 @@ const (
 	// 请求链接
 	StockListURL = "https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&secids=%s&fields=%s"
 	// 查询字段
-	StockListFields = "f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f14,f20,f21,f23,f26,f38,f39,f100,f102,f103,f265"
+	StockListFields = "f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f14,f20,f21,f23,f26,f38,f39,f45,f58,f100,f102,f103,f265"
 )
 
 // ----------------------------------------------------------------
@@ -48,6 +49,8 @@ type diff struct {
 	F26  int64   `json:"f26"`  // 上市时间
 	F38  float64 `json:"f38"`  // 总股本
 	F39  float64 `json:"f39"`  // 流通股
+	F45  float64 `json:"f45"`  // 净利润
+	F58  float64 `json:"f58"`  // 股东权益
 	F100 string  `json:"f100"` // 板块名称
 	F102 string  `json:"f102"` // 地区板块
 	F103 string  `json:"f103"` // 标签
@@ -77,6 +80,7 @@ type StockDetail struct {
 	MarketFlow  int64     `json:"market_flow"`  // 流通市值
 	PE          float64   `json:"pe"`           // 市盈率
 	PB          float32   `json:"pb"`           // 市净率
+	ROE         float64   `json:"roe"`          // ROE
 	StockTotal  float64   `json:"stock_total"`  // 总股本
 	StockFlow   float64   `json:"stock_flow"`   // 流通股
 	PlateName   string    `json:"plate_name"`   // 板块名称
@@ -125,6 +129,7 @@ func FetchStockList(ctx context.Context, codes []string) ([]*StockDetail, error)
 			PlateArea:   v.F102,
 			Tag:         v.F103,
 			PlateCode:   v.F265,
+			ROE:         xutil.Round(v.F45*100/v.F58, 2),
 		})
 	}
 	return list, nil

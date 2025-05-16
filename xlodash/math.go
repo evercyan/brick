@@ -37,12 +37,11 @@ func Max[T constraints.Ordered](nums ...T) T {
 }
 
 // IF ...
-func IF[T any](condition T, value interface{}) interface{} {
+func IF[T any](condition T, a, b interface{}) interface{} {
 	if reflect.DeepEqual(condition, reflect.Zero(reflect.TypeOf(condition)).Interface()) {
-		var res T
-		return res
+		return b
 	}
-	return value
+	return a
 }
 
 // Sum ...

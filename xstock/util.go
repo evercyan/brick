@@ -9,15 +9,17 @@ import (
 
 // GetCode ...
 func GetCode(codes ...string) string {
-	list := make([]string, 0, len(codes))
-	for _, code := range codes {
-		if strings.HasPrefix(code, "6") {
-			list = append(list, "1."+code)
+	for k, v := range codes {
+		if strings.Contains(v, ".") {
+			continue
+		}
+		if strings.HasPrefix(v, "6") {
+			codes[k] = "1." + v
 		} else {
-			list = append(list, "0."+code)
+			codes[k] = "0." + v
 		}
 	}
-	return strings.Join(list, ",")
+	return strings.Join(codes, ",")
 }
 
 // FormatDate ...

@@ -21,3 +21,8 @@ func TestMax(t *testing.T) {
 	assert.Equal(t, 0, Max[int]())
 	assert.Equal(t, "", Max[string]())
 }
+
+func TestIF(t *testing.T) {
+	assert.Equal(t, 1, IF(1 > 0, 1, 2))
+	assert.Equal(t, 2, IF(1 < 0, 1, 2))
+}

@@ -9,7 +9,7 @@ import (
 )
 
 func TestFetchStockList(t *testing.T) {
-	codes := []string{"002392", "600340"}
+	codes := []string{"002392", "600340", "000001"}
 	list, err := FetchStockList(context.Background(), codes)
 	if err != nil {
 		t.Fatal(err)

@@ -137,3 +137,17 @@ func MoveToFront[T any](list []T, index int) []T {
 	list = append([]T{element}, list...)
 	return list
 }
+
+// Pluck ...
+func Pluck[T any, K comparable](list []T, field func(T) K, filters ...bool) []K {
+	filter := First(filters)
+	result := make([]K, 0, len(list))
+	for _, item := range list {
+		value := field(item)
+		if filter && IsZero(value) {
+			continue
+		}
+		result = append(result, value)
+	}
+	return result
+}

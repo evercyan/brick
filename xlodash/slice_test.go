@@ -159,3 +159,50 @@ func TestMoveToFront(t *testing.T) {
 	assert.Equal(t, []int{2, 0, 1, 3}, MoveToFront([]int{0, 1, 2, 3}, 2))
 	assert.Equal(t, []int{3, 0, 1, 2}, MoveToFront([]int{0, 1, 2, 3}, 3))
 }
+
+func TestPluck(t *testing.T) {
+	{
+		list := []map[string]string{
+			{
+				"key": "1",
+			},
+			{
+				"key": "",
+			},
+			{
+				"key": "2",
+			},
+		}
+		assert.Equal(t, []string{"1", "", "2"}, Pluck(list, func(item map[string]string) string {
+			return item["key"]
+		}))
+
+		assert.Equal(t, []string{"1", "2"}, Pluck(list, func(item map[string]string) string {
+			return item["key"]
+		}, true))
+	}
+	{
+
+		type sss struct {
+			Name string
+		}
+		list := []*sss{
+			{
+				Name: "1",
+			},
+			{
+				Name: "",
+			},
+			{
+				Name: "2",
+			},
+		}
+		assert.Equal(t, []string{"1", "", "2"}, Pluck(list, func(item *sss) string {
+			return item.Name
+		}))
+		assert.Equal(t, []string{"1", "2"}, Pluck(list, func(item *sss) string {
+			return item.Name
+		}, true))
+	}
+
+}

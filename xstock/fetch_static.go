@@ -15,6 +15,13 @@ const (
 	staticMarketChangeURL = "https://dq.10jqka.com.cn/fuyao/up_down_distribution/distribution/v2/realtime"
 )
 
+// ...
+var (
+	staticCodes = []string{
+		"1.000001", "0.399001", "0.399006", "1.000688", "1.000300", "1.000905",
+	}
+)
+
 // ----------------------------------------------------------------
 
 // fetchMarkeTradeDetailResp ...
@@ -96,20 +103,50 @@ func fetchMarkeChangeDetail(ctx context.Context) (*fetchMarkeChangeDetailResp, e
 
 // Static ...
 type Static struct {
-	AmountToday     float64 `json:"amount_today"`     // 今日成交额
-	AmountYesterday float64 `json:"amount_yesterday"` // 昨日成交额
-	AmountChange    float64 `json:"amount_change"`    // 较昨日变动
-	AmountPredict   float64 `json:"amount_predict"`   // 今日预测额
-	CountUp         int     `json:"count_up"`         // 上涨数量
-	CountDown       int     `json:"count_down"`       // 下跌数量
-	CountFlat       int     `json:"count_flat"`       // 平盘数量
-	CountLimitUp    int     `json:"count_limit_up"`   // 涨停数量
-	CountLimitDown  int     `json:"count_limit_down"` // 跌停数量
+	IndexSzzs       *StockDetail `json:"index_szzs"`       // 上证指数
+	IndexSzcz       *StockDetail `json:"index_szcz"`       // 深证成指
+	IndexCybz       *StockDetail `json:"index_cybz"`       // 创业板指
+	IndexKc50       *StockDetail `json:"index_kc50"`       // 科创50
+	IndexHs300      *StockDetail `json:"index_hs300"`      // 沪深300
+	IndexZz500      *StockDetail `json:"index_zz500"`      // 中证500
+	AmountToday     float64      `json:"amount_today"`     // 今日成交额
+	AmountYesterday float64      `json:"amount_yesterday"` // 昨日成交额
+	AmountChange    float64      `json:"amount_change"`    // 较昨日变动
+	AmountPredict   float64      `json:"amount_predict"`   // 今日预测额
+	CountUp         int          `json:"count_up"`         // 上涨数量
+	CountDown       int          `json:"count_down"`       // 下跌数量
+	CountFlat       int          `json:"count_flat"`       // 平盘数量
+	CountLimitUp    int          `json:"count_limit_up"`   // 涨停数量
+	CountLimitDown  int          `json:"count_limit_down"` // 跌停数量
 }
 
 // FetchStatic 查询大盘交易额和涨跌情况
 func FetchStatic(ctx context.Context) *Static {
-	static := &Static{}
+	static := &Static{
+		IndexSzzs:  &StockDetail{},
+		IndexSzcz:  &StockDetail{},
+		IndexCybz:  &StockDetail{},
+		IndexKc50:  &StockDetail{},
+		IndexHs300: &StockDetail{},
+		IndexZz500: &StockDetail{},
+	}
+	// 指数
+	list, _ := FetchStockList(ctx, staticCodes)
+	for _, v := range list {
+		if v.Name == "上证指数" {
+			static.IndexSzzs = v
+		} else if v.Name == "深证成指" {
+			static.IndexSzcz = v
+		} else if v.Name == "创业板指" {
+			static.IndexCybz = v
+		} else if v.Name == "科创50" {
+			static.IndexKc50 = v
+		} else if v.Name == "沪深300" {
+			static.IndexHs300 = v
+		} else if v.Name == "中证500" {
+			static.IndexZz500 = v
+		}
+	}
 	// 交易额
 	tradeDetail, err := fetchMarkeTradeDetail(ctx)
 	if err != nil {
