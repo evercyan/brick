@@ -17,7 +17,7 @@ const (
 	// 请求链接
 	StockListURL = "https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&secids=%s&fields=%s"
 	// 查询字段
-	StockListFields = "f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f14,f20,f21,f23,f26,f38,f39,f45,f58,f100,f102,f103,f265"
+	StockListFields = "f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f14,f20,f21,f23,f26,f38,f39,f45,f58,f100,f102,f103,f265,f62,f64,f65,f66,f70,f71,f72,f76,f77,f78,f82,f83,f84"
 )
 
 // ----------------------------------------------------------------
@@ -45,7 +45,7 @@ type diff struct {
 	F14  string  `json:"f14"`  // 股票名称
 	F20  int64   `json:"f20"`  // 市值
 	F21  int64   `json:"f21"`  // 流通市值
-	F23  float32 `json:"f23"`  // 市净率
+	F23  float64 `json:"f23"`  // 市净率
 	F26  int64   `json:"f26"`  // 上市时间
 	F38  float64 `json:"f38"`  // 总股本
 	F39  float64 `json:"f39"`  // 流通股
@@ -55,6 +55,19 @@ type diff struct {
 	F102 string  `json:"f102"` // 地区板块
 	F103 string  `json:"f103"` // 标签
 	F265 string  `json:"f265"` // 板块代码
+	F62  float64 `json:"f62"`  // 主力净流入
+	F64  float64 `json:"f64"`  // 超大流入
+	F65  float64 `json:"f65"`  // 超大流出
+	F66  float64 `json:"f66"`  // 净超大
+	F70  float64 `json:"f70"`  // 大单流入
+	F71  float64 `json:"f71"`  // 大单流出
+	F72  float64 `json:"f72"`  // 净大单
+	F76  float64 `json:"f76"`  // 中单流入
+	F77  float64 `json:"f77"`  // 中单流出
+	F78  float64 `json:"f78"`  // 净中单
+	F82  float64 `json:"f82"`  // 小单流入
+	F83  float64 `json:"f83"`  // 小单流出
+	F84  float64 `json:"f84"`  // 净小单
 	//F11  float64 `json:"f11"`  // 5分钟涨幅
 	//F13  string  `json:"f13"`  // 市场
 	//F24  float32 `json:"f24"`  // 60日涨跌幅
@@ -79,7 +92,7 @@ type StockDetail struct {
 	MarketValue int64     `json:"market_value"` // 市值
 	MarketFlow  int64     `json:"market_flow"`  // 流通市值
 	PE          float64   `json:"pe"`           // 市盈率
-	PB          float32   `json:"pb"`           // 市净率
+	PB          float64   `json:"pb"`           // 市净率
 	ROE         float64   `json:"roe"`          // ROE
 	StockTotal  float64   `json:"stock_total"`  // 总股本
 	StockFlow   float64   `json:"stock_flow"`   // 流通股
@@ -88,6 +101,12 @@ type StockDetail struct {
 	PlateArea   string    `json:"plate_area"`   // 地区板块
 	Tag         string    `json:"tag"`          // 标签
 	ListingAt   time.Time `json:"listing_at"`   // 上市时间
+	LargeBuy    float64   `json:"large_buy"`    // 主力流入
+	LargeSell   float64   `json:"large_sell"`   // 主力流出
+	LargeChange float64   `json:"large_change"` // 主力净流入
+	SmallBuy    float64   `json:"small_buy"`    // 散户流入
+	SmallSell   float64   `json:"small_sell"`   // 散户流出
+	SmallChange float64   `json:"small_change"` // 散户净流入
 }
 
 // FetchStockList ...
@@ -130,6 +149,12 @@ func FetchStockList(ctx context.Context, codes []string) ([]*StockDetail, error)
 			Tag:         v.F103,
 			PlateCode:   v.F265,
 			ROE:         xutil.Round(v.F45*100/v.F58, 2),
+			LargeBuy:    v.F64 + v.F70,
+			LargeSell:   v.F65 + v.F71,
+			LargeChange: v.F66 + v.F72,
+			SmallBuy:    v.F82,
+			SmallSell:   v.F83,
+			SmallChange: v.F84,
 		})
 	}
 	return list, nil
