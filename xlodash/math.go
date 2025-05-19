@@ -52,3 +52,11 @@ func Sum[T constraints.Ordered](nums ...T) T {
 	}
 	return res
 }
+
+// Divide
+func Divide[T constraints.Integer | constraints.Float](x, y T) T {
+	if y == 0 {
+		return 0
+	}
+	return x / y
+}

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/evercyan/brick/xhttp"
+	"github.com/evercyan/brick/xlodash"
 	"github.com/evercyan/brick/xlog"
 	"github.com/evercyan/brick/xtype"
 	"github.com/evercyan/brick/xutil"
@@ -148,7 +149,7 @@ func FetchStockList(ctx context.Context, codes []string) ([]*StockDetail, error)
 			PlateArea:   v.F102,
 			Tag:         v.F103,
 			PlateCode:   v.F265,
-			ROE:         xutil.Round(v.F45*100/v.F58, 2),
+			ROE:         xutil.Round(xlodash.Divide(v.F45*100, v.F58), 2),
 			LargeBuy:    v.F64 + v.F70,
 			LargeSell:   v.F65 + v.F71,
 			LargeChange: v.F66 + v.F72,
