@@ -19,10 +19,10 @@ import (
 // ...
 const (
 	// 请求链接
-	TradeListURL = "https://push2his.eastmoney.com/api/qt/stock/kline/get?fields1=%s&fields2=%s&klt=101&fqt=0&secid=%s&beg=%s&end=%s"
+	KlineListURL = "https://push2his.eastmoney.com/api/qt/stock/kline/get?fields1=%s&fields2=%s&klt=101&fqt=0&secid=%s&beg=%s&end=%s"
 	// 查询字段
-	TradeListFields1 = "f1,f2,f3,f4,f5,f6"
-	TradeListFields2 = "f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f116"
+	KlineListFields1 = "f1,f2,f3,f4,f5,f6"
+	KlineListFields2 = "f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f116"
 )
 
 // ----------------------------------------------------------------
@@ -51,7 +51,7 @@ type LineDetail struct {
 
 // FetchKlineList 查询单只股票的日行情
 func FetchKlineList(ctx context.Context, code, begin, end string) ([]*LineDetail, error) {
-	url := fmt.Sprintf(TradeListURL, TradeListFields1, TradeListFields2, GetCode(code), begin, end)
+	url := fmt.Sprintf(KlineListURL, KlineListFields1, KlineListFields2, GetCode(code), begin, end)
 	response, err := xhttp.New().Get(ctx, url, xhttp.RandomHeader())
 	if err != nil {
 		return nil, err

@@ -18,7 +18,7 @@ const (
 	// 请求链接
 	StockListURL = "https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&secids=%s&fields=%s"
 	// 查询字段
-	StockListFields = "f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f14,f20,f21,f23,f26,f38,f39,f45,f58,f100,f102,f103,f265,f62,f64,f65,f66,f70,f71,f72,f76,f77,f78,f82,f83,f84"
+	StockListFields = "f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f14,f15,f16,f17,f18,f20,f21,f23,f26,f38,f39,f45,f58,f100,f102,f103,f265,f297,f62,f64,f65,f66,f70,f71,f72,f76,f77,f78,f82,f83,f84"
 )
 
 // ----------------------------------------------------------------
@@ -36,7 +36,7 @@ type diff struct {
 	F2   float64 `json:"f2"`   // 当前价格
 	F3   float64 `json:"f3"`   // 涨跌幅
 	F4   float64 `json:"f4"`   // 涨跌价格
-	F5   float64 `json:"f5"`   // 总手数
+	F5   float64 `json:"f5"`   // 成交量
 	F6   float64 `json:"f6"`   // 成交额
 	F7   float64 `json:"f7"`   // 振幅
 	F8   float64 `json:"f8"`   // 换手率
@@ -44,6 +44,10 @@ type diff struct {
 	F10  float64 `json:"f10"`  // 量比
 	F12  string  `json:"f12"`  // 股票代码
 	F14  string  `json:"f14"`  // 股票名称
+	F15  float64 `json:"f15"`  // 最高价
+	F16  float64 `json:"f16"`  // 最低价
+	F17  float64 `json:"f17"`  // 开盘价
+	F18  float64 `json:"f18"`  // 前收盘价
 	F20  int64   `json:"f20"`  // 市值
 	F21  int64   `json:"f21"`  // 流通市值
 	F23  float64 `json:"f23"`  // 市净率
@@ -56,6 +60,7 @@ type diff struct {
 	F102 string  `json:"f102"` // 地区板块
 	F103 string  `json:"f103"` // 标签
 	F265 string  `json:"f265"` // 板块代码
+	F297 int64   `json:"f297"` // 交易日期
 	F62  float64 `json:"f62"`  // 主力净流入
 	F64  float64 `json:"f64"`  // 超大流入
 	F65  float64 `json:"f65"`  // 超大流出
@@ -80,38 +85,60 @@ type diff struct {
 
 // StockDetail ...
 type StockDetail struct {
-	Code        string    `json:"code"`         // 股票代码
-	Name        string    `json:"name"`         // 股票名称
-	Price       float64   `json:"price"`        // 当前价格
-	ChangePrice float64   `json:"change_price"` // 涨跌价格
-	Percent     float64   `json:"percent"`      // 涨跌幅
-	Exchange    float64   `json:"exchange"`     // 换手率
-	Amount      float64   `json:"amount"`       // 成交额
-	Hands       float64   `json:"hands"`        // 总手数
-	Amplitude   float64   `json:"amplitude"`    // 振幅
-	VR          float64   `json:"vr"`           // 量比
-	MarketValue int64     `json:"market_value"` // 市值
-	MarketFlow  int64     `json:"market_flow"`  // 流通市值
-	PE          float64   `json:"pe"`           // 市盈率
-	PB          float64   `json:"pb"`           // 市净率
-	ROE         float64   `json:"roe"`          // ROE
-	StockTotal  float64   `json:"stock_total"`  // 总股本
-	StockFlow   float64   `json:"stock_flow"`   // 流通股
-	PlateName   string    `json:"plate_name"`   // 板块名称
-	PlateCode   string    `json:"plate_code"`   // 板块代码
-	PlateArea   string    `json:"plate_area"`   // 地区板块
-	Tag         string    `json:"tag"`          // 标签
-	ListingAt   time.Time `json:"listing_at"`   // 上市时间
-	LargeBuy    float64   `json:"large_buy"`    // 主力流入
-	LargeSell   float64   `json:"large_sell"`   // 主力流出
-	LargeChange float64   `json:"large_change"` // 主力净流入
-	SmallBuy    float64   `json:"small_buy"`    // 散户流入
-	SmallSell   float64   `json:"small_sell"`   // 散户流出
-	SmallChange float64   `json:"small_change"` // 散户净流入
+	Code          string    `json:"code"`            // 股票代码
+	Name          string    `json:"name"`            // 股票名称
+	Price         float64   `json:"price"`           // 当前价格
+	ChangePrice   float64   `json:"change_price"`    // 涨跌价格
+	OpenPrice     float64   `json:"open_price"`      // 开盘价
+	HighPrice     float64   `json:"high_price"`      // 最高价
+	LowPrice      float64   `json:"low_price"`       // 最低价
+	PreClosePrice float64   `json:"pre_close_price"` // 前收盘价
+	Percent       float64   `json:"percent"`         // 涨跌幅
+	Exchange      float64   `json:"exchange"`        // 换手率
+	Amount        float64   `json:"amount"`          // 成交额
+	Hands         float64   `json:"hands"`           // 总手数
+	Amplitude     float64   `json:"amplitude"`       // 振幅
+	VR            float64   `json:"vr"`              // 量比
+	MarketValue   int64     `json:"market_value"`    // 市值
+	MarketFlow    int64     `json:"market_flow"`     // 流通市值
+	PE            float64   `json:"pe"`              // 市盈率
+	PB            float64   `json:"pb"`              // 市净率
+	ROE           float64   `json:"roe"`             // ROE
+	StockTotal    float64   `json:"stock_total"`     // 总股本
+	StockFlow     float64   `json:"stock_flow"`      // 流通股
+	PlateName     string    `json:"plate_name"`      // 板块名称
+	PlateCode     string    `json:"plate_code"`      // 板块代码
+	PlateArea     string    `json:"plate_area"`      // 地区板块
+	Tag           string    `json:"tag"`             // 标签
+	ListingAt     time.Time `json:"listing_at"`      // 上市时间
+	LargeBuy      float64   `json:"large_buy"`       // 主力流入
+	LargeSell     float64   `json:"large_sell"`      // 主力流出
+	LargeChange   float64   `json:"large_change"`    // 主力净流入
+	SmallBuy      float64   `json:"small_buy"`       // 散户流入
+	SmallSell     float64   `json:"small_sell"`      // 散户流出
+	SmallChange   float64   `json:"small_change"`    // 散户净流入
+	TradeAt       time.Time `json:"trade_at"`        // 交易时间
 }
 
 // FetchStockList ...
 func FetchStockList(ctx context.Context, codes []string) ([]*StockDetail, error) {
+	list := make([]*StockDetail, 0)
+	batches := xlodash.Chunk(codes, 100)
+	for _, batch := range batches {
+		details, err := fetchStockList(ctx, batch)
+		if err != nil {
+			continue
+		}
+		list = append(list, details...)
+	}
+	if len(list) == 0 {
+		return nil, fmt.Errorf("not found")
+	}
+	return list, nil
+}
+
+// fetchStockList ...
+func fetchStockList(ctx context.Context, codes []string) ([]*StockDetail, error) {
 	url := fmt.Sprintf(StockListURL, GetCode(codes...), StockListFields)
 	response, err := xhttp.New().Get(ctx, url, xhttp.RandomHeader())
 	if err != nil {
@@ -128,34 +155,39 @@ func FetchStockList(ctx context.Context, codes []string) ([]*StockDetail, error)
 	list := make([]*StockDetail, 0)
 	for _, v := range resp.Data.Diff {
 		list = append(list, &StockDetail{
-			Price:       v.F2,
-			Percent:     v.F3,
-			ChangePrice: v.F4,
-			Hands:       v.F5,
-			Amount:      v.F6,
-			Amplitude:   v.F7,
-			Exchange:    v.F8,
-			PE:          v.F9,
-			VR:          v.F10,
-			Code:        v.F12,
-			Name:        v.F14,
-			MarketValue: v.F20,
-			MarketFlow:  v.F21,
-			PB:          v.F23,
-			ListingAt:   xtype.ToTime(fmt.Sprint(v.F26), "20060102"),
-			StockTotal:  v.F38,
-			StockFlow:   v.F39,
-			PlateName:   v.F100,
-			PlateArea:   v.F102,
-			Tag:         v.F103,
-			PlateCode:   v.F265,
-			ROE:         xutil.Round(xlodash.Divide(v.F45*100, v.F58), 2),
-			LargeBuy:    v.F64 + v.F70,
-			LargeSell:   v.F65 + v.F71,
-			LargeChange: v.F66 + v.F72,
-			SmallBuy:    v.F82,
-			SmallSell:   v.F83,
-			SmallChange: v.F84,
+			Price:         v.F2,
+			Percent:       v.F3,
+			ChangePrice:   v.F4,
+			OpenPrice:     v.F17,
+			HighPrice:     v.F15,
+			LowPrice:      v.F16,
+			PreClosePrice: v.F18,
+			Hands:         v.F5,
+			Amount:        v.F6,
+			Amplitude:     v.F7,
+			Exchange:      v.F8,
+			PE:            v.F9,
+			VR:            v.F10,
+			Code:          v.F12,
+			Name:          v.F14,
+			MarketValue:   v.F20,
+			MarketFlow:    v.F21,
+			PB:            v.F23,
+			ListingAt:     xtype.ToTime(fmt.Sprint(v.F26), "20060102"),
+			StockTotal:    v.F38,
+			StockFlow:     v.F39,
+			PlateName:     v.F100,
+			PlateArea:     v.F102,
+			Tag:           v.F103,
+			PlateCode:     v.F265,
+			ROE:           xutil.Round(xlodash.Divide(v.F45*100, v.F58), 2),
+			LargeBuy:      v.F64 + v.F70,
+			LargeSell:     v.F65 + v.F71,
+			LargeChange:   v.F66 + v.F72,
+			SmallBuy:      v.F82,
+			SmallSell:     v.F83,
+			SmallChange:   v.F84,
+			TradeAt:       xtype.ToTime(fmt.Sprint(v.F297), "20060102"),
 		})
 	}
 	return list, nil

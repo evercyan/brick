@@ -1,5 +1,11 @@
 # xstock
 
+资金流向
+https://akshare.akfamily.xyz/data/stock/stock.html#id165
+
+筹码分布
+https://akshare.akfamily.xyz/data/stock/stock.html#id174
+
 ## 东财接口F字段
 
 ```

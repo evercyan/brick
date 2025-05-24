@@ -8,7 +8,7 @@ import (
 	"github.com/evercyan/brick/xjson"
 )
 
-func TestFetchTradeList(t *testing.T) {
+func TestFetchKlineList(t *testing.T) {
 	code := "002392"
 	begin, end := "20250501", "20250508"
 	list, err := FetchKlineList(context.Background(), code, begin, end)
