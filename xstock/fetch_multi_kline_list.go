@@ -16,7 +16,7 @@ func FetchMultiKlineList(ctx context.Context, codes []string) ([]*LineDetail, er
 	for _, stock := range stockList {
 		list = append(list, &LineDetail{
 			Code: stock.Code,
-			Date: xtime.Format(stock.TradeAt, xtime.DateJoin),
+			Date: xtime.Format(stock.TradeAt, xtime.DateOnly),
 			OP:   stock.OpenPrice,
 			CP:   stock.Price,
 			Per:  stock.Percent,
