@@ -125,14 +125,16 @@ func FetchStockList(ctx context.Context, codes []string) ([]*StockDetail, error)
 	list := make([]*StockDetail, 0)
 	batches := xlodash.Chunk(codes, 100)
 	for k, batch := range batches {
+		// 避免请求频率过快被封 IP
+		if k > 0 {
+			time.Sleep(time.Second * 1)
+		}
 		details, err := fetchStockList(ctx, batch)
 		if err != nil {
 			continue
 		}
 		list = append(list, details...)
 		xlog.Ctx(ctx).Infof("FetchStockList No.%d, count: %d", k+1, len(details))
-		// 避免请求频率过快被封 IP
-		time.Sleep(time.Second * 1)
 	}
 	if len(list) == 0 {
 		return nil, fmt.Errorf("not found")
