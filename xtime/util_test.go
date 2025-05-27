@@ -29,7 +29,11 @@ func TestPastDaysInWeek(t *testing.T) {
 }
 
 func TestAge(t *testing.T) {
-	start := ToTime("2024-06-12", DateOnly)
+	toTime := func(s string, layout Pattern) time.Time {
+		t, _ := Parse(s, layout)
+		return t
+	}
+	start := toTime("2024-06-12", DateOnly)
 	dates := map[string]string{
 		"2024-06-12": "第1天",
 		"2024-06-14": "第3天",
@@ -44,6 +48,6 @@ func TestAge(t *testing.T) {
 		"2025-07-13": "1岁1个月零1天",
 	}
 	for date, age := range dates {
-		assert.Equal(t, age, Age(start, ToTime(date, DateOnly)))
+		assert.Equal(t, age, Age(start, toTime(date, DateOnly)))
 	}
 }
