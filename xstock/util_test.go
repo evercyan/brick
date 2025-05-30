@@ -6,5 +6,5 @@ import (
 )
 
 func TestFormatEmCodes(t *testing.T) {
-	fmt.Println(GetCode("002392", "600340", "000001"))
+	fmt.Println(generateEMCode("002392", "600340", "000001"))
 }

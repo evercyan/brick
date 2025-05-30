@@ -51,7 +51,14 @@ type LineDetail struct {
 
 // FetchKlineList 查询单只股票的日行情
 func FetchKlineList(ctx context.Context, code, begin, end string) ([]*LineDetail, error) {
-	url := fmt.Sprintf(KlineListURL, KlineListFields1, KlineListFields2, GetCode(code), begin, end)
+	url := fmt.Sprintf(
+		KlineListURL,
+		KlineListFields1,
+		KlineListFields2,
+		generateEMCode(code),
+		begin,
+		end,
+	)
 	response, err := xhttp.New().Get(ctx, url, xhttp.RandomHeader())
 	if err != nil {
 		return nil, err

@@ -144,7 +144,7 @@ func FetchStockList(ctx context.Context, codes []string) ([]*StockDetail, error)
 
 // fetchStockList ...
 func fetchStockList(ctx context.Context, codes []string) ([]*StockDetail, error) {
-	url := fmt.Sprintf(StockListURL, GetCode(codes...), StockListFields)
+	url := fmt.Sprintf(StockListURL, generateEMCode(codes...), StockListFields)
 	response, err := xhttp.New().Get(ctx, url, xhttp.RandomHeader())
 	if err != nil {
 		return nil, err

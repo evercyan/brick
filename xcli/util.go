@@ -5,6 +5,8 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/evercyan/brick/xutil"
 )
 
 // HideCursor ...
@@ -72,4 +74,17 @@ func Progress(prefix string, percent float64, blocks int, suffixs ...string) {
 		strings.Join(suffixs, ""),
 	)
 	fmt.Print("\r" + s)
+}
+
+// Notice ...
+func Notice(title, content string) error {
+	if !xutil.IsMac() {
+		return fmt.Errorf("only support MacOS")
+	}
+	Shell(fmt.Sprintf(
+		`terminal-notifier -sound default -title "%s" -message "%s"`,
+		title,
+		content,
+	))
+	return nil
 }
