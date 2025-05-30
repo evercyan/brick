@@ -125,9 +125,6 @@ func WriteXLSX(ctx context.Context, fpath string, list [][]interface{}, forces .
 
 // ----------------------------------------------------------------
 
-// WriteExcel ...
-var WriteExcel = writeExcel
-
 // ReadExcel ...
 func ReadExcel(ctx context.Context, fpath string, list interface{}) error {
 	if list == nil {
@@ -147,15 +144,15 @@ func ReadExcel(ctx context.Context, fpath string, list interface{}) error {
 		*t = records
 		return nil
 	default:
-		val := reflect.ValueOf(list)
-		if val.Kind() != reflect.Ptr ||
-			val.Elem().Kind() != reflect.Slice ||
-			val.Elem().Type().Elem().Elem().Kind() != reflect.Struct {
+		listValue := reflect.ValueOf(list)
+		if listValue.Kind() != reflect.Ptr ||
+			listValue.Elem().Kind() != reflect.Slice ||
+			listValue.Elem().Type().Elem().Elem().Kind() != reflect.Struct {
 			return fmt.Errorf("only support []*struct")
 		}
 		var (
-			elemType  = val.Elem().Type().Elem().Elem()
-			elemValue = val.Elem()
+			elemType  = listValue.Elem().Type().Elem().Elem()
+			elemValue = listValue.Elem()
 		)
 		// 解析结构体标签映射
 		headerMap, fieldMap := make(map[string]string), make(map[string]reflect.Kind)
@@ -225,4 +222,49 @@ func fillExcelFieldValue(field reflect.Value, value string, kind reflect.Kind) e
 	return nil
 }
 
-// ----------------------------------------------------------------
+// WriteExcel ...
+func WriteExcel(ctx context.Context, fpath string, list interface{}, forces ...bool) error {
+	if list == nil {
+		return fmt.Errorf("list cannot be nil")
+	}
+	switch list.(type) {
+	case [][]interface{}:
+		return writeExcel(ctx, fpath, list.([][]interface{}), forces...)
+	default:
+		listValue := reflect.ValueOf(list)
+		if listValue.Kind() != reflect.Slice {
+			return fmt.Errorf("only support []interface{}")
+		}
+		if listValue.Len() == 0 {
+			return fmt.Errorf("emtpy record")
+		}
+		lines := make([][]interface{}, 0)
+		header := make([]interface{}, 0)
+		for i := 0; i < listValue.Len(); i++ {
+			item := listValue.Index(i)
+			if item.Kind() == reflect.Ptr {
+				item = item.Elem()
+			}
+			line := make([]interface{}, 0)
+			for j := 0; j < item.NumField(); j++ {
+				fieldType := item.Type().Field(j)
+				// 非导出数据
+				if !fieldType.IsExported() {
+					continue
+				}
+				// 第一行时处理标题写入
+				if i == 0 {
+					if tag := fieldType.Tag.Get("excel"); tag != "" {
+						header = append(header, tag)
+					} else {
+						header = append(header, fieldType.Name)
+					}
+				}
+				line = append(line, item.Field(j).Interface())
+			}
+			lines = append(lines, line)
+		}
+		lines = append([][]interface{}{header}, lines...)
+		return writeExcel(ctx, fpath, lines, forces...)
+	}
+}
