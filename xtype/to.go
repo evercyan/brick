@@ -236,6 +236,7 @@ var (
 	timeMillSecondRe = regexp.MustCompile(`^\d{13}$`)
 	timeDateTimeRe   = regexp.MustCompile(`^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$`)
 	timeDateOnlyRe   = regexp.MustCompile(`^\d{4}-\d{2}-\d{2}$`)
+	timeDateJoin     = regexp.MustCompile(`^\d{4}[01]\d[0123]\d$`)
 )
 
 // ToTime 转换成时间, 错误时为时间零值
@@ -262,6 +263,8 @@ func ToTime(t string, patterns ...xtime.Pattern) time.Time {
 			patterns = append(patterns, xtime.DateOnly)
 		} else if timeDateTimeRe.MatchString(t) {
 			patterns = append(patterns, xtime.DateTime)
+		} else if timeDateJoin.MatchString(t) {
+			patterns = append(patterns, xtime.DateJoin)
 		}
 	}
 	tt, err := xtime.Parse(t, patterns...)

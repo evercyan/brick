@@ -5,6 +5,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
+	"path/filepath"
 	"reflect"
 	"strings"
 
@@ -27,6 +28,12 @@ func readExcel(ctx context.Context, fpath string) ([][]string, error) {
 
 // writeExcel ...
 func writeExcel(ctx context.Context, fpath string, list [][]interface{}, forces ...bool) error {
+	fdir := filepath.Dir(fpath)
+	if !IsDir(fdir) {
+		if err := os.MkdirAll(fdir, os.ModePerm); err != nil {
+			return err
+		}
+	}
 	if strings.HasSuffix(fpath, ".csv") {
 		return WriteCSV(ctx, fpath, list, forces...)
 	} else if strings.HasSuffix(fpath, ".xlsx") {

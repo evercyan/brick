@@ -18,7 +18,7 @@ const (
 	// 请求链接
 	StockListURL = "https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&secids=%s&fields=%s"
 	// 查询字段
-	StockListFields = "f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f14,f15,f16,f17,f18,f20,f21,f23,f26,f38,f39,f45,f58,f100,f102,f103,f265,f297,f62,f64,f65,f66,f70,f71,f72,f76,f77,f78,f82,f83,f84"
+	StockListFields = "f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f14,f15,f16,f17,f18,f20,f21,f23,f26,f38,f39,f45,f58,f100,f101,f146,f102,f103,f265,f297,f62,f64,f65,f66,f70,f71,f72,f76,f77,f78,f82,f83,f84"
 )
 
 // ----------------------------------------------------------------
@@ -74,6 +74,8 @@ type diff struct {
 	F82  float64 `json:"f82"`  // 小单流入
 	F83  float64 `json:"f83"`  // 小单流出
 	F84  float64 `json:"f84"`  // 净小单
+	F101 string  `json:"f101"` // 板块领涨股票名称
+	F146 string  `json:"f146"` // 板块领涨股票代码
 	//F11  float64 `json:"f11"`  // 5分钟涨幅
 	//F13  string  `json:"f13"`  // 市场
 	//F24  float32 `json:"f24"`  // 60日涨跌幅
@@ -109,6 +111,8 @@ type StockDetail struct {
 	PlateName     string    `json:"plate_name"`      // 板块名称
 	PlateCode     string    `json:"plate_code"`      // 板块代码
 	PlateArea     string    `json:"plate_area"`      // 地区板块
+	PlateHeadName string    `json:"plate_head_name"` // 板块领涨股名称
+	PlateHeadCode string    `json:"plate_head_code"` // 板块领涨股代码
 	Tag           string    `json:"tag"`             // 标签
 	ListingAt     time.Time `json:"listing_at"`      // 上市时间
 	LargeBuy      float64   `json:"large_buy"`       // 主力流入
@@ -183,6 +187,8 @@ func fetchStockList(ctx context.Context, codes []string) ([]*StockDetail, error)
 			StockFlow:     v.F39,
 			PlateName:     v.F100,
 			PlateArea:     v.F102,
+			PlateHeadName: v.F101,
+			PlateHeadCode: v.F146,
 			Tag:           v.F103,
 			PlateCode:     v.F265,
 			ROE:           xutil.Round(xlodash.Divide(v.F45*100, v.F58), 2),
