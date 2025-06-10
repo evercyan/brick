@@ -9,7 +9,7 @@ import (
 
 // SelectOption 选项
 type SelectOption struct {
-	Label string      `json:"label"`
+	Label string      `json:"title"`
 	Value interface{} `json:"value"`
 	Desc  string      `json:"desc"`
 }
@@ -22,8 +22,8 @@ func (t SelectOption) FilterValue() string { return t.Label }
 
 // selectModel ...
 type selectModel struct {
-	list     list.Model
-	selected *SelectOption
+	list  list.Model
+	value *SelectOption
 }
 
 // Init ...
@@ -36,12 +36,13 @@ func (t selectModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch mt := msg.(type) {
 	case tea.KeyMsg:
 		if IsQuit(mt) {
+			t.value = nil
 			return t, tea.Quit
 		}
 		if IsEnter(mt) {
 			v, ok := t.list.SelectedItem().(*SelectOption)
 			if ok {
-				t.selected = v
+				t.value = v
 			}
 			return t, tea.Quit
 		}
@@ -90,8 +91,8 @@ func Select(title string, options []*SelectOption) (*SelectOption, error) {
 		return nil, err
 	}
 	m := tp.(selectModel)
-	if m.selected == nil {
+	if m.value == nil {
 		return nil, fmt.Errorf("未选中选项")
 	}
-	return m.selected, nil
+	return m.value, nil
 }

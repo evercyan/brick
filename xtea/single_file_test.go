@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPickSingleFile(t *testing.T) {
+func TestSingleFile(t *testing.T) {
 	fpath, err := SingleFile("../", ".go")
 	assert.Nil(t, err)
 	fmt.Println(fpath)
