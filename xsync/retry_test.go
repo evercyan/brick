@@ -1,4 +1,4 @@
-package xretry
+package xsync
 
 import (
 	"fmt"

@@ -1,4 +1,4 @@
-package xgit
+package xgithub
 
 import (
 	"bytes"

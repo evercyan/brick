@@ -16,8 +16,8 @@ const (
 
 // ----------------------------------------------------------------
 
-// Output 处理提示前置
-func Output(c Fg, texts ...interface{}) {
+// Text 处理提示前置
+func Text(c Fg, texts ...interface{}) string {
 	text := ""
 	if len(texts) > 1 {
 		text += New(fmt.Sprint(texts[0])).Fg(c).Text() + " "
@@ -26,7 +26,12 @@ func Output(c Fg, texts ...interface{}) {
 	text += New(xlodash.Map(texts, func(i int, v interface{}) string {
 		return fmt.Sprint(v)
 	})...).Fg(c).Text()
-	fmt.Println(text)
+	return text
+}
+
+// Output 处理提示前置
+func Output(c Fg, texts ...interface{}) {
+	fmt.Println(Text(c, texts...))
 }
 
 // ----------------------------------------------------------------
@@ -55,11 +60,6 @@ func Danger(args ...interface{}) {
 	Output(FgRed, args...)
 }
 
-// Danger ...
-func Dangerf(tpl string, args ...interface{}) {
-	Danger(fmt.Sprintf(tpl, args...))
-}
-
 // Success ...
 func Successf(tpl string, args ...interface{}) {
 	Success(fmt.Sprintf(tpl, args...))
@@ -73,4 +73,33 @@ func Infof(tpl string, args ...interface{}) {
 // Warnning ...
 func Warnningf(tpl string, args ...interface{}) {
 	Warnning(fmt.Sprintf(tpl, args...))
+}
+
+// Danger ...
+func Dangerf(tpl string, args ...interface{}) {
+	Danger(fmt.Sprintf(tpl, args...))
+}
+
+// Successt ...
+func Successt(args ...interface{}) string {
+	args = append([]interface{}{S}, args...)
+	return Text(FgGreen, args...)
+}
+
+// Infot ...
+func Infot(args ...interface{}) string {
+	args = append([]interface{}{I}, args...)
+	return Text(FgCyan, args...)
+}
+
+// Warnningt ...
+func Warnningt(args ...interface{}) string {
+	args = append([]interface{}{I}, args...)
+	return Text(FgYellow, args...)
+}
+
+// Dangert ...
+func Dangert(args ...interface{}) string {
+	args = append([]interface{}{F}, args...)
+	return Text(FgRed, args...)
 }

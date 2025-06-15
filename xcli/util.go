@@ -34,6 +34,11 @@ func Exec(name string, args ...string) error {
 	return cmd.Run()
 }
 
+// Output ...
+func Output(cmd string) ([]byte, error) {
+	return exec.Command("sh", "-c", cmd).Output()
+}
+
 // Shell ...
 func Shell(cmd string) string {
 	b, err := exec.Command("sh", "-c", cmd).Output()

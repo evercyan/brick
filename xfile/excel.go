@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"strings"
+	"time"
 
 	"github.com/360EntSecGroup-Skylar/excelize"
 	"github.com/evercyan/brick/xlodash"
@@ -224,6 +225,15 @@ func fillExcelFieldValue(field reflect.Value, value string, kind reflect.Kind) e
 	case reflect.Bool:
 		field.SetBool(xtype.ToBool(value))
 	default:
+		// 兼容 time.Time
+		if field.Type() == reflect.TypeOf(time.Time{}) {
+			t := xtype.ToTime(value)
+			if t.IsZero() {
+				return fmt.Errorf("无效的时间格式: %s", value)
+			}
+			field.Set(reflect.ValueOf(t))
+			return nil
+		}
 		return fmt.Errorf("unsupported type: %s", kind)
 	}
 	return nil

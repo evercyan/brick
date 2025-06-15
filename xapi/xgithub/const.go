@@ -1,4 +1,4 @@
-package xgit
+package xgithub
 
 // Client https://docs.github.com/cn/rest/reference/repos#contents
 const (

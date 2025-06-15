@@ -21,14 +21,24 @@ func Parse(t string, patterns ...Pattern) (time.Time, error) {
 	return time.ParseInLocation(xlodash.First(patterns, DateTime).Desc(), t, time.Local)
 }
 
-// FormatD ...
-func FormatD(t time.Time) string {
+// D ...
+func D(t time.Time) string {
 	return Format(t, DateOnly)
 }
 
-// FormatDJ ...
-func FormatDJ(t time.Time) string {
+// DJ ...
+func DJ(t time.Time) string {
 	return Format(t, DateJoin)
+}
+
+// DT ...
+func DT(t time.Time) string {
+	return Format(t, DateTime)
+}
+
+// DTJ ...
+func DTJ(t time.Time) string {
+	return Format(t, DateTimeJoin)
 }
 
 // IsToday ...

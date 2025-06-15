@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestBuildQuery(t *testing.T) {
+func TestBuildURL(t *testing.T) {
 	m := map[string]interface{}{
 		"c": 2,
 		"a": "a",
