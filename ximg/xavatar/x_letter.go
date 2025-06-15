@@ -7,7 +7,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/disintegration/letteravatar"
-	"github.com/evercyan/brick/xfont"
+	"github.com/evercyan/brick/xcli/xfont"
 	"github.com/evercyan/brick/ximg"
 	"github.com/evercyan/brick/xregex"
 	"github.com/evercyan/brick/xutil"
