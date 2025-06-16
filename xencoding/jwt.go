@@ -1,4 +1,4 @@
-package xauth
+package xencoding
 
 import (
 	"encoding/base64"
