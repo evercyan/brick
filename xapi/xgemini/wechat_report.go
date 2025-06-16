@@ -12,8 +12,8 @@ import (
 
 // https://ai.google.dev/gemini-api/docs/document-processing?hl=zh-cn&lang=go
 
-// GenerateWechatReport ...
-func GenerateWechatReport(ctx context.Context, templatePath, chatPath, targetPath string) error {
+// GenerateReport ...
+func GenerateReport(ctx context.Context, templatePath, chatPath, targetPath string) error {
 	client, err := GetClient(ctx)
 	if err != nil {
 		return err
@@ -37,7 +37,7 @@ func GenerateWechatReport(ctx context.Context, templatePath, chatPath, targetPat
 	contents := []*genai.Content{
 		genai.NewContentFromParts(parts, genai.RoleUser),
 	}
-	result, err := client.Models.GenerateContent(ctx, ModelGeminiPro, contents, nil)
+	result, err := client.Models.GenerateContent(ctx, ModelFlashPreview, contents, nil)
 	if err != nil {
 		return err
 	}

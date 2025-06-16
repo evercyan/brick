@@ -9,15 +9,14 @@ import (
 	"github.com/evercyan/brick/xfile"
 )
 
-func TestGenerateWechatDailyReport(t *testing.T) {
+func TestGenerateReport(t *testing.T) {
 	ctx := context.Background()
-	chatlogDir := filepath.Join(xfile.GetHomeDir(), "Y1ker/AI/chatlog")
-	// 微信聊天记录提示词
-	// 勇敢牛牛_20250611
-	templatePath := filepath.Join(chatlogDir, "微信聊天记录提示词.txt")
-	chatPath := filepath.Join(chatlogDir, "勇敢牛牛_20250611.txt")
-	targetPath := filepath.Join(chatlogDir, "勇敢牛牛_202506111111.html")
-	err := GenerateWechatReport(
+	date := "2025-06-13"
+	reporterDir := filepath.Join(xfile.GetHomeDir(), "Y1ker/Database/Chatlog/reporter")
+	templatePath := filepath.Join(reporterDir, "群聊日报.txt")
+	chatPath := filepath.Join(reporterDir, fmt.Sprintf("勇敢牛牛/勇敢牛牛_%s.txt", date))
+	targetPath := filepath.Join(reporterDir, fmt.Sprintf("勇敢牛牛/勇敢牛牛_%s.html", date))
+	err := GenerateReport(
 		ctx, templatePath, chatPath, targetPath,
 	)
 	if err != nil {

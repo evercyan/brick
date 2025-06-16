@@ -20,7 +20,7 @@ func GetClient(ctx context.Context) (*genai.Client, error) {
 	}
 	apiKey := xutil.Getenv("GEMINI_API_KEY")
 	if apiKey == "" {
-		return nil, fmt.Errorf("no GEMINI_API_KEY found")
+		return nil, fmt.Errorf("GEMINI_API_KEY not found")
 	}
 	client, err := genai.NewClient(ctx, &genai.ClientConfig{
 		APIKey:  apiKey,
