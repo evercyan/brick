@@ -1,23 +1,22 @@
-package xversion
+package xutil
 
 import (
 	"strings"
 
 	"github.com/evercyan/brick/xtype"
-	"github.com/evercyan/brick/xutil"
 )
 
 // Format 格式化版本
-func Format(version string) string {
+func FormatVersion(version string) string {
 	version = strings.TrimLeft(strings.TrimSpace(strings.ToLower(version)), "v")
-	return xutil.Replace(version, map[string]string{
+	return Replace(version, map[string]string{
 		"-": ".",
 	})
 }
 
 // Compare 版本比较
-func Compare(src string, dst string) int {
-	src, dst = Format(src), Format(dst)
+func CompareVersion(src string, dst string) int {
+	src, dst = FormatVersion(src), FormatVersion(dst)
 	if src == dst {
 		return 0
 	}

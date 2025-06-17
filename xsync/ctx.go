@@ -2,6 +2,7 @@ package xsync
 
 import (
 	"context"
+
 	"github.com/evercyan/brick/xgen"
 	"github.com/evercyan/brick/xlog"
 )

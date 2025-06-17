@@ -32,6 +32,7 @@ func TestSizeText(t *testing.T) {
 	assert.Equal(t, "1.65MB", SizeText((1024+666)*1024))
 	assert.Equal(t, "1.65GB", SizeText((1024+666)*1024*1024))
 	assert.Equal(t, "1.00TB", SizeText(1*1024*1024*1024*1024))
+	fmt.Println(SizeText(1 << 30))
 }
 
 func TestRead(t *testing.T) {

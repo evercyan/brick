@@ -91,6 +91,6 @@ func FetchMessageListRaw(ctx context.Context, req *FetchMessageListReq) (string,
 	if err != nil {
 		return "", err
 	}
-	xlog.Ctx(ctx).Debugf("FetchMessageListRaw url: %s, response: %s", url, response.String())
+	xlog.Ctx(ctx).Debugf("FetchMessageListRaw url: %s, response: %s", reqURL, response.String())
 	return response.String(), nil
 }

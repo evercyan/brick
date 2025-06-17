@@ -1,6 +1,7 @@
 package xtype
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"regexp"
@@ -8,9 +9,6 @@ import (
 	"strings"
 	"time"
 	"unsafe"
-
-	"github.com/evercyan/brick/xencoding"
-	"github.com/evercyan/brick/xtime"
 )
 
 // ToInt ...
@@ -164,10 +162,16 @@ func ToString(v interface{}) string {
 		return Bytes2String(val)
 	default:
 		if IsJSONObject(v) {
-			return xencoding.JSONEncode(v)
+			return JSONEncode(v)
 		}
 		return fmt.Sprint(v)
 	}
+}
+
+// JSONEncode ...
+func JSONEncode(v interface{}) string {
+	b, _ := json.Marshal(v)
+	return string(b)
 }
 
 // ToBool ...
@@ -240,7 +244,7 @@ var (
 )
 
 // ToTime 转换成时间, 错误时为时间零值
-func ToTime(t string, patterns ...xtime.Pattern) time.Time {
+func ToTime(t string, patterns ...string) time.Time {
 	if len(patterns) == 0 {
 		// Excel 时间处理
 		if timeExcelRe.MatchString(t) {
@@ -260,14 +264,18 @@ func ToTime(t string, patterns ...xtime.Pattern) time.Time {
 		}
 		// 其他格式化模板
 		if timeDateOnlyRe.MatchString(t) {
-			patterns = append(patterns, xtime.DateOnly)
+			patterns = append(patterns, time.DateOnly)
 		} else if timeDateTimeRe.MatchString(t) {
-			patterns = append(patterns, xtime.DateTime)
+			patterns = append(patterns, time.DateTime)
 		} else if timeDateJoin.MatchString(t) {
-			patterns = append(patterns, xtime.DateJoin)
+			patterns = append(patterns, "20060102")
 		}
 	}
-	tt, err := xtime.Parse(t, patterns...)
+	pattern := time.DateTime
+	if len(patterns) > 0 {
+		pattern = patterns[0]
+	}
+	tt, err := time.ParseInLocation(pattern, t, time.Local)
 	if err != nil {
 		return time.Time{}
 	}

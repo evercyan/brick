@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	"github.com/evercyan/brick/xtype"
 )
 
 // BeginOfDay ...
@@ -110,3 +112,5 @@ func Age(start, end time.Time) string {
 	}
 	return strings.Join(parts, "")
 }
+
+var ToTime = xtype.ToTime
