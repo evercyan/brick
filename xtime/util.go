@@ -16,6 +16,25 @@ func BeginOfDay(t time.Time) int64 {
 	return t.Unix() - int64(t.Hour())*3600 - int64(t.Minute())*60 - int64(t.Second())
 }
 
+// BeginOfMonth ...
+func BeginOfMonth(times ...time.Time) time.Time {
+	t := time.Now()
+	if len(times) > 0 && !times[0].IsZero() {
+		t = times[0]
+	}
+	return time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, t.Location())
+}
+
+// EndOfMonth ...
+func EndOfMonth(times ...time.Time) time.Time {
+	t := time.Now()
+	if len(times) > 0 && !times[0].IsZero() {
+		t = times[0]
+	}
+	nextMonth := time.Date(t.Year(), t.Month()+1, 1, 0, 0, 0, 0, t.Location())
+	return nextMonth.Add(-time.Nanosecond)
+}
+
 // EndOfDay ...
 func EndOfDay(t time.Time) int64 {
 	return BeginOfDay(t) + 24*3600 - 1

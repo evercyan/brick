@@ -51,3 +51,10 @@ func TestAge(t *testing.T) {
 		assert.Equal(t, age, Age(start, toTime(date, DateOnly)))
 	}
 }
+
+func TestMonth(t *testing.T) {
+	tt, _ := Parse("2025-01-10 12:33:00")
+	assert.Equal(t, "2025-01-01 00:00:00", Format(BeginOfMonth(tt)))
+	assert.Equal(t, "2025-01-31 23:59:59", Format(EndOfMonth(tt)))
+
+}
