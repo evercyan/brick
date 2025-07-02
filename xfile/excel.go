@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/csv"
 	"fmt"
+	"math"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -17,12 +18,29 @@ import (
 
 // ----------------------------------------------------------------
 
+// interface2string ...
+func interface2string(list [][]interface{}) [][]string {
+	lines := make([][]string, 0)
+	for _, v := range list {
+		line := make([]string, 0)
+		for _, vv := range v {
+			line = append(line, fmt.Sprint(vv))
+		}
+		lines = append(lines, line)
+	}
+	return lines
+}
+
 // readExcel ...
 func readExcel(ctx context.Context, fpath string) ([][]string, error) {
 	if strings.HasSuffix(fpath, ".csv") {
 		return ReadCSV(ctx, fpath)
 	} else if strings.HasSuffix(fpath, ".xlsx") {
-		return ReadXLSX(ctx, fpath)
+		list, err := ReadXLSX(ctx, fpath)
+		if err != nil {
+			return nil, err
+		}
+		return interface2string(list), nil
 	}
 	return nil, fmt.Errorf("invalid file ext")
 }
@@ -86,7 +104,7 @@ func WriteCSV(ctx context.Context, fpath string, list [][]interface{}, forces ..
 // ----------------------------------------------------------------
 
 // ReadXLSX ...
-func ReadXLSX(ctx context.Context, fpath string, sheets ...string) ([][]string, error) {
+func ReadXLSX(ctx context.Context, fpath string, sheets ...string) ([][]interface{}, error) {
 	if !IsExist(fpath) {
 		return nil, fmt.Errorf("file not exist")
 	}
@@ -100,13 +118,19 @@ func ReadXLSX(ctx context.Context, fpath string, sheets ...string) ([][]string, 
 			sheets = append(sheets, sheet)
 		}
 	}
-	list := make([][]string, 0)
+	list := make([][]interface{}, 0)
 	for _, sheet := range sheets {
 		rows := f.GetRows(sheet)
 		if len(rows) == 0 {
 			continue
 		}
-		list = append(list, rows...)
+		for _, row := range rows {
+			line := make([]interface{}, 0)
+			for _, v := range row {
+				line = append(line, v)
+			}
+			list = append(list, line)
+		}
 	}
 	return list, nil
 }
@@ -126,6 +150,14 @@ func WriteXLSX(ctx context.Context, fpath string, list [][]interface{}, forces .
 	sheet1 := "Sheet1"
 	f.SetActiveSheet(f.NewSheet(sheet1))
 	for k, v := range list {
+		// 通过这种方式区分 float64 类型字段设置值为 0 和默认值为 0
+		for kk, vv := range v {
+			if vvv, ok := vv.(float64); ok {
+				if vvv == math.MaxFloat64 {
+					v[kk] = ""
+				}
+			}
+		}
 		f.SetSheetRow(sheet1, fmt.Sprintf("A%d", k+1), &v)
 	}
 	return f.SaveAs(fpath)

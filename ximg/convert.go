@@ -17,10 +17,21 @@ func HTML2PNG(ctx context.Context, url, imgPath string) error {
 		url = "file://" + url
 	}
 	var buf []byte
+	var width, height int64
 	err := chromedp.Run(ctx,
 		chromedp.Navigate(url),
-		chromedp.WaitVisible(`body`, chromedp.ByQuery), // 等待 body 元素可见
-		chromedp.Sleep(1*time.Second),                  // 额外延迟（根据需求调整）
+		chromedp.WaitVisible("body", chromedp.ByQuery),
+		chromedp.WaitVisible("footer", chromedp.ByQuery),
+		chromedp.EvaluateAsDevTools(`Math.max(
+			document.body.scrollWidth, 
+			document.documentElement.scrollWidth
+		)`, &width),
+		chromedp.EvaluateAsDevTools(`Math.max(
+			document.body.scrollHeight, 
+			document.documentElement.scrollHeight
+		)`, &height),
+		chromedp.EmulateViewport(width, height),
+		chromedp.Sleep(3*time.Second),
 		chromedp.FullScreenshot(&buf, 100),
 	)
 	if err != nil {

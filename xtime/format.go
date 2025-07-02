@@ -45,3 +45,8 @@ func DTJ(t time.Time) string {
 func IsToday(t time.Time) bool {
 	return Format(t, DateOnly) == Format(time.Now(), DateOnly)
 }
+
+// T ...
+func T(t time.Time) string {
+	return Format(t, TimeOnly)
+}
