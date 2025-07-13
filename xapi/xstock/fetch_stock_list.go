@@ -18,7 +18,7 @@ const (
 	// 请求链接
 	StockListURL = "https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&secids=%s&fields=%s"
 	// 查询字段
-	StockListFields = "f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f14,f15,f16,f17,f18,f20,f21,f23,f26,f38,f39,f45,f58,f100,f101,f146,f102,f103,f265,f297,f62,f64,f65,f66,f70,f71,f72,f76,f77,f78,f82,f83,f84"
+	StockListFields = "f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f14,f15,f16,f17,f18,f20,f21,f23,f26,f34,f35,f38,f39,f45,f58,f100,f101,f146,f102,f103,f265,f297,f62,f64,f65,f66,f70,f71,f72,f76,f77,f78,f82,f83,f84"
 )
 
 // ----------------------------------------------------------------
@@ -52,6 +52,8 @@ type diff struct {
 	F21  int64   `json:"f21"`  // 流通市值
 	F23  float64 `json:"f23"`  // 市净率
 	F26  int64   `json:"f26"`  // 上市时间
+	F34  float64 `json:"f34"`  // 外盘(手)
+	F35  float64 `json:"f35"`  // 内盘(手)
 	F38  float64 `json:"f38"`  // 总股本
 	F39  float64 `json:"f39"`  // 流通股
 	F45  float64 `json:"f45"`  // 净利润
@@ -122,6 +124,8 @@ type StockDetail struct {
 	SmallSell     float64   `json:"small_sell"`      // 散户流出
 	SmallChange   float64   `json:"small_change"`    // 散户净流入
 	TradeAt       time.Time `json:"trade_at"`        // 交易时间
+	Inner         float64   `json:"inner"`           // 内盘(手)
+	Outer         float64   `json:"outer"`           // 外盘(手)
 }
 
 // FetchStockList ...
@@ -199,6 +203,8 @@ func fetchStockList(ctx context.Context, codes []string) ([]*StockDetail, error)
 			SmallSell:     v.F83,
 			SmallChange:   v.F84,
 			TradeAt:       xtype.ToTime(fmt.Sprint(v.F297), "20060102"),
+			Inner:         v.F35,
+			Outer:         v.F34,
 		})
 	}
 	return list, nil
