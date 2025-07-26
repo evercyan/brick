@@ -21,7 +21,6 @@ func HTML2PNG(ctx context.Context, url, imgPath string) error {
 	err := chromedp.Run(ctx,
 		chromedp.Navigate(url),
 		chromedp.WaitVisible("body", chromedp.ByQuery),
-		chromedp.WaitVisible("footer", chromedp.ByQuery),
 		chromedp.EvaluateAsDevTools(`Math.max(
 			document.body.scrollWidth, 
 			document.documentElement.scrollWidth

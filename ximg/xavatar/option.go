@@ -55,3 +55,17 @@ func WithBlockNum(blockNum int) Option {
 		}
 	}
 }
+
+// WithColor 设置字体颜色
+func WithColor(color color.Color) Option {
+	return func(o *option) {
+		o.Color = color
+	}
+}
+
+// WithBgColor 设置背景颜色
+func WithBgColor(bgColor color.Color) Option {
+	return func(o *option) {
+		o.BgColor = bgColor
+	}
+}

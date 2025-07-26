@@ -1,6 +1,7 @@
 package xtime
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/evercyan/brick/xlodash"
@@ -49,4 +50,12 @@ func IsToday(t time.Time) bool {
 // T ...
 func T(t time.Time) string {
 	return Format(t, TimeOnly)
+}
+
+// FormatDuration ...
+func FormatDuration(d time.Duration) string {
+	h := d / time.Hour
+	m := (d % time.Hour) / time.Minute
+	s := (d % time.Minute) / time.Second
+	return fmt.Sprintf("%02d:%02d:%02d", h, m, s)
 }

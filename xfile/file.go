@@ -212,6 +212,9 @@ func Shadow(fpath string, joins ...string) string {
 		suffix := xtime.Format(time.Now(), xtime.DateTimeJoin)
 		return fmt.Sprintf("%s_%s%s", prefix, suffix, ext)
 	default:
+		if join != "" {
+			return fmt.Sprintf("%s_%s%s", prefix, join, ext)
+		}
 		// /tmp/abc_1.txt
 		for i := 1; ; i++ {
 			f := fmt.Sprintf("%s_%d%s", prefix, i, ext)

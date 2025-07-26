@@ -13,11 +13,11 @@ func Merge(images []image.Image, row int, col int, options ...func(*Option)) (im
 	if len(images) == 0 {
 		return nil, fmt.Errorf("invalid images")
 	}
-	if row == 1 {
-		return MergeToRow(images, options...)
-	}
 	if col == 1 {
 		return MergeToCol(images, options...)
+	}
+	if row == 1 {
+		return MergeToRow(images, options...)
 	}
 	if row > mergeMaxRowCount {
 		return nil, fmt.Errorf("max row count is %d", mergeMaxRowCount)

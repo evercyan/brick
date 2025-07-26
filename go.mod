@@ -5,6 +5,7 @@ go 1.24.0
 require (
 	github.com/360EntSecGroup-Skylar/excelize v1.4.1
 	github.com/alexmullins/zip v0.0.0-20180717182244-4affb64b04d0
+	github.com/alfg/mp4 v0.0.0-20210728035756-55ea58c08aeb
 	github.com/auxten/postgresql-parser v1.0.1
 	github.com/barasher/go-exiftool v1.7.0
 	github.com/cespare/xxhash/v2 v2.3.0
