@@ -6,15 +6,15 @@ import (
 	"github.com/evercyan/brick/xtime"
 )
 
-// FetchMultiKlineList 批量查询股票的实时日K线数据
-func FetchMultiKlineList(ctx context.Context, codes []string) ([]*LineDetail, error) {
+// FetchMultiDaylineList 批量查询股票的实时日K线数据
+func FetchMultiDaylineList(ctx context.Context, codes []string) ([]*DaylineDetail, error) {
 	stockList, err := FetchStockList(ctx, codes)
 	if err != nil {
 		return nil, err
 	}
-	list := make([]*LineDetail, 0)
+	list := make([]*DaylineDetail, 0)
 	for _, stock := range stockList {
-		list = append(list, &LineDetail{
+		list = append(list, &DaylineDetail{
 			Code: stock.Code,
 			Date: xtime.Format(stock.TradeAt, xtime.DateOnly),
 			OP:   stock.OpenPrice,

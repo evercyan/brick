@@ -7,8 +7,8 @@ import (
 	"github.com/evercyan/brick/xjson"
 )
 
-func TestFetchOperatedeptList(t *testing.T) {
-	list, err := FetchOperatedeptList(context.Background(), 1, 10)
+func TestFetchBuyerList(t *testing.T) {
+	list, err := FetchBuyerList(context.Background())
 	if err != nil {
 		t.Fatal(err)
 	}

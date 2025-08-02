@@ -8,9 +8,9 @@ import (
 	"github.com/evercyan/brick/xjson"
 )
 
-func TestFetchMultiKlineList(t *testing.T) {
+func TestFetchMultiDaylineList(t *testing.T) {
 	codes := []string{"002900", "002365"}
-	list, err := FetchMultiKlineList(context.Background(), codes)
+	list, err := FetchMultiDaylineList(context.Background(), codes)
 	if err != nil {
 		t.Fatal(err)
 	}

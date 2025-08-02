@@ -8,10 +8,9 @@ import (
 	"github.com/evercyan/brick/xjson"
 )
 
-func TestFetchKlineList(t *testing.T) {
+func TestFetchMinlineList(t *testing.T) {
 	code := "002392"
-	begin, end := "20250501", "20250508"
-	list, err := FetchKlineList(context.Background(), code, begin, end)
+	list, err := FetchMinlineList(context.Background(), code)
 	if err != nil {
 		t.Fatal(err)
 	}

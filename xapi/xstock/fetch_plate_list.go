@@ -14,10 +14,8 @@ import (
 
 // ...
 const (
-	// 请求链接
-	PlateListURL = "https://push2delay.eastmoney.com/api/qt/clist/get?pn=1&pz=2000&po=1&np=3&fid=f3&fs=%s&fields=%s&fltt=2&invt=2"
-	// 查询字段
-	PlateListFields = "f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f14,f20,f21,f22,f25,f62,f64,f65,f66,f70,f71,f72,f76,f77,f78,f82,f83,f84"
+	plateListURL    = "https://push2delay.eastmoney.com/api/qt/clist/get?pn=1&pz=2000&po=1&np=3&fid=f3&fs=%s&fields=%s&fltt=2&invt=2"
+	plateListFields = "f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f14,f20,f21,f22,f25,f62,f64,f65,f66,f70,f71,f72,f76,f77,f78,f82,f83,f84"
 )
 
 // ----------------------------------------------------------------
@@ -95,7 +93,7 @@ func FetchPlateList(ctx context.Context) []*PlateDetail {
 	typeMap := map[int]string{1: "m:90 t:2", 2: "m:90 t:3"}
 	list := make([]*PlateDetail, 0)
 	for k, v := range typeMap {
-		url := fmt.Sprintf(PlateListURL, xencoding.URLEncode(v), PlateListFields)
+		url := fmt.Sprintf(plateListURL, xencoding.URLEncode(v), plateListFields)
 		response, err := xhttp.New().Get(ctx, url, xhttp.RandomHeader())
 		if err != nil {
 			xlog.Ctx(ctx).Errorf("FetchPlateList url: %s, err: %v", url, err)

@@ -13,12 +13,14 @@ import (
 	"github.com/evercyan/brick/xutil"
 )
 
+// invt=2 后, 所以 float64(0) 都会返回 "-"
+// fltt=2 保留两位小数
+
 // ...
 const (
-	// 请求链接
-	StockListURL = "https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&secids=%s&fields=%s"
-	// 查询字段
-	StockListFields = "f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f14,f15,f16,f17,f18,f20,f21,f23,f26,f34,f35,f38,f39,f45,f58,f100,f101,f146,f102,f103,f265,f297,f62,f64,f65,f66,f70,f71,f72,f76,f77,f78,f82,f83,f84"
+	stockListURL    = "https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&secids=%s&fields=%s"
+	allStockListURL = "https://push2.eastmoney.com/api/qt/clist/get?np=1&fltt=2&fs=m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048&fields=%s&fid=f3&pn=%d&pz=%d&po=1&dect=1"
+	stockListFields = "f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f14,f15,f16,f17,f18,f20,f21,f23,f26,f34,f35,f38,f39,f45,f58,f100,f101,f146,f102,f103,f265,f297,f62,f64,f65,f66,f70,f71,f72,f76,f77,f78,f82,f83,f84"
 )
 
 // ----------------------------------------------------------------
@@ -26,65 +28,62 @@ const (
 // FetchStockListResp ...
 type FetchStockListResp struct {
 	Data struct {
-		Total int     `json:"total"`
-		Diff  []*diff `json:"diff"`
+		Total int `json:"total"`
+		Diff  []struct {
+			F2   float64 `json:"f2"`   // 当前价格
+			F3   float64 `json:"f3"`   // 涨跌幅
+			F4   float64 `json:"f4"`   // 涨跌价格
+			F5   float64 `json:"f5"`   // 成交量
+			F6   float64 `json:"f6"`   // 成交额
+			F7   float64 `json:"f7"`   // 振幅
+			F8   float64 `json:"f8"`   // 换手率
+			F9   float64 `json:"f9"`   // 市盈率
+			F10  float64 `json:"f10"`  // 量比
+			F12  string  `json:"f12"`  // 股票代码
+			F14  string  `json:"f14"`  // 股票名称
+			F15  float64 `json:"f15"`  // 最高价
+			F16  float64 `json:"f16"`  // 最低价
+			F17  float64 `json:"f17"`  // 开盘价
+			F18  float64 `json:"f18"`  // 前收盘价
+			F20  int64   `json:"f20"`  // 市值
+			F21  int64   `json:"f21"`  // 流通市值
+			F23  float64 `json:"f23"`  // 市净率
+			F26  int64   `json:"f26"`  // 上市时间
+			F34  float64 `json:"f34"`  // 外盘(手)
+			F35  float64 `json:"f35"`  // 内盘(手)
+			F38  float64 `json:"f38"`  // 总股本
+			F39  float64 `json:"f39"`  // 流通股
+			F45  float64 `json:"f45"`  // 净利润
+			F58  float64 `json:"f58"`  // 股东权益
+			F100 string  `json:"f100"` // 板块名称
+			F102 string  `json:"f102"` // 地区板块
+			F103 string  `json:"f103"` // 标签
+			F265 string  `json:"f265"` // 板块代码
+			F297 int64   `json:"f297"` // 交易日期
+			F62  float64 `json:"f62"`  // 主力净流入
+			F64  float64 `json:"f64"`  // 超大流入
+			F65  float64 `json:"f65"`  // 超大流出
+			F66  float64 `json:"f66"`  // 净超大
+			F70  float64 `json:"f70"`  // 大单流入
+			F71  float64 `json:"f71"`  // 大单流出
+			F72  float64 `json:"f72"`  // 净大单
+			F76  float64 `json:"f76"`  // 中单流入
+			F77  float64 `json:"f77"`  // 中单流出
+			F78  float64 `json:"f78"`  // 净中单
+			F82  float64 `json:"f82"`  // 小单流入
+			F83  float64 `json:"f83"`  // 小单流出
+			F84  float64 `json:"f84"`  // 净小单
+			F101 string  `json:"f101"` // 板块领涨股票名称
+			F146 string  `json:"f146"` // 板块领涨股票代码
+			//F11  float64 `json:"f11"`  // 5分钟涨幅
+			//F13  string  `json:"f13"`  // 市场
+			//F24  float32 `json:"f24"`  // 60日涨跌幅
+			//F33  float64 `json:"f33"`  // 委比
+			//F36  float64 `json:"f36"`  // 人均持股数
+			//F101 string  `json:"f101"` // 板块领涨股名称
+			//F128 string `json:"f128"` // 板块领涨股代码
+		} `json:"diff"`
 	} `json:"data"`
-}
-
-// diff ...
-type diff struct {
-	F2   float64 `json:"f2"`   // 当前价格
-	F3   float64 `json:"f3"`   // 涨跌幅
-	F4   float64 `json:"f4"`   // 涨跌价格
-	F5   float64 `json:"f5"`   // 成交量
-	F6   float64 `json:"f6"`   // 成交额
-	F7   float64 `json:"f7"`   // 振幅
-	F8   float64 `json:"f8"`   // 换手率
-	F9   float64 `json:"f9"`   // 市盈率
-	F10  float64 `json:"f10"`  // 量比
-	F12  string  `json:"f12"`  // 股票代码
-	F14  string  `json:"f14"`  // 股票名称
-	F15  float64 `json:"f15"`  // 最高价
-	F16  float64 `json:"f16"`  // 最低价
-	F17  float64 `json:"f17"`  // 开盘价
-	F18  float64 `json:"f18"`  // 前收盘价
-	F20  int64   `json:"f20"`  // 市值
-	F21  int64   `json:"f21"`  // 流通市值
-	F23  float64 `json:"f23"`  // 市净率
-	F26  int64   `json:"f26"`  // 上市时间
-	F34  float64 `json:"f34"`  // 外盘(手)
-	F35  float64 `json:"f35"`  // 内盘(手)
-	F38  float64 `json:"f38"`  // 总股本
-	F39  float64 `json:"f39"`  // 流通股
-	F45  float64 `json:"f45"`  // 净利润
-	F58  float64 `json:"f58"`  // 股东权益
-	F100 string  `json:"f100"` // 板块名称
-	F102 string  `json:"f102"` // 地区板块
-	F103 string  `json:"f103"` // 标签
-	F265 string  `json:"f265"` // 板块代码
-	F297 int64   `json:"f297"` // 交易日期
-	F62  float64 `json:"f62"`  // 主力净流入
-	F64  float64 `json:"f64"`  // 超大流入
-	F65  float64 `json:"f65"`  // 超大流出
-	F66  float64 `json:"f66"`  // 净超大
-	F70  float64 `json:"f70"`  // 大单流入
-	F71  float64 `json:"f71"`  // 大单流出
-	F72  float64 `json:"f72"`  // 净大单
-	F76  float64 `json:"f76"`  // 中单流入
-	F77  float64 `json:"f77"`  // 中单流出
-	F78  float64 `json:"f78"`  // 净中单
-	F82  float64 `json:"f82"`  // 小单流入
-	F83  float64 `json:"f83"`  // 小单流出
-	F84  float64 `json:"f84"`  // 净小单
-	F101 string  `json:"f101"` // 板块领涨股票名称
-	F146 string  `json:"f146"` // 板块领涨股票代码
-	//F11  float64 `json:"f11"`  // 5分钟涨幅
-	//F13  string  `json:"f13"`  // 市场
-	//F24  float32 `json:"f24"`  // 60日涨跌幅
-	//F33  float64 `json:"f33"`  // 委比
-	//F36  float64 `json:"f36"`  // 人均持股数
-	//F101 string  `json:"f101"` // 板块领涨股名称
-	//F128 string `json:"f128"` // 板块领涨股代码
 }
 
 // StockDetail ...
@@ -128,45 +127,101 @@ type StockDetail struct {
 	Outer         float64   `json:"outer"`           // 外盘(手)
 }
 
-// FetchStockList ...
+// ----------------------------------------------------------------
+
+// FetchAllStockList 查询所有股票列表
+func FetchAllStockList(ctx context.Context) ([]*StockDetail, error) {
+	list := make([]*StockDetail, 0)
+	// pageSize 最大为 100
+	pageNum, pageSize := 1, 100
+	for {
+		if pageNum > 1 {
+			time.Sleep(SleepDuration)
+		}
+		pageList, err := fetchAllStockList(ctx, pageNum, pageSize)
+		if err != nil {
+			return nil, err
+		}
+		xlog.Ctx(ctx).Infof("FetchStockList No.%d, count: %d", pageNum, len(pageList))
+		if len(pageList) == 0 {
+			break
+		}
+		list = append(list, pageList...)
+		pageNum++
+		if Debug {
+			break
+		}
+	}
+	if len(list) == 0 {
+		return nil, fmt.Errorf("未查询到股票纪录")
+	}
+	return list, nil
+}
+
+// fetchAllStockList ...
+func fetchAllStockList(ctx context.Context, pageNum, pageSize int) ([]*StockDetail, error) {
+	url := fmt.Sprintf(allStockListURL, stockListFields, pageNum, pageSize)
+	response, err := xhttp.New().Get(ctx, url, xhttp.RandomHeader())
+	if err != nil {
+		return nil, err
+	}
+	xlog.Ctx(ctx).Debugf("fetchAllStockList url: %s, response: %s", url, response.String())
+	// 排行榜中的数据需要除以 100 后取 2 位小数
+	return getStockDetails(ctx, response.Bytes(), true)
+}
+
+// ----------------------------------------------------------------
+
+// FetchStockList 根据股票代码查询股票列表
 func FetchStockList(ctx context.Context, codes []string) ([]*StockDetail, error) {
 	list := make([]*StockDetail, 0)
 	batches := xlodash.Chunk(codes, 100)
 	for k, batch := range batches {
 		// 避免请求频率过快被封 IP
 		if k > 0 {
-			time.Sleep(time.Second * 1)
+			time.Sleep(SleepDuration)
 		}
-		details, err := fetchStockList(ctx, batch)
+		batchList, err := fetchStockList(ctx, batch)
 		if err != nil {
-			continue
+			return nil, err
 		}
-		list = append(list, details...)
-		xlog.Ctx(ctx).Infof("FetchStockList No.%d, count: %d", k+1, len(details))
+		xlog.Ctx(ctx).Infof("FetchStockList No.%d, count: %d", k+1, len(batchList))
+		if len(batchList) == 0 {
+			break
+		}
+		list = append(list, batchList...)
+		if Debug {
+			break
+		}
 	}
 	if len(list) == 0 {
-		return nil, fmt.Errorf("not found")
+		return nil, fmt.Errorf("未查询到股票纪录")
 	}
 	return list, nil
 }
 
 // fetchStockList ...
 func fetchStockList(ctx context.Context, codes []string) ([]*StockDetail, error) {
-	url := fmt.Sprintf(StockListURL, generateEMCode(codes...), StockListFields)
+	url := fmt.Sprintf(stockListURL, generateEMCode(codes...), stockListFields)
 	response, err := xhttp.New().Get(ctx, url, xhttp.RandomHeader())
 	if err != nil {
 		return nil, err
 	}
-	xlog.Ctx(ctx).Debugf("FetchStockList url: %s, response: %s", url, response.String())
+	xlog.Ctx(ctx).Debugf("fetchStockList url: %s, response: %s", url, response.String())
+	return getStockDetails(ctx, response.Bytes(), false)
+}
+
+// ----------------------------------------------------------------
+
+// getStockDetails
+func getStockDetails(ctx context.Context, response []byte, transform bool) ([]*StockDetail, error) {
 	resp := &FetchStockListResp{}
-	if err := json.Unmarshal(response.Bytes(), resp); err != nil {
+	if err := json.Unmarshal(response, resp); err != nil {
 		return nil, err
-	}
-	if len(resp.Data.Diff) == 0 {
-		return nil, fmt.Errorf("not found")
 	}
 	list := make([]*StockDetail, 0)
 	for _, v := range resp.Data.Diff {
+		// f34
 		list = append(list, &StockDetail{
 			Price:         v.F2,
 			Percent:       v.F3,
