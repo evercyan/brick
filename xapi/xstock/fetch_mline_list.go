@@ -18,18 +18,18 @@ import (
 
 // ...
 const (
-	minlineListURL = "http://push2his.eastmoney.com/api/qt/stock/trends2/get?ndays=%d&secid=%s&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58"
+	mlineListURL = "http://push2his.eastmoney.com/api/qt/stock/trends2/get?ndays=%d&secid=%s&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58"
 )
 
-// Minline ...
-type Minline struct {
-	Code string           `json:"code"` // 股票代码
-	Date string           `json:"date"` // 交易日期
-	List []*MinlineDetail `json:"list"` // 分时列表
+// Mline ...
+type Mline struct {
+	Code string         `json:"code"` // 股票代码
+	Date string         `json:"date"` // 交易日期
+	List []*MlineDetail `json:"list"` // 分时列表
 }
 
-// MinlineDetail ...
-type MinlineDetail struct {
+// MlineDetail ...
+type MlineDetail struct {
 	Time  string  `json:"time"`  // 时间点
 	Price float64 `json:"price"` // 当前价格
 	TC    float64 `json:"tc"`    // 成交量
@@ -37,10 +37,10 @@ type MinlineDetail struct {
 	PA    float64 `json:"pa"`    // 分时平均价格
 }
 
-// FetchMinlineList 查询单只股票的5日分时
-func FetchMinlineList(ctx context.Context, code string, days ...int) ([]*Minline, error) {
+// FetchMlineList 查询单只股票的5日分时
+func FetchMlineList(ctx context.Context, code string, days ...int) ([]*Mline, error) {
 	day := xlodash.First(days, 1)
-	url := fmt.Sprintf(minlineListURL, day, generateEMCode(code))
+	url := fmt.Sprintf(mlineListURL, day, generateEMCode(code))
 	response, err := xhttp.New().Get(ctx, url, xhttp.RandomHeader())
 	if err != nil {
 		return nil, err
@@ -66,8 +66,8 @@ func FetchMinlineList(ctx context.Context, code string, days ...int) ([]*Minline
 	// 351, 成交量(手)
 	// 683997.00, 成交额
 	// 19.590, 分时平均价格
-	list := make([]*Minline, 0)
-	dateMap := make(map[string][]*MinlineDetail)
+	list := make([]*Mline, 0)
+	dateMap := make(map[string][]*MlineDetail)
 	for _, item := range resp.Data.Trends {
 		items := strings.Split(item, ",")
 		if len(items) < 8 {
@@ -76,9 +76,9 @@ func FetchMinlineList(ctx context.Context, code string, days ...int) ([]*Minline
 		dt := strings.Split(items[0], " ")
 		d, t := dt[0], dt[1]
 		if _, ok := dateMap[d]; !ok {
-			dateMap[d] = make([]*MinlineDetail, 0)
+			dateMap[d] = make([]*MlineDetail, 0)
 		}
-		dateMap[d] = append(dateMap[d], &MinlineDetail{
+		dateMap[d] = append(dateMap[d], &MlineDetail{
 			Time:  t,
 			Price: xtype.ToFloat64(items[2]),
 			TC:    xtype.ToFloat64(items[5]),
@@ -87,7 +87,7 @@ func FetchMinlineList(ctx context.Context, code string, days ...int) ([]*Minline
 		})
 	}
 	for date, details := range dateMap {
-		list = append(list, &Minline{
+		list = append(list, &Mline{
 			Code: code,
 			Date: date,
 			List: details,

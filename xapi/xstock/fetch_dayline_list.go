@@ -19,8 +19,8 @@ import (
 // ...
 const (
 	daylineListURL     = "https://push2his.eastmoney.com/api/qt/stock/kline/get?fields1=%s&fields2=%s&klt=101&fqt=0&secid=%s&beg=%s&end=%s"
-	daylineListFields1 = "f1,f2,f3,f4,f5,f6"
-	daylineListFields2 = "f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f116"
+	daylineListFields1 = "f1,f2,f3,f5"
+	daylineListFields2 = "f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61"
 )
 
 // DaylineDetail ...
@@ -36,6 +36,8 @@ type DaylineDetail struct {
 	TC   float64 `json:"tc"`   // 成交量
 	TA   float64 `json:"ta"`   // 成交额
 	Ex   float64 `json:"ex"`   // 换手率
+	Vr   float64 `json:"vr"`   // 量比
+	Gap  float64 `json:"gap"`  // 振幅
 }
 
 // FetchDaylineList 查询单只股票的日行情
@@ -52,7 +54,7 @@ func FetchDaylineList(ctx context.Context, code, begin, end string) ([]*DaylineD
 	if err != nil {
 		return nil, err
 	}
-	xlog.Ctx(ctx).Debugf("FetchDaylineList url: %s, response: %s", url, response.String())
+	xlog.Ctx(ctx).Infof("FetchDaylineList url: %s, response: %s", url, response.String())
 	var resp struct {
 		Data struct {
 			Klines []string `json:"klines"`
@@ -65,7 +67,7 @@ func FetchDaylineList(ctx context.Context, code, begin, end string) ([]*DaylineD
 		return nil, fmt.Errorf("not found")
 	}
 	list := make([]*DaylineDetail, 0)
-	// 2025-08-01,19.59,19.60,19.74,19.43,163364,319752955.16,1.58,0.05,0.01,6.65,0
+	// 2025-08-01,19.59,19.60,19.74,19.43,163364,319752955.16,1.58,0.05,0.01,6.65
 	// 2025-08-01, 日期
 	// 19.59, 开盘价
 	// 19.60, 收盘价
@@ -77,10 +79,9 @@ func FetchDaylineList(ctx context.Context, code, begin, end string) ([]*DaylineD
 	// 0.05, // 涨跌幅
 	// 0.01, // 涨跌价格
 	// 6.65, // 换手率
-	// 0,
 	for _, item := range resp.Data.Klines {
 		items := strings.Split(item, ",")
-		if len(items) < 12 {
+		if len(items) < 11 {
 			continue
 		}
 		list = append(list, &DaylineDetail{
@@ -100,5 +101,10 @@ func FetchDaylineList(ctx context.Context, code, begin, end string) ([]*DaylineD
 	sort.Slice(list, func(i, j int) bool {
 		return list[i].Date < list[j].Date
 	})
+	for k, v := range list {
+		// 振幅=(最高-最低)/(收盘价/(1+涨幅))
+		list[k].Gap = xutil.Round((v.HP-v.LP)/(v.CP/(100+v.Per)), 2)
+		// 无量比数据...
+	}
 	return list, nil
 }

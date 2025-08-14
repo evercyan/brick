@@ -9,8 +9,8 @@ import (
 )
 
 func TestFetchDaylineList(t *testing.T) {
-	code := "002392"
-	begin, end := "20250501", "20250508"
+	code := "001331"
+	begin, end := "20250801", "20250805"
 	list, err := FetchDaylineList(context.Background(), code, begin, end)
 	if err != nil {
 		t.Fatal(err)

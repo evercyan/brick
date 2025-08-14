@@ -10,7 +10,7 @@ import (
 
 func TestFetchMinlineList(t *testing.T) {
 	code := "002392"
-	list, err := FetchMinlineList(context.Background(), code)
+	list, err := FetchMlineList(context.Background(), code)
 	if err != nil {
 		t.Fatal(err)
 	}

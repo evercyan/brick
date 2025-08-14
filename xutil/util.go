@@ -44,6 +44,12 @@ func Round(x float64, length int) float64 {
 	return math.Round(x*factor) / factor
 }
 
+// Ceil ...
+func Ceil(x float64, length int) float64 {
+	factor := math.Pow10(length)
+	return math.Ceil(x*factor) / factor
+}
+
 // Abbr ...
 func Abbr(name string) string {
 	items := pinyin.LazyConvert(name, nil)

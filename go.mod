@@ -24,6 +24,7 @@ require (
 	github.com/matoous/go-nanoid/v2 v2.0.0
 	github.com/mozillazg/go-pinyin v0.20.0
 	github.com/noelyahan/mergi v0.0.0-20190514155713-69271a4267fb
+	github.com/openai/openai-go v1.12.0
 	github.com/rs/xid v1.3.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/sirupsen/logrus v1.9.0
@@ -34,8 +35,8 @@ require (
 	golang.design/x/clipboard v0.6.3
 	golang.org/x/exp v0.0.0-20220909182711-5c715a9e8561
 	golang.org/x/image v0.5.0
-	golang.org/x/net v0.29.0
-	golang.org/x/text v0.18.0
+	golang.org/x/net v0.34.0
+	golang.org/x/text v0.21.0
 	golang.org/x/time v0.6.0
 	google.golang.org/genai v1.11.0
 	gorm.io/gorm v1.25.12
@@ -104,11 +105,15 @@ require (
 	github.com/sahilm/fuzzy v0.1.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/tebeka/strftime v0.1.5 // indirect
+	github.com/tidwall/gjson v1.14.4 // indirect
+	github.com/tidwall/match v1.1.1 // indirect
+	github.com/tidwall/pretty v1.2.1 // indirect
+	github.com/tidwall/sjson v1.2.5 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
-	golang.org/x/crypto v0.27.0 // indirect
+	golang.org/x/crypto v0.32.0 // indirect
 	golang.org/x/exp/shiny v0.0.0-20221205204356-47842c84f3db // indirect
 	golang.org/x/mobile v0.0.0-20210716004757-34ab1303b554 // indirect
 	golang.org/x/sync v0.13.0 // indirect

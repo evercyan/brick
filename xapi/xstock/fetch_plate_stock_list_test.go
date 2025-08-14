@@ -7,8 +7,9 @@ import (
 	"github.com/evercyan/brick/xjson"
 )
 
-func TestFetchPlateList(t *testing.T) {
-	list, err := FetchPlateList(context.Background(), 1)
+func TestFetchPlateStockList(t *testing.T) {
+	plateCode := "BK0424"
+	list, err := FetchPlateStockList(context.Background(), plateCode)
 	if err != nil {
 		t.Fatal(err)
 	}

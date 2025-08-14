@@ -60,6 +60,12 @@ func Danger(args ...interface{}) {
 	Output(FgRed, args...)
 }
 
+// Notice ...
+func Notice(args ...interface{}) {
+	args = append([]interface{}{I}, args...)
+	Output(FgBlack, args...)
+}
+
 // Success ...
 func Successf(tpl string, args ...interface{}) {
 	Success(fmt.Sprintf(tpl, args...))
@@ -78,6 +84,11 @@ func Warnningf(tpl string, args ...interface{}) {
 // Danger ...
 func Dangerf(tpl string, args ...interface{}) {
 	Danger(fmt.Sprintf(tpl, args...))
+}
+
+// Noticef ...
+func Noticef(tpl string, args ...interface{}) {
+	Notice(fmt.Sprintf(tpl, args...))
 }
 
 // Successt ...
