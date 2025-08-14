@@ -18,9 +18,10 @@ import (
 
 // ...
 const (
-	daylineListURL     = "https://push2his.eastmoney.com/api/qt/stock/kline/get?fields1=%s&fields2=%s&klt=101&fqt=0&secid=%s&beg=%s&end=%s"
-	daylineListFields1 = "f1,f2,f3,f5"
-	daylineListFields2 = "f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61"
+	dlineListURL     = "https://push2his.eastmoney.com/api/qt/stock/kline/get?fields1=%s&fields2=%s&klt=101&fqt=0&secid=%s&beg=%s&end=%s"
+	dlineListFields1 = "f1,f2,f3,f5"
+	dlineListFields2 = "f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61"
+	// f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64,f65
 )
 
 // DaylineDetail ...
@@ -40,12 +41,12 @@ type DaylineDetail struct {
 	Gap  float64 `json:"gap"`  // 振幅
 }
 
-// FetchDaylineList 查询单只股票的日行情
-func FetchDaylineList(ctx context.Context, code, begin, end string) ([]*DaylineDetail, error) {
+// FetchDlineList 查询单只股票的日行情
+func FetchDlineList(ctx context.Context, code, begin, end string) ([]*DaylineDetail, error) {
 	url := fmt.Sprintf(
-		daylineListURL,
-		daylineListFields1,
-		daylineListFields2,
+		dlineListURL,
+		dlineListFields1,
+		dlineListFields2,
 		generateEMCode(code),
 		begin,
 		end,
@@ -54,7 +55,7 @@ func FetchDaylineList(ctx context.Context, code, begin, end string) ([]*DaylineD
 	if err != nil {
 		return nil, err
 	}
-	xlog.Ctx(ctx).Infof("FetchDaylineList url: %s, response: %s", url, response.String())
+	xlog.Ctx(ctx).Infof("FetchDlineList url: %s, response: %s", url, response.String())
 	var resp struct {
 		Data struct {
 			Klines []string `json:"klines"`
