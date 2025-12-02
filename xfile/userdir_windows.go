@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	GetHomdDir = getRoamingAppDataDir
+	GetHomeDir = getRoamingAppDataDir
 	GetDataDir = getRoamingAppDataDir
 	GetConfDir = getRoamingAppDataDir
 )

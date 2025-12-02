@@ -13,8 +13,8 @@ func TestSelect(t *testing.T) {
 		{Label: "BBB", Desc: "It's good on toast", Value: "a"},
 	}
 	//options = []*SelectOption{
-	//	{Label: "AAA"},
-	//	{Label: "BBB"},
+	//	{Title: "AAA"},
+	//	{Title: "BBB"},
 	//}
 	option, err := Select("请选择选项", options)
 	assert.Nil(t, err)

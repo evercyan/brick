@@ -38,7 +38,10 @@ func Max[T constraints.Ordered](nums ...T) T {
 
 // IF ...
 func IF[T any](condition T, a, b interface{}) interface{} {
-	if reflect.DeepEqual(condition, reflect.Zero(reflect.TypeOf(condition)).Interface()) {
+	if reflect.DeepEqual(
+		condition,
+		reflect.Zero(reflect.TypeOf(condition)).Interface(),
+	) {
 		return b
 	}
 	return a

@@ -30,6 +30,7 @@ require (
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spaolacci/murmur3 v1.1.0
 	github.com/stretchr/testify v1.8.1
+	github.com/tdewolff/minify/v2 v2.24.3
 	github.com/wenzhenxi/gorsa v0.0.0-20210524035706-528c7050d703
 	go.uber.org/zap v1.23.0
 	golang.design/x/clipboard v0.6.3
@@ -104,6 +105,7 @@ require (
 	github.com/rogpeppe/go-internal v1.10.0 // indirect
 	github.com/sahilm/fuzzy v0.1.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/tdewolff/parse/v2 v2.8.3 // indirect
 	github.com/tebeka/strftime v0.1.5 // indirect
 	github.com/tidwall/gjson v1.14.4 // indirect
 	github.com/tidwall/match v1.1.1 // indirect

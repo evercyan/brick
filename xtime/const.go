@@ -27,12 +27,13 @@ const (
 	DateJoin     Pattern = "20060102"
 	DateTimeJoin Pattern = "20060102150405"
 	TimeJoinOnly Pattern = "150405"
+	HourMin      Pattern = "15:04"
 )
 
 // Desc ...
 func (t Pattern) Desc() string {
 	switch t {
-	case Layout, ANSIC, UnixDate, RubyDate, RFC822, RFC822Z, RFC850, RFC1123, RFC1123Z, RFC3339, RFC3339Nano, Kitchen, Stamp, StampMilli, StampMicro, StampNano, DateTime, DateOnly, TimeOnly, DateJoin, DateTimeJoin, TimeJoinOnly:
+	case Layout, ANSIC, UnixDate, RubyDate, RFC822, RFC822Z, RFC850, RFC1123, RFC1123Z, RFC3339, RFC3339Nano, Kitchen, Stamp, StampMilli, StampMicro, StampNano, DateTime, DateOnly, TimeOnly, DateJoin, DateTimeJoin, TimeJoinOnly, HourMin:
 		return string(t)
 	default:
 		return string(DateTime)

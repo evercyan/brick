@@ -284,9 +284,9 @@ func WriteExcel(ctx context.Context, fpath string, list interface{}, forces ...b
 		if listValue.Kind() != reflect.Slice {
 			return fmt.Errorf("only support []interface{}")
 		}
-		if listValue.Len() == 0 {
-			return fmt.Errorf("emtpy record")
-		}
+		//if listValue.Len() == 0 {
+		//	return fmt.Errorf("emtpy record")
+		//}
 		lines := make([][]interface{}, 0)
 		header := make([]interface{}, 0)
 		for i := 0; i < listValue.Len(); i++ {

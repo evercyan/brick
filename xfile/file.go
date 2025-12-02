@@ -161,7 +161,10 @@ func ReadJSON(filepath string, data interface{}) error {
 	if err != nil {
 		return err
 	}
-	return json.Unmarshal(b, data)
+	s := string(b)
+	s = strings.TrimPrefix(s, "```json")
+	s = strings.TrimSuffix(s, "```")
+	return json.Unmarshal([]byte(s), data)
 }
 
 // Md5 file md5
@@ -232,4 +235,9 @@ func ModTime(filepath string) time.Time {
 		return time.Time{}
 	}
 	return f.ModTime()
+}
+
+// Extend ...
+func Extend(fpath, fext string) string {
+	return GetFilePathWithoutExt(fpath) + fext
 }

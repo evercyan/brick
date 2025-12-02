@@ -87,9 +87,14 @@ func Notice(title, content string) error {
 		return fmt.Errorf("only support MacOS")
 	}
 	Shell(fmt.Sprintf(
-		`terminal-notifier -sound default -title "%s" -message "%s"`,
+		`/usr/local/bin/terminal-notifier -sound default -title "%s" -message "%s"`,
 		title,
 		content,
 	))
 	return nil
+}
+
+// OpenURL ...
+func OpenURL(url string) string {
+	return Shell(fmt.Sprintf("open %s", url))
 }
