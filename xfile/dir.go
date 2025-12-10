@@ -6,6 +6,7 @@ import (
 	"os/user"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 )
 
@@ -83,5 +84,6 @@ func ListFiles(dir string, match string, isRecursive ...bool) []string {
 		}
 		l = append(l, fp)
 	}
+	slices.Sort(l)
 	return l
 }

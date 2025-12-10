@@ -45,18 +45,20 @@ func WithZipKeepLevel(value bool) ZipOptionFn {
 // ----------------------------------------------------------------
 
 // WriteZip 写入 zip 文件
-func WriteZip(zpath string, args []string, options ...ZipOptionFn) error {
+func WriteZip(zipPath string, baseDir string, args []string, options ...ZipOptionFn) error {
 	fpaths := make([]string, 0)
 	fnames := make(map[string]string)
+	baseDir = strings.TrimRight(baseDir, "/") + "/"
 	for _, arg := range args {
 		if IsDir(arg) {
 			tpaths := ListFiles(arg, "", true)
 			for _, tpath := range tpaths {
-				fnames[tpath] = strings.TrimLeft(tpath, filepath.Dir(arg)+"/")
 				fpaths = append(fpaths, tpath)
+				fnames[tpath] = strings.TrimLeft(tpath, baseDir)
 			}
 		} else {
 			fpaths = append(fpaths, arg)
+			fnames[arg] = strings.TrimLeft(arg, baseDir)
 		}
 	}
 	if len(fpaths) == 0 {
@@ -66,7 +68,7 @@ func WriteZip(zpath string, args []string, options ...ZipOptionFn) error {
 	for _, fn := range options {
 		fn(option)
 	}
-	zipfile, err := os.Create(zpath)
+	zipfile, err := os.Create(zipPath)
 	if err != nil {
 		return err
 	}
