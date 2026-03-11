@@ -18,6 +18,21 @@ func Unique[T comparable](list []T) []T {
 	return res
 }
 
+// UniqueBy ...
+func UniqueBy[T comparable](list []T, fn func(T) string) []T {
+	res := make([]T, 0)
+	m := make(map[string]struct{})
+	for _, v := range list {
+		key := fn(v)
+		if _, ok := m[key]; ok {
+			continue
+		}
+		m[key] = struct{}{}
+		res = append(res, v)
+	}
+	return res
+}
+
 // Union ...
 func Union[T comparable](list1 []T, list2 []T) []T {
 	return Unique(append(list1, list2...))

@@ -1,13 +1,14 @@
 package xlodash
 
 import (
+	"cmp"
 	"reflect"
 
 	"golang.org/x/exp/constraints"
 )
 
 // Min ...
-func Min[T constraints.Ordered](nums ...T) T {
+func Min[T cmp.Ordered](nums ...T) T {
 	var res T
 	if len(nums) == 0 {
 		return res
@@ -22,7 +23,7 @@ func Min[T constraints.Ordered](nums ...T) T {
 }
 
 // Max ...
-func Max[T constraints.Ordered](nums ...T) T {
+func Max[T cmp.Ordered](nums ...T) T {
 	var res T
 	if len(nums) == 0 {
 		return res
@@ -34,6 +35,23 @@ func Max[T constraints.Ordered](nums ...T) T {
 		}
 	}
 	return res
+}
+
+// MaxKV ...
+func MaxKV[T cmp.Ordered](nums ...T) (int, T) {
+	var res T
+	if len(nums) == 0 {
+		return -1, res
+	}
+	res = nums[0]
+	index := 0
+	for i := 1; i < len(nums); i++ {
+		if nums[i] > res {
+			res = nums[i]
+			index = i
+		}
+	}
+	return index, res
 }
 
 // IF ...
@@ -48,7 +66,7 @@ func IF[T any](condition T, a, b interface{}) interface{} {
 }
 
 // Sum ...
-func Sum[T constraints.Ordered](nums ...T) T {
+func Sum[T cmp.Ordered](nums ...T) T {
 	var res T
 	for _, num := range nums {
 		res += num

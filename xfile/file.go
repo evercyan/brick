@@ -241,3 +241,27 @@ func ModTime(filepath string) time.Time {
 func Extend(fpath, fext string) string {
 	return GetFilePathWithoutExt(fpath) + fext
 }
+
+// WriteBatch 分批次写入文件
+func WriteBatch(fpath string, lines []string, maxsize int) ([]string, error) {
+	tpaths := make([]string, 0)
+	tpath, flines, fsize := Shadow(fpath), make([]string, 0), 0
+	for _, line := range lines {
+		if fsize > 0 && fsize+len(line) > maxsize {
+			if err := Write(tpath, strings.Join(flines, "\n")); err != nil {
+				return nil, err
+			}
+			tpaths = append(tpaths, tpath)
+			tpath, flines, fsize = Shadow(fpath), make([]string, 0), 0
+		}
+		flines = append(flines, line)
+		fsize += len(line)
+	}
+	if len(flines) > 0 {
+		if err := Write(tpath, strings.Join(flines, "\n")); err != nil {
+			return nil, err
+		}
+		tpaths = append(tpaths, tpath)
+	}
+	return tpaths, nil
+}
