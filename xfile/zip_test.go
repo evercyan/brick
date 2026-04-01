@@ -8,9 +8,9 @@ import (
 )
 
 func TestWriteZip(t *testing.T) {
-	err := WriteZip("./test.zip", []string{
-		"./dir.go",
-		"../xlog",
+	err := WriteZip("./test.zip", "./", []string{
+		"dir.go",
+		"xlog",
 	}, WithZipPassword("123456"), WithZipKeepLevel(true))
 	assert.Nil(t, err)
 	os.Remove("./test.zip")
