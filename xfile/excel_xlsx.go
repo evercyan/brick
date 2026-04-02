@@ -9,8 +9,6 @@ import (
 	"github.com/360EntSecGroup-Skylar/excelize"
 )
 
-// TODO 头部固定
-
 // ReadXLSX ...
 func ReadXLSX(ctx context.Context, fpath string, sheets ...string) ([][]interface{}, error) {
 	f, err := excelize.OpenFile(fpath)
@@ -73,5 +71,6 @@ func WriteXLSX(
 			}
 		}
 	}
+	f.SetPanes(sheet1, `{"freeze":true,"x_split":0,"y_split":1}`)
 	return f.SaveAs(fpath)
 }
