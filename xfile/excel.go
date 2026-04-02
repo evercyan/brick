@@ -2,34 +2,13 @@ package xfile
 
 import (
 	"context"
-	"encoding/csv"
 	"fmt"
-	"math"
-	"os"
-	"path/filepath"
 	"reflect"
 	"strings"
 	"time"
 
-	"github.com/360EntSecGroup-Skylar/excelize"
-	"github.com/evercyan/brick/xlodash"
 	"github.com/evercyan/brick/xtype"
 )
-
-// ----------------------------------------------------------------
-
-// interface2string ...
-func interface2string(list [][]interface{}) [][]string {
-	lines := make([][]string, 0)
-	for _, v := range list {
-		line := make([]string, 0)
-		for _, vv := range v {
-			line = append(line, fmt.Sprint(vv))
-		}
-		lines = append(lines, line)
-	}
-	return lines
-}
 
 // readExcel ...
 func readExcel(ctx context.Context, fpath string) ([][]string, error) {
@@ -40,127 +19,57 @@ func readExcel(ctx context.Context, fpath string) ([][]string, error) {
 		if err != nil {
 			return nil, err
 		}
-		return interface2string(list), nil
+		return xtype.Interface2string(list), nil
 	}
-	return nil, fmt.Errorf("invalid file ext")
+	return nil, fmt.Errorf("无效的文件类型")
 }
 
 // writeExcel ...
-func writeExcel(ctx context.Context, fpath string, list [][]interface{}, forces ...bool) error {
-	fdir := filepath.Dir(fpath)
-	if !IsDir(fdir) {
-		if err := os.MkdirAll(fdir, os.ModePerm); err != nil {
-			return err
-		}
-	}
+func writeExcel(
+	ctx context.Context,
+	fpath string,
+	list [][]interface{},
+	rowColors ...map[int]string,
+) error {
 	if strings.HasSuffix(fpath, ".csv") {
-		return WriteCSV(ctx, fpath, list, forces...)
+		return WriteCSV(ctx, fpath, list)
 	} else if strings.HasSuffix(fpath, ".xlsx") {
-		return WriteXLSX(ctx, fpath, list, forces...)
+		return WriteXLSX(ctx, fpath, list, rowColors...)
 	}
-	return fmt.Errorf("invalid file ext")
+	return fmt.Errorf("无效的文件类型")
 }
 
-// ----------------------------------------------------------------
-
-// ReadCSV ...
-func ReadCSV(ctx context.Context, fpath string) ([][]string, error) {
-	file, err := os.Open(fpath)
-	if err != nil {
-		return nil, err
+// fillExcelFieldValue 填充字段值并做类型转换
+func fillExcelFieldValue(field reflect.Value, value string, kind reflect.Kind) error {
+	if value == "" {
+		return nil
 	}
-	defer file.Close()
-	return csv.NewReader(file).ReadAll()
-}
-
-// WriteCSV ...
-func WriteCSV(ctx context.Context, fpath string, list [][]interface{}, forces ...bool) error {
-	if len(list) == 0 {
-		return fmt.Errorf("emtpy record")
-	}
-	if !strings.HasSuffix(fpath, ".csv") {
-		fpath += ".csv"
-	}
-	if !xlodash.First(forces) && IsExist(fpath) {
-		return fmt.Errorf("file exist")
-	}
-	file, err := os.Create(fpath)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	writer := csv.NewWriter(file)
-	defer writer.Flush()
-	for _, v := range list {
-		row := make([]string, 0)
-		for _, vv := range v {
-			row = append(row, xtype.ToString(vv))
+	switch kind {
+	case reflect.String:
+		field.SetString(value)
+	case reflect.Int,
+		reflect.Int8,
+		reflect.Int16,
+		reflect.Int32,
+		reflect.Int64:
+		field.SetInt(xtype.ToInt64(value))
+	case reflect.Float32, reflect.Float64:
+		field.SetFloat(xtype.ToFloat64(value))
+	case reflect.Bool:
+		field.SetBool(xtype.ToBool(value))
+	default:
+		// 兼容 time.Time
+		if field.Type() == reflect.TypeOf(time.Time{}) {
+			t := xtype.ToTime(value)
+			if t.IsZero() {
+				return fmt.Errorf("无效的时间格式: %s", value)
+			}
+			field.Set(reflect.ValueOf(t))
+			return nil
 		}
-		writer.Write(row)
+		return fmt.Errorf("unsupported type: %s", kind)
 	}
 	return nil
-}
-
-// ----------------------------------------------------------------
-
-// ReadXLSX ...
-func ReadXLSX(ctx context.Context, fpath string, sheets ...string) ([][]interface{}, error) {
-	if !IsExist(fpath) {
-		return nil, fmt.Errorf("file not exist")
-	}
-	f, err := excelize.OpenFile(fpath)
-	if err != nil {
-		return nil, err
-	}
-	if len(sheets) == 0 {
-		sheetMap := f.GetSheetMap()
-		for _, sheet := range sheetMap {
-			sheets = append(sheets, sheet)
-		}
-	}
-	list := make([][]interface{}, 0)
-	for _, sheet := range sheets {
-		rows := f.GetRows(sheet)
-		if len(rows) == 0 {
-			continue
-		}
-		for _, row := range rows {
-			line := make([]interface{}, 0)
-			for _, v := range row {
-				line = append(line, v)
-			}
-			list = append(list, line)
-		}
-	}
-	return list, nil
-}
-
-// WriteXLSX ...
-func WriteXLSX(ctx context.Context, fpath string, list [][]interface{}, forces ...bool) error {
-	if len(list) == 0 {
-		return fmt.Errorf("emtpy record")
-	}
-	if !strings.HasSuffix(fpath, ".xlsx") {
-		fpath += ".xlsx"
-	}
-	if !xlodash.First(forces) && IsExist(fpath) {
-		return fmt.Errorf("file exist")
-	}
-	f := excelize.NewFile()
-	sheet1 := "Sheet1"
-	f.SetActiveSheet(f.NewSheet(sheet1))
-	for k, v := range list {
-		// 通过这种方式区分 float64 类型字段设置值为 0 和默认值为 0
-		for kk, vv := range v {
-			if vvv, ok := vv.(float64); ok {
-				if vvv == math.MaxFloat64 {
-					v[kk] = ""
-				}
-			}
-		}
-		f.SetSheetRow(sheet1, fmt.Sprintf("A%d", k+1), &v)
-	}
-	return f.SaveAs(fpath)
 }
 
 // ----------------------------------------------------------------
@@ -206,7 +115,7 @@ func ReadExcel(ctx context.Context, fpath string, list interface{}) error {
 			fieldMap[field.Name] = field.Type.Kind()
 		}
 		if len(headerMap) == 0 {
-			return fmt.Errorf("tag excel not found")
+			return fmt.Errorf("未找到 excel 标签")
 		}
 		// 匹配表头与标签以及转换数据行
 		header := records[0]
@@ -238,59 +147,23 @@ func ReadExcel(ctx context.Context, fpath string, list interface{}) error {
 	}
 }
 
-// fillExcelFieldValue 填充字段值并做类型转换
-func fillExcelFieldValue(field reflect.Value, value string, kind reflect.Kind) error {
-	if value == "" {
-		return nil
-	}
-	switch kind {
-	case reflect.String:
-		field.SetString(value)
-	case reflect.Int,
-		reflect.Int8,
-		reflect.Int16,
-		reflect.Int32,
-		reflect.Int64:
-		field.SetInt(xtype.ToInt64(value))
-	case reflect.Float32, reflect.Float64:
-		field.SetFloat(xtype.ToFloat64(value))
-	case reflect.Bool:
-		field.SetBool(xtype.ToBool(value))
-	default:
-		// 兼容 time.Time
-		if field.Type() == reflect.TypeOf(time.Time{}) {
-			t := xtype.ToTime(value)
-			if t.IsZero() {
-				return fmt.Errorf("无效的时间格式: %s", value)
-			}
-			field.Set(reflect.ValueOf(t))
-			return nil
-		}
-		return fmt.Errorf("unsupported type: %s", kind)
-	}
-	return nil
-}
-
 // WriteExcel ...
-func WriteExcel(ctx context.Context, fpath string, list interface{}, forces ...bool) error {
-	if list == nil {
-		return fmt.Errorf("list cannot be nil")
-	}
+func WriteExcel(
+	ctx context.Context,
+	fpath string,
+	list interface{},
+	colors ...map[int]string,
+) error {
 	switch list.(type) {
 	case [][]interface{}:
-		return writeExcel(ctx, fpath, list.([][]interface{}), forces...)
+		return writeExcel(ctx, fpath, list.([][]interface{}), colors...)
 	default:
 		listValue := reflect.ValueOf(list)
 		if listValue.Kind() != reflect.Slice {
-			return fmt.Errorf("only support []interface{}")
+			return fmt.Errorf("只支持 []interface{} 类型")
 		}
-		//if listValue.Len() == 0 {
-		//	return fmt.Errorf("emtpy record")
-		//}
 		lines := make([][]interface{}, 0)
 		header := make([]interface{}, 0)
-		// 用于存储每列的颜色信息，key 为列索引，value 为颜色值
-		colColors := make(map[int]string)
 		// 用于存储每行每列的颜色信息
 		rowColors := make([]map[int]string, 0)
 		// 字段名到列索引的映射
@@ -324,16 +197,12 @@ func WriteExcel(ctx context.Context, fpath string, list interface{}, forces ...b
 				}
 				// 第一行时处理标题写入
 				if i == 0 {
-					var colIdx int
+					fieldName := fieldType.Name
 					if tag := fieldType.Tag.Get("excel"); tag != "" {
-						colIdx = len(header)
-						header = append(header, tag)
-						fieldColIdx[fieldType.Name] = colIdx
-					} else {
-						colIdx = len(header)
-						header = append(header, fieldType.Name)
-						fieldColIdx[fieldType.Name] = colIdx
+						fieldName = tag
 					}
+					fieldColIdx[fieldType.Name] = len(header)
+					header = append(header, fieldName)
 				}
 				line = append(line, item.Field(j).Interface())
 			}
@@ -341,56 +210,6 @@ func WriteExcel(ctx context.Context, fpath string, list interface{}, forces ...b
 			rowColors = append(rowColors, rowColor)
 		}
 		lines = append([][]interface{}{header}, lines...)
-		// 处理颜色
-		if strings.HasSuffix(fpath, ".csv") {
-			return writeExcel(ctx, fpath, lines, forces...)
-		} else if strings.HasSuffix(fpath, ".xlsx") {
-			return writeExcelWithColors(ctx, fpath, lines, colColors, rowColors, forces...)
-		}
-		return fmt.Errorf("invalid file ext")
+		return writeExcel(ctx, fpath, lines, rowColors...)
 	}
-}
-
-// writeExcelWithColors ...
-func writeExcelWithColors(ctx context.Context, fpath string, list [][]interface{}, colColors map[int]string, rowColors []map[int]string, forces ...bool) error {
-	if len(list) == 0 {
-		return fmt.Errorf("emtpy record")
-	}
-	if !strings.HasSuffix(fpath, ".xlsx") {
-		fpath += ".xlsx"
-	}
-	if !xlodash.First(forces) && IsExist(fpath) {
-		return fmt.Errorf("file exist")
-	}
-	fdir := filepath.Dir(fpath)
-	if !IsDir(fdir) {
-		if err := os.MkdirAll(fdir, os.ModePerm); err != nil {
-			return err
-		}
-	}
-	f := excelize.NewFile()
-	sheet1 := "Sheet1"
-	f.SetActiveSheet(f.NewSheet(sheet1))
-	for k, v := range list {
-		// 通过这种方式区分 float64 类型字段设置值为 0 和默认值为 0
-		for kk, vv := range v {
-			if vvv, ok := vv.(float64); ok {
-				if vvv == math.MaxFloat64 {
-					v[kk] = ""
-				}
-			}
-		}
-		f.SetSheetRow(sheet1, fmt.Sprintf("A%d", k+1), &v)
-
-		// 应用行颜色
-		if k > 0 && k-1 < len(rowColors) {
-			rowColor := rowColors[k-1]
-			for colIdx, color := range rowColor {
-				cell := excelize.ToAlphaString(colIdx) + fmt.Sprintf("%d", k+1)
-				style, _ := f.NewStyle(fmt.Sprintf(`{"fill":{"type":"pattern","color":["%s"],"pattern":1}}`, color))
-				f.SetCellStyle(sheet1, cell, cell, style)
-			}
-		}
-	}
-	return f.SaveAs(fpath)
 }

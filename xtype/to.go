@@ -281,3 +281,18 @@ func ToTime(t string, patterns ...string) time.Time {
 	}
 	return tt
 }
+
+// ----------------------------------------------------------------
+
+// Interface2string ...
+func Interface2string(list [][]interface{}) [][]string {
+	lines := make([][]string, 0)
+	for _, v := range list {
+		line := make([]string, 0)
+		for _, vv := range v {
+			line = append(line, fmt.Sprint(vv))
+		}
+		lines = append(lines, line)
+	}
+	return lines
+}

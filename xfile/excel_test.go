@@ -20,7 +20,7 @@ type Excel struct {
 
 var (
 	ctx   = context.Background()
-	epath = "../output.xlsx"
+	epath = "./output.xlsx"
 )
 
 func TestReadExcel(t *testing.T) {
@@ -31,7 +31,7 @@ func TestReadExcel(t *testing.T) {
 	xjson.Pretty(list, true)
 }
 
-func TestWriteExcel(t *testing.T) {
+func TestWriteExcel1(t *testing.T) {
 	list := []*Excel{
 		{
 			Id:    1,
@@ -45,12 +45,14 @@ func TestWriteExcel(t *testing.T) {
 			},
 		},
 		{
-			Id:     2,
-			Name:   "bbbb",
-			Price:  10.9,
-			Time:   time.Now(),
-			test:   "test2",
-			Colors: map[string]string{"Price": "#00FF00"},
+			Id:    2,
+			Name:  "bbbb",
+			Price: 10.9,
+			Time:  time.Now(),
+			test:  "test2",
+			Colors: map[string]string{
+				"Price": "#00FF00",
+			},
 		},
 		{
 			Id:     3,
@@ -69,7 +71,33 @@ func TestWriteExcel(t *testing.T) {
 			Colors: nil,
 		},
 	}
-	if err := WriteExcel(ctx, epath, list, true); err != nil {
+	if err := WriteExcel(ctx, epath, list); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestWriteExcel2(t *testing.T) {
+	list := [][]interface{}{
+		{
+			"序号", "名称", "价格",
+		},
+		{
+			"1", "aaa", "33.0",
+		},
+		{
+			"2", "bbb", "34.0",
+		},
+	}
+	colors := []map[int]string{
+		{
+			1: "#FF0000", // aaa 会标红
+			2: "#00FF00", // 33.0 会标绿
+		},
+		{
+			2: "#0000FF", // 34.0 会标蓝
+		},
+	}
+	if err := WriteExcel(ctx, epath, list, colors...); err != nil {
 		t.Fatal(err)
 	}
 }
