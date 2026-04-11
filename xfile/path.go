@@ -29,3 +29,8 @@ func GetFileDir(filepath string) string {
 func GetFileExt(file string) string {
 	return strings.ToLower(strings.Trim(path.Ext(file), "."))
 }
+
+// ReplaceExt ...
+func ReplaceExt(filepath, ext string) string {
+	return strings.ReplaceAll(filepath, path.Ext(filepath), "."+strings.Trim(ext, "."))
+}

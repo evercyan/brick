@@ -14,4 +14,5 @@ func TestPath(t *testing.T) {
 	assert.Equal(t, "/home/data", GetFileDir(filepath))
 	assert.Equal(t, "/home/data/logo", GetFilePathWithoutExt(filepath))
 	assert.Equal(t, "png", GetFileExt(filepath))
+	assert.Equal(t, "/home/data/logo.jpeg", ReplaceExt(filepath, "jpeg"))
 }

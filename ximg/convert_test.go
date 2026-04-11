@@ -25,3 +25,12 @@ func TestHTML2PNG(t *testing.T) {
 		fmt.Println(imgPath)
 	}
 }
+
+func TestConvertHTML2PNG(t *testing.T) {
+	hpath := "/Users/Cyan/Y1ker/AI/01-群聊周报/寻龙掘金2/20260410.html"
+	ppath := xfile.ReplaceExt(hpath, "png")
+	if err := ConvertHTML2PNG(context.Background(), hpath, ppath); err != nil {
+		panic(err)
+	}
+	fmt.Println(ppath)
+}

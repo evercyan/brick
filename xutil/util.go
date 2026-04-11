@@ -5,6 +5,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	"github.com/evercyan/brick/xlodash"
 	"github.com/evercyan/brick/xtype"
 	"github.com/mozillazg/go-pinyin"
 )
@@ -64,4 +65,12 @@ func Abbr(name string) string {
 		abbrs = append(abbrs, string(item[0]))
 	}
 	return strings.Join(abbrs, "")
+}
+
+// Percent ...
+func Percent(x float64, y float64, lengths ...int) float64 {
+	if y == 0 {
+		return 0
+	}
+	return Round(x/y, xlodash.First(lengths, 2))
 }
